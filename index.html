@@ -20,7 +20,7 @@
  --crimson-lt: #FEF2F2; /* light tint */
  --bg: #F3F5FA; /* page background */
  --surface: #FFFFFF; /* card surface */
- --border: #D4D8E8; /* border */
+ --border:#D4D8E8; /* border */
  --txt: #131B35; /* primary text */
  --txt2: #4B5563; /* secondary text */
  --txt3: #9CA3AF; /* placeholder */
@@ -43,8 +43,8 @@ body{
 h1,h2,h3,h4,h5{font-family:'Outfit',sans-serif;line-height:1.2}
 
 ::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background: #f1f5f9}
-::-webkit-scrollbar-thumb{background: #cbd5e1;border-radius:3px}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
 
 .app-shell{display:flex;flex-direction:column;min-height:100vh}
 .app-body{display:flex;flex:1}
@@ -86,7 +86,7 @@ h1,h2,h3,h4,h5{font-family:'Outfit',sans-serif;line-height:1.2}
 .tnb:hover{background:rgba(255,255,255,.1);color:white}
 .tnb.on{background:rgba(255,255,255,.14);color:white;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
 .live-badge{
- background: #16A34A;color:white;
+ background:#16A34A;color:white;
  font-size:10px;font-weight:800;
  padding:2px 7px;border-radius:20px;
  letter-spacing:.3px;
@@ -176,10 +176,10 @@ h1,h2,h3,h4,h5{font-family:'Outfit',sans-serif;line-height:1.2}
 .tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.2px}
 .tag-navy{background:var(--navy-lt);color:var(--navy)}
 .tag-crimson{background:var(--crimson-lt);color:var(--crimson)}
-.tag-green{background: #DCFCE7;color: #15803D}
-.tag-amber{background: #FEF3C7;color: #92400E}
-.tag-gray{background: #F3F4F6;color: #4B5563}
-.tag-live{background: #16A34A;color:white}
+.tag-green{background:#DCFCE7;color:#15803D}
+.tag-amber{background:#FEF3C7;color:#92400E}
+.tag-gray{background:#F3F4F6;color:#4B5563}
+.tag-live{background:#16A34A;color:white}
 
 .form-field{margin-bottom:14px}
 .form-label{display:block;font-size:11px;font-weight:700;color:var(--navy-dk);margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase}
@@ -195,9 +195,9 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 
 .data-table{width:100%;border-collapse:collapse;font-size:13px}
-.data-table th{background: #F8FAFF;padding:9px 14px;text-align:left;font-weight:700;color:var(--navy);border-bottom:1.5px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-family:'Inter',sans-serif}
+.data-table th{background:#F8FAFF;padding:9px 14px;text-align:left;font-weight:700;color:var(--navy);border-bottom:1.5px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-family:'Inter',sans-serif}
 .data-table td{padding:10px 14px;border-bottom:1px solid #F1F5F9;vertical-align:middle}
-.data-table tbody tr:hover td{background: #FAFBFF}
+.data-table tbody tr:hover td{background:#FAFBFF}
 .data-table tbody tr:last-child td{border-bottom:none}
 .rank-circle{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:white}
 
@@ -214,14 +214,14 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 .score-panel{display:grid;grid-template-columns:1fr 48px 1fr;gap:16px;align-items:center;text-align:center;margin:20px 0}
 .score-team-name{font-family:'Outfit',sans-serif;font-weight:800;font-size:15px;color:var(--navy-dk);margin-bottom:14px}
 .score-controls{display:flex;align-items:center;gap:14px;justify-content:center}
-.score-btn-minus{width:48px;height:48px;border-radius:50%;border:none;background: #FEE2E2;color:var(--crimson);font-size:26px;font-weight:800;cursor:pointer;transition:all .1s}
+.score-btn-minus{width:48px;height:48px;border-radius:50%;border:none;background:#FEE2E2;color:var(--crimson);font-size:26px;font-weight:800;cursor:pointer;transition:all .1s}
 .score-btn-minus:hover{background:var(--crimson);color:white}
-.score-btn-plus{width:48px;height:48px;border-radius:50%;border:none;background: #DCFCE7;color:var(--green);font-size:26px;font-weight:800;cursor:pointer;transition:all .1s}
+.score-btn-plus{width:48px;height:48px;border-radius:50%;border:none;background:#DCFCE7;color:var(--green);font-size:26px;font-weight:800;cursor:pointer;transition:all .1s}
 .score-btn-plus:hover{background:var(--green);color:white}
 .score-display{font-family:'Outfit',sans-serif;font-size:56px;font-weight:900;color:var(--navy);min-width:72px}
 .vs-divider{color:var(--txt3);font-weight:700;font-size:16px}
 
-.pin-screen{background: #F8FAFF;border-radius:12px;padding:16px;text-align:center;font-family:'Outfit',sans-serif;font-size:38px;font-weight:900;letter-spacing:12px;min-height:66px;color:var(--navy-dk);margin-bottom:14px;border:1.5px solid var(--border)}
+.pin-screen{background:#F8FAFF;border-radius:12px;padding:16px;text-align:center;font-family:'Outfit',sans-serif;font-size:38px;font-weight:900;letter-spacing:12px;min-height:66px;color:var(--navy-dk);margin-bottom:14px;border:1.5px solid var(--border)}
 .pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto}
 .pin-key{padding:16px;border:1.5px solid var(--border);border-radius:10px;background:white;font-size:20px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .12s;color:var(--navy-dk)}
 .pin-key:hover{background:var(--navy);color:white;border-color:var(--navy)}
@@ -231,13 +231,13 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 .stat-n{font-family:'Outfit',sans-serif;font-size:36px;font-weight:900;color:var(--navy)}
 .stat-l{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
 
-.calc-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background: #EEF2FF;border-radius:10px;padding:4px;margin-bottom:20px}
+.calc-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#EEF2FF;border-radius:10px;padding:4px;margin-bottom:20px}
 .calc-mode{padding:9px 8px;border-radius:7px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;font-family:'Inter',sans-serif;color:var(--txt2);transition:all .15s;text-align:center;line-height:1.3}
 .calc-mode:hover{color:var(--navy)}
 .calc-mode.on{background:white;color:var(--navy);box-shadow:var(--shadow)}
 .calc-result{background:var(--navy-dk);color:white;border-radius:12px;padding:20px;margin-top:16px}
 .calc-result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px}
-.calc-result-row:last-child{border:none;padding-top:14px;font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color: #FDE68A}
+.calc-result-row:last-child{border:none;padding-top:14px;font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#FDE68A}
 .calc-tip{background:rgba(255,255,255,.06);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.6}
 
 .bracket-scroll{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding:8px 2px}
@@ -246,19 +246,19 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 .bracket-match{background:white;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;box-shadow:var(--shadow)}
 .bracket-team{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;color:var(--txt2)}
 .bracket-team.w{color:var(--navy);font-weight:700}
-.bracket-sep{height:1px;background: #F1F5F9;margin:2px 0}
+.bracket-sep{height:1px;background:#F1F5F9;margin:2px 0}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
 .modal-box{background:white;border-radius:16px;padding:26px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .modal-title{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:var(--navy-dk)}
 .modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--txt3);width:32px;height:32px;border-radius:8px;display:grid;place-items:center}
-.modal-close:hover{background: #F3F4F6;color:var(--txt)}
+.modal-close:hover{background:#F3F4F6;color:var(--txt)}
 
 .alert{padding:11px 14px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:14px;display:flex;gap:8px;align-items:flex-start}
-.alert-blue{background: #EFF6FF;color: #1D4ED8;border:1px solid #BFDBFE}
-.alert-green{background: #F0FDF4;color: #15803D;border:1px solid #BBF7D0}
-.alert-amber{background: #FFFBEB;color: #92400E;border:1px solid #FDE68A}
+.alert-blue{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.alert-green{background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0}
+.alert-amber{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A}
 
 .empty{text-align:center;padding:48px 20px;color:var(--txt3)}
 .empty-icon{font-size:44px;margin-bottom:12px;opacity:.6}
@@ -267,7 +267,7 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 
 .sk-game{background:white;border-radius:10px;border-left:4px solid var(--navy);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
 .sk-game:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
-.sk-game.active{border-left-color: #16A34A}
+.sk-game.active{border-left-color:#16A34A}
 
 /* ── TABLET ── */
 @media(max-width:1024px){
@@ -894,13 +894,13 @@ function Rulebook({onExport}){
  const filtered=SPORTS.filter(s=>(sel==='all'||s.id===sel)&&(!search||s.n.toLowerCase().includes(search.toLowerCase())||s.rules.toLowerCase().includes(search.toLowerCase())));
  function printRules(){
  const win=window.open('','_blank');
- win.document.write(`<!DOCTYPE html><html><head><title>NAIG 2027 — Rulebook</title> <style>body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;color: #131B35;}
- h1{color: #1E3A8A;border-bottom:3px solid #BF1B2A;padding-bottom:12px;}
- h2{color: #1E3A8A;margin-top:32px;}
+ win.document.write(`<!DOCTYPE html><html><head><title>NAIG 2027 — Rulebook</title> <style>body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;color:'#131B35';}
+ h1{color:'#1E3A8A';border-bottom:3px solid #BF1B2A;padding-bottom:12px;}
+ h2{color:'#1E3A8A';margin-top:32px;}
  .sport{margin-bottom:24px;padding:16px;border:1px solid #D4D8E8;border-radius:8px;}
- .meta{font-size:12px;color: #6B7583;margin-bottom:8px;}
- .rules{font-size:14px;line-height:1.6;}</style></head><body> <h1>NAIG 2027 — Official Rulebook</h1> <p style="color: #6B7583;margin-bottom:32px;">North American Ismaili Games · #CompeteConnectUnite</p> ${filtered.map(s=>`<div class="sport"><h2>$<span className="sport-code">{s.abbr}</span> ${s.n}</h2> <div class="meta">Type: ${s.t} · Ages: ${s.ages.join(', ')} · Divisions: ${s.genders.join(', ')} · Roster: ${s.rMin}–${s.rMax}</div> <div class="rules">${s.rules}</div></div>`).join('')}
- <p style="margin-top:40px;font-size:11px;color: #9CA3AF;">Generated by NAIG Sports Central · naismailigames.com</p> </body></html>`);
+ .meta{font-size:12px;color:'#6B7583';margin-bottom:8px;}
+ .rules{font-size:14px;line-height:1.6;}</style></head><body> <h1>NAIG 2027 — Official Rulebook</h1> <p style="color:#6B7583;margin-bottom:32px;">North American Ismaili Games · #CompeteConnectUnite</p> ${filtered.map(s=>`<div class="sport"><h2>$<span className="sport-code">{s.abbr}</span> ${s.n}</h2> <div class="meta">Type: ${s.t} · Ages: ${s.ages.join(', ')} · Divisions: ${s.genders.join(', ')} · Roster: ${s.rMin}–${s.rMax}</div> <div class="rules">${s.rules}</div></div>`).join('')}
+ <p style="margin-top:40px;font-size:11px;color:#9CA3AF;">Generated by NAIG Sports Central · naismailigames.com</p> </body></html>`);
  win.document.close();win.print();
  }
  return<div> <div className="section-head"> <div> <h2 style={{fontFamily:'Outfit',fontWeight:900,fontSize:22,color:'var(--navy-dk)'}}>Official Rulebook</h2> <p style={{color:'var(--txt2)',fontSize:14,marginTop:4}}>NAIG 2027 · All sport rules, divisions, and roster requirements</p> </div> <div style={{display:'flex',gap:8}}> <button className="btn btn-ghost btn-sm" onClick={()=>{const b=new Blob([JSON.stringify(SPORTS.map(s=>({sport:s.n,type:s.t,ages:s.ages,genders:s.genders,roster:`${s.rMin}-${s.rMax}`,rules:s.rules})),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='naig2027-rulebook.json';a.click();}}> JSON</button> <button className="btn btn-navy btn-sm" onClick={printRules}> Print / PDF</button> </div> </div> <div style={{display:'flex',gap:10,marginBottom:20,flexWrap:'wrap'}}> <input className="form-input" placeholder="Search rules..." value={search} onChange={e=>setSearch(e.target.value)} style={{maxWidth:280}}/> <select className="form-input" value={sel} onChange={e=>setSel(e.target.value)} style={{maxWidth:220}}> <option value="all">All Sports</option> {SPORTS.map(s=><option key={s.id} value={s.id}>{s.n}</option>)}
@@ -921,23 +921,23 @@ function ScoresheetExport({db}){
  const vn=id=>db.venues.find(v=>v.id===id)?.name||'TBD';
  function printSheet(){
  const win=window.open('','_blank');
- win.document.write(`<!DOCTYPE html><html><head><title>NAIG 2027 — Scoresheets — ${sp?.n}</title> <style> body{font-family:Arial,sans-serif;color: #131B35;margin:0}
+ win.document.write(`<!DOCTYPE html><html><head><title>NAIG 2027 — Scoresheets — ${sp?.n}</title> <style> body{font-family:Arial,sans-serif;color:'#131B35';margin:0}
  .sheet{page-break-after:always;padding:24px;border:2px solid #1E3A8A;margin:20px;border-radius:8px}
  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:12px;border-bottom:3px solid #BF1B2A}
- .sport-name{font-size:20px;font-weight:900;color: #1E3A8A}
- .meta{font-size:12px;color: #6B7583;margin-top:4px}
+ .sport-name{font-size:20px;font-weight:900;color:'#1E3A8A'}
+ .meta{font-size:12px;color:'#6B7583';margin-top:4px}
  .teams{display:flex;justify-content:space-around;margin:24px 0;text-align:center}
  .team-box{border:2px solid #D4D8E8;border-radius:8px;padding:20px 40px}
- .team-name{font-size:18px;font-weight:800;color: #131B35;margin-bottom:8px}
- .score-box{font-size:48px;font-weight:900;color: #1E3A8A;border-bottom:3px solid #131B35;min-width:80px;padding-bottom:4px;text-align:center}
- .vs{font-size:24px;font-weight:700;color: #9CA3AF;margin-top:30px}
+ .team-name{font-size:18px;font-weight:800;color:'#131B35';margin-bottom:8px}
+ .score-box{font-size:48px;font-weight:900;color:'#1E3A8A';border-bottom:3px solid #131B35;min-width:80px;padding-bottom:4px;text-align:center}
+ .vs{font-size:24px;font-weight:700;color:'#9CA3AF';margin-top:30px}
  .sig-row{display:flex;gap:40px;margin-top:32px;padding-top:16px;border-top:1px solid #D4D8E8}
  .sig-field{flex:1}
- .sig-label{font-size:11px;color: #9CA3AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+ .sig-label{font-size:11px;color:'#9CA3AF';text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
  .sig-line{border-bottom:1.5px solid #D4D8E8;height:30px}
  .period-table{width:100%;border-collapse:collapse;margin-top:20px}
  .period-table th,.period-table td{border:1px solid #D4D8E8;padding:8px 12px;text-align:center;font-size:13px}
- .period-table th{background: #EEF2FF;font-weight:700;color: #1E3A8A}
+ .period-table th{background:'#EEF2FF';font-weight:700;color:'#1E3A8A'}
  </style></head><body> ${games.map(g=>`
  <div class="sheet"> <div class="header"> <div> <div class="sport-name">$<span className="sport-code">{sp?.abbr}</span> ${sp?.n} — Official Scoresheet</div> <div class="meta">NAIG 2027 · ${g.round} · ${g.date} at ${g.time}</div> <div class="meta"> ${vn(g.vid)} · Division: ${g.age} ${g.gender}</div> </div> <div style="text-align:right;font-size:11px;color: #9CA3AF">Game ID: ${g.id}<br/>Status: ${g.status}</div> </div> <div class="teams"> <div class="team-box"><div class="team-name">${tn(g.hid)}</div><div class="sig-label">Score</div><div class="score-box">${g.status==='completed'?g.hs:''}</div></div> <div class="vs">VS</div> <div class="team-box"><div class="team-name">${tn(g.aid)}</div><div class="sig-label">Score</div><div class="score-box">${g.status==='completed'?g.as:''}</div></div> </div> <table class="period-table"> <tr><th>Period/Half</th><th>${tn(g.hid)} Score</th><th>${tn(g.aid)} Score</th><th>Notes</th></tr> <tr><td>1</td><td></td><td></td><td></td></tr> <tr><td>2</td><td></td><td></td><td></td></tr> <tr><td>3</td><td></td><td></td><td></td></tr> <tr><td>4 / OT</td><td></td><td></td><td></td></tr> <tr><td><strong>Final</strong></td><td><strong>${g.status==='completed'?g.hs:''}</strong></td><td><strong>${g.status==='completed'?g.as:''}</strong></td><td></td></tr> </table> <div class="sig-row"> <div class="sig-field"><div class="sig-label">Scorekeeper Name</div><div class="sig-line"></div></div> <div class="sig-field"><div class="sig-label">Scorekeeper Signature</div><div class="sig-line"></div></div> <div class="sig-field"><div class="sig-label">Referee Signature</div><div class="sig-line"></div></div> <div class="sig-field"><div class="sig-label">Date & Time</div><div class="sig-line"></div></div> </div> </div>`).join('')}
  </body></html>`);
@@ -1029,7 +1029,7 @@ function SOPHelp({role}){
  <div key={i} style={{border:'1px solid var(--border)',borderRadius:10,marginBottom:8,overflow:'hidden',cursor:'pointer'}}
  onClick={()=>setOpenStep(openStep===i?null:i)}> <div style={{padding:'12px 16px',display:'flex',alignItems:'center',gap:12,background:openStep===i?'var(--navy-lt)':'white'}}> <span style={{width:26,height:26,borderRadius:'50%',background:openStep===i?'var(--navy)':'var(--border)',color:openStep===i?'white':'var(--txt2)',display:'grid',placeItems:'center',fontWeight:800,fontSize:12,flexShrink:0}}>{i+1}</span> <span style={{fontWeight:700,fontSize:14,color:openStep===i?'var(--navy)':'var(--txt)',flex:1}}>{step.n}</span> <span style={{color:'var(--txt3)',fontSize:18,lineHeight:1}}>{openStep===i?'−':'+'}</span> </div> {openStep===i&&<div style={{padding:'12px 16px 14px 54px',background:'var(--navy-lt)',fontSize:13,color:'var(--txt2)',lineHeight:1.7,borderTop:'1px solid var(--border)'}}>{step.d}</div>}
  </div> ))}
- </div> <div style={{background: #FFFBEB',border:'1px solid #FDE68A',borderRadius:10,padding:'14px 16px'}}> <div style={{fontWeight:700,fontSize:13,color: #92400E',marginBottom:8}}> Quick tips</div> {r.tips.map((tip,i)=><div key={i} style={{fontSize:13,color: #78350F',marginBottom:4,paddingLeft:16,position:'relative'}}> <span style={{position:'absolute',left:0,color: #F59E0B'}}>›</span>{tip}
+ </div> <div style={{background:'#FFFBEB',border:'1px solid #FDE68A',borderRadius:10,padding:'14px 16px'}}> <div style={{fontWeight:700,fontSize:13,color:'#92400E',marginBottom:8}}> Quick tips</div> {r.tips.map((tip,i)=><div key={i} style={{fontSize:13,color:'#78350F',marginBottom:4,paddingLeft:16,position:'relative'}}> <span style={{position:'absolute',left:0,color:'#F59E0B'}}>›</span>{tip}
  </div>)}
  </div> </div>;
 }
@@ -1103,7 +1103,7 @@ function LiveScoring({db,onUpdate,isAdmin}){
  const [tick,setTick]=useState(0);
  useEffect(()=>{const t=setInterval(()=>setTick(x=>x+1),5000);return()=>clearInterval(t);},[]);
  return<div> {/* Live games */}
- <div style={{marginBottom:28}}> <div className="section-head"> <span className="section-title" style={{display:'flex',alignItems:'center',gap:8}}> <span style={{width:10,height:10,borderRadius:'50%',background: #16A34A',animation:'breathe 1.5s infinite',display:'inline-block'}}></span> Live Right Now
+ <div style={{marginBottom:28}}> <div className="section-head"> <span className="section-title" style={{display:'flex',alignItems:'center',gap:8}}> <span style={{width:10,height:10,borderRadius:'50%',background:'#16A34A',animation:'breathe 1.5s infinite',display:'inline-block'}}></span> Live Right Now
  </span> <span className="tag tag-gray" style={{fontSize:12}}>{liveGames.length} active</span> </div> {!liveGames.length&&<div style={{background:'var(--navy-lt)',borderRadius:12,padding:'28px 20px',textAlign:'center'}}> <div style={{fontSize:36,marginBottom:8}}></div> <div style={{fontFamily:'Outfit',fontWeight:700,fontSize:16,color:'var(--navy)',marginBottom:4}}>No games live right now</div> <div style={{fontSize:13,color:'var(--txt2)'}}>Check back when play begins · Next games start below</div> </div>}
  {liveGames.map(g=>{
  const sp=SPORTS.find(s=>s.id===g.sid);
@@ -1406,10 +1406,10 @@ function AdminPanel({db,onUpdate,scope}){
 
  {tab==='dashboard'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Dashboard</h2></div> <div className="g4" style={{marginBottom:20}}> {[{n:db.teams.length,l:'Teams',i:' '},{n:db.athletes.length,l:'Athletes',i:' '},{n:db.venues.length,l:'Venues',i:' '},{n:db.games.length,l:'Total Games',i:' '}].map(s=>(
  <div key={s.l} className="stat-card"><div style={{fontSize:28,marginBottom:4}}>{s.i}</div><div className="stat-n">{s.n}</div><div className="stat-l">{s.l}</div></div> ))}
- </div> <div className="g3" style={{marginBottom:20}}> <div className="stat-card" style={{borderTop:`4px solid #16A34A`}}><div className="stat-n" style={{color: #16A34A'}}>{live2}</div><div className="stat-l">Live now</div></div> <div className="stat-card" style={{borderTop:`4px solid var(--amber)`}}><div className="stat-n" style={{color:'var(--amber)'}}>{sched2}</div><div className="stat-l">Upcoming</div></div> <div className="stat-card" style={{borderTop:`4px solid var(--navy)`}}><div className="stat-n">{done2}</div><div className="stat-l">Completed</div></div> </div> <div className="card"><div className="card-head"><h3 className="card-title">Sport Overview</h3></div> <table className="data-table"> <thead><tr><th>Sport</th><th>Type</th><th>Teams</th><th>Athletes</th><th>Games</th><th>Progress</th></tr></thead> <tbody>{SPORTS.map(s=>{
+ </div> <div className="g3" style={{marginBottom:20}}> <div className="stat-card" style={{borderTop:`4px solid #16A34A`}}><div className="stat-n" style={{color:'#16A34A'}}>{live2}</div><div className="stat-l">Live now</div></div> <div className="stat-card" style={{borderTop:`4px solid var(--amber)`}}><div className="stat-n" style={{color:'var(--amber)'}}>{sched2}</div><div className="stat-l">Upcoming</div></div> <div className="stat-card" style={{borderTop:`4px solid var(--navy)`}}><div className="stat-n">{done2}</div><div className="stat-l">Completed</div></div> </div> <div className="card"><div className="card-head"><h3 className="card-title">Sport Overview</h3></div> <table className="data-table"> <thead><tr><th>Sport</th><th>Type</th><th>Teams</th><th>Athletes</th><th>Games</th><th>Progress</th></tr></thead> <tbody>{SPORTS.map(s=>{
  const te=db.teams.filter(t=>t.sid===s.id).length,at=db.athletes.filter(a=>a.sid===s.id).length;
  const ga=db.games.filter(g=>g.sid===s.id),dn=ga.filter(g=>g.status==='completed').length;
- return<tr key={s.id}> <td style={{fontWeight:700}}>{s.n}</td> <td><span className={`tag ${s.t==='team'?'tag-navy':'tag-crimson'}`}>{s.t}</span></td> <td>{te||<span style={{color: #D1D5DB'}}>—</span>}</td> <td>{at||<span style={{color: #D1D5DB'}}>—</span>}</td> <td>{ga.length||<span style={{color: #D1D5DB'}}>—</span>}</td> <td>{ga.length?<span style={{fontWeight:700,color:dn===ga.length?'var(--green)':'var(--amber)'}}>{dn}/{ga.length}</span>:<span style={{color: #D1D5DB'}}>—</span>}</td> </tr>;
+ return<tr key={s.id}> <td style={{fontWeight:700}}>{s.n}</td> <td><span className={`tag ${s.t==='team'?'tag-navy':'tag-crimson'}`}>{s.t}</span></td> <td>{te||<span style={{color:'#D1D5DB'}}>—</span>}</td> <td>{at||<span style={{color:'#D1D5DB'}}>—</span>}</td> <td>{ga.length||<span style={{color:'#D1D5DB'}}>—</span>}</td> <td>{ga.length?<span style={{fontWeight:700,color:dn===ga.length?'var(--green)':'var(--amber)'}}>{dn}/{ga.length}</span>:<span style={{color:'#D1D5DB'}}>—</span>}</td> </tr>;
  })}</tbody> </table> </div> </div>}
 
  {tab==='calc'&&<Calculator/>}
@@ -1526,7 +1526,7 @@ function App(){
  </div> {/* MOBILE BOTTOM NAV */}
  <div className="mobile-bottom-nav no-print"> <div className="mbn-inner"> {NAV.map(n=>(
  <button key={n.id} className={`mbn-btn${activeBase===n.id?' on':''}`} onClick={()=>goTo(n.id)}> <span className="mbn-icon">{n.icon}</span> {n.label}
- {n.id==='spectator'&&live>0&&<span style={{position:'absolute',top:6,right:'calc(50% - 18px)',background: #16A34A',color:'white',borderRadius:20,fontSize:9,padding:'1px 4px',fontWeight:800}}>{live}</span>}
+ {n.id==='spectator'&&live>0&&<span style={{position:'absolute',top:6,right:'calc(50% - 18px)',background:'#16A34A',color:'white',borderRadius:20,fontSize:9,padding:'1px 4px',fontWeight:800}}>{live}</span>}
  </button> ))}
  </div> </div> {/* FOOTER — desktop only */}
  <footer className="no-print" style={{background:'var(--navy-dk)',color:'rgba(255,255,255,.45)',textAlign:'center',padding:'14px 24px',fontSize:11,borderTop:'1px solid rgba(255,255,255,.08)'}}> NAIG Sports Central 2027 · #CompeteConnectUnite · AKYSB USA & Canada
