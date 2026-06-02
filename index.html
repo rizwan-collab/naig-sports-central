@@ -653,6 +653,39 @@ const SEED={
     {id:'m10',sid:'s7',age:'18+',gender:"Girls/Women's",event:'Flag Football Final',gold:'BC',silver:'Saskatchewan/Manitoba',bronze:'Alberta'},
     {id:'m11',sid:'s10',age:'18+',gender:'Open',event:'Table Tennis Singles',gold:'Ontario East',silver:'BC',bronze:'Alberta'},
     {id:'m12',sid:'s10',age:'18+',gender:"Girls/Women's",event:'Table Tennis Mixed Doubles',gold:'Alberta',silver:'Northeast USA',bronze:'Ontario West'},
+    {id:'m13',sid:'s2',age:'18+',gender:'Open',event:'Basketball 18+ Open Final',gold:'BC',silver:'Ontario East',bronze:'Saskatchewan/Manitoba'},
+    {id:'m14',sid:'s2',age:'18+',gender:"Girls/Women's",event:'Basketball 18+ Women Final',gold:'BC',silver:'Ontario West',bronze:'Great Lakes USA'},
+    {id:'m15',sid:'s8',age:'18+',gender:'Open',event:'Soccer 18+ Open Final',gold:'Ontario East',silver:'BC',bronze:'Prairie'},
+    {id:'m16',sid:'s14',age:'18+',gender:"Girls/Women's",event:'Volleyball 18+ Women Final',gold:'BC',silver:'Pacific USA',bronze:'Alberta'},
+    {id:'m17',sid:'s13',age:'18+',gender:'Open',event:'Track 100m Men',gold:'Alberta',silver:'Ontario West',bronze:'BC'},
+    {id:'m18',sid:'s13',age:'U18',gender:"Girls/Women's",event:'Track 200m Girls',gold:'Quebec',silver:'Alberta',bronze:'Ontario East'},
+  ],
+
+  /* ── INDIVIDUAL SPORT RESULTS (stored as games with sid + athlete IDs) ── */
+  indResults:[
+    {id:'r01',sid:'s1',age:'18+',gender:'Open',event:'Badminton Singles',round:'Quarterfinal',p1:'Ayaan Merchant (BC)',p2:'Omar Dewji (ON-E)',score:'21-14, 18-21, 21-16',winner:'BC',date:'2027-07-15'},
+    {id:'r02',sid:'s1',age:'18+',gender:'Open',event:'Badminton Singles',round:'Semifinal',p1:'Zain Kanji (AB)',p2:'Imran Fazal (GL-USA)',score:'21-18, 21-9',winner:'AB',date:'2027-07-15'},
+    {id:'r03',sid:'s1',age:'18+',gender:'Open',event:'Badminton Singles',round:'Gold Final',p1:'Ayaan Merchant (BC)',p2:'Zain Kanji (AB)',score:'21-19, 19-21, 21-17',winner:'BC',date:'2027-07-16'},
+    {id:'r04',sid:'s1',age:'18+',gender:"Girls/Women's",event:'Badminton Singles',round:'Gold Final',p1:'Zara Alibhai (ON-W)',p2:'Rania Virani (BC)',score:'21-15, 21-11',winner:'ON-W',date:'2027-07-16'},
+    {id:'r05',sid:'s1',age:'18+',gender:'Open',event:'Badminton Mixed Doubles',round:'Gold Final',p1:'Dewji/Alibhai (ON-E)',p2:'Merchant/Virani (BC)',score:'21-18, 21-16',winner:'ON-E',date:'2027-07-16'},
+    {id:'r06',sid:'s3',age:'18+',gender:'Open',event:'Chess — Round 1',round:'Swiss Round 1',p1:'Hassan Dharani (ON-W)',p2:'Khalil Remtulla (AB)',score:'1-0',winner:'ON-W',date:'2027-07-14'},
+    {id:'r07',sid:'s3',age:'18+',gender:'Open',event:'Chess — Round 2',round:'Swiss Round 2',p1:'Tariq Bhimani (BC)',p2:'Hassan Dharani (ON-W)',score:'0.5-0.5',winner:'Draw',date:'2027-07-14'},
+    {id:'r08',sid:'s3',age:'18+',gender:'Open',event:'Chess — Round 7 (Final)',round:'Swiss Round 7',p1:'Hassan Dharani (ON-W)',p2:'Tariq Bhimani (BC)',score:'1-0',winner:'ON-W',date:'2027-07-16'},
+    {id:'r09',sid:'s10',age:'18+',gender:'Open',event:'Table Tennis Singles',round:'Quarterfinal',p1:'Shaffin Jetha (BC)',p2:'Murad Kara (ON-W)',score:'11-8, 9-11, 11-7, 11-5',winner:'BC',date:'2027-07-15'},
+    {id:'r10',sid:'s10',age:'18+',gender:'Open',event:'Table Tennis Singles',round:'Gold Final',p1:'Shaffin Jetha (BC)',p2:'Opponent (ON-E)',score:'11-9, 11-7, 11-8',winner:'ON-E',date:'2027-07-16'},
+    {id:'r11',sid:'s10',age:'18+',gender:"Girls/Women's",event:'Table Tennis Mixed Doubles',round:'Gold Final',p1:'Dhanani/Momin (NE-USA)',p2:'Laila/Yasmin (AB)',score:'11-7, 9-11, 11-8, 11-6',winner:'AB',date:'2027-07-16'},
+    {id:'r12',sid:'s11',age:'18+',gender:'Open',event:'Tennis Singles',round:'Quarterfinal',p1:'Arif Kassam (ON-E)',p2:'Tariq Lalji (AC)',score:'6-3, 6-4',winner:'ON-E',date:'2027-07-15'},
+    {id:'r13',sid:'s11',age:'18+',gender:'Open',event:'Tennis Singles',round:'Semifinal',p1:'Arif Kassam (ON-E)',p2:'Player (BC)',score:'7-5, 4-6, 6-2',winner:'ON-E',date:'2027-07-15'},
+    {id:'r14',sid:'s11',age:'18+',gender:"Girls/Women's",event:'Tennis Singles',round:'Gold Final',p1:'Sana Bandali (BC)',p2:'Opponent (AB)',score:'6-2, 6-3',winner:'BC',date:'2027-07-16'},
+    {id:'r15',sid:'s13',age:'18+',gender:'Open',event:'100m Sprint',round:'Final',p1:'Zubair Fazal (ON-W)',p2:'Karim Nasser (AB)',score:'10.82s vs 10.91s',winner:'ON-W',date:'2027-07-15'},
+    {id:'r16',sid:'s13',age:'18+',gender:'Open',event:'400m',round:'Final',p1:'Karim Nasser (AB)',p2:'Iqbal Devji (BC)',score:'48.3s vs 49.1s',winner:'AB',date:'2027-07-15'},
+    {id:'r17',sid:'s13',age:'18+',gender:'Open',event:'1500m',round:'Final',p1:'Rizwan Bharmal (PA)',p2:'Iqbal Devji (BC)',score:'3:52.4 vs 3:54.7',winner:'PA',date:'2027-07-16'},
+    {id:'r18',sid:'s13',age:'U18',gender:"Girls/Women's",event:'100m Girls',round:'Final',p1:'Salma Hussain (QC)',p2:'Kiran Lakhani (AB)',score:'11.94s vs 12.11s',winner:'QC',date:'2027-07-15'},
+    {id:'r19',sid:'s13',age:'18+',gender:"Girls/Women's",event:'800m Women',round:'Final',p1:'Fatima Habib (ON-E)',p2:'Kiran Lakhani (AB)',score:'2:08.2 vs 2:09.5',winner:'ON-E',date:'2027-07-16'},
+    {id:'r20',sid:'s6',age:'18+',gender:'Open',event:'Dance Group',round:'Final',p1:'Team Nur — ON-W',p2:'Team Sama — BC',score:'87.4 vs 85.1',winner:'ON-W',date:'2027-07-16'},
+    {id:'r21',sid:'s6',age:'18+',gender:'Open',event:'Dance Group',round:'Semifinals',p1:'Team Noor — AB',p2:'Team Roshni — NE-USA',score:'82.0 vs 79.5',winner:'AB',date:'2027-07-15'},
+    {id:'r22',sid:'s9',age:'18+',gender:'Open',event:'Pickleball Singles',round:'Quarterfinal',p1:'Nadim Walji (BC)',p2:'Rahim Somani (AB)',score:'11-7, 11-4',winner:'BC',date:'2027-07-15'},
+    {id:'r23',sid:'s9',age:'18+',gender:"Girls/Women's",event:'Pickleball Doubles',round:'Gold Final',p1:'Layla/Mehrun (ON-E/PA)',p2:'Opponents (AB)',score:'11-8, 9-11, 11-6',winner:'Mixed',date:'2027-07-16'},
   ],
 };
 
@@ -1562,8 +1595,9 @@ function SpectatorView({db}){
       <div className="card-body"><MedalTable medals={db.medals}/></div>
     </div>}
     {tab==='results'&&<div>
-      <div className="section-head"><span className="section-title">Completed Games</span></div>
-      {!filtered.filter(g=>g.status==='completed').length&&<div className="empty"><div className="empty-icon">🏁</div><p className="empty-title">No results yet</p><p className="empty-sub">Check back after the first games wrap up</p></div>}
+      {/* Team sport results */}
+      <div className="section-title" style={{marginBottom:14}}>🏆 Team Sport Results</div>
+      {!filtered.filter(g=>g.status==='completed').length&&<div className="empty"><div className="empty-icon">🏁</div><p className="empty-title">No results yet</p><p className="empty-sub">Check back after games wrap up</p></div>}
       {filtered.filter(g=>g.status==='completed').map(g=>{const s=SPORTS.find(x=>x.id===g.sid);const hw=+g.hs>+g.as,aw=+g.as>+g.hs;return(
         <div key={g.id} className="game-row">
           <div className="game-vs">
@@ -1574,6 +1608,32 @@ function SpectatorView({db}){
           <div className="game-meta"><span>{s?.icon} {s?.n}</span><span>📅 {g.date}</span><span>📍 {vn(g.vid)}</span><span>{g.round}</span></div>
         </div>
       );})}
+      {/* Individual sport results */}
+      {db.indResults&&db.indResults.length>0&&<div style={{marginTop:24}}>
+        <div className="section-title" style={{marginBottom:14}}>🏅 Individual Sport Results</div>
+        {(sf==='all'?db.indResults:db.indResults.filter(r=>r.sid===sf)).map(r=>{
+          const s=SPORTS.find(x=>x.id===r.sid);
+          return<div key={r.id} className="game-row">
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:8}}>
+              <div>
+                <div style={{fontWeight:700,fontSize:14,marginBottom:4}}>{s?.icon} {r.event}</div>
+                <div style={{fontSize:13,marginBottom:4}}>
+                  <span style={{fontWeight:700,color:'var(--navy)'}}>{r.p1}</span>
+                  <span style={{margin:'0 8px',color:'var(--txt3)'}}>vs</span>
+                  <span>{r.p2}</span>
+                </div>
+                <div style={{fontSize:12,color:'var(--txt2)'}}>📊 {r.score}</div>
+              </div>
+              <div style={{textAlign:'right',flexShrink:0}}>
+                <div style={{marginBottom:4}}><span className="tag tag-gray">{r.round}</span></div>
+                {r.winner!=='Draw'&&<div style={{fontSize:12,fontWeight:700,color:'var(--green)'}}>🏆 Winner: {r.winner}</div>}
+                {r.winner==='Draw'&&<div style={{fontSize:12,fontWeight:700,color:'var(--amber)'}}>🤝 Draw</div>}
+                <div style={{fontSize:11,color:'var(--txt3)',marginTop:2}}>📅 {r.date}</div>
+              </div>
+            </div>
+          </div>;
+        })}
+      </div>}
     </div>}
     {tab==='sports'&&<div>
       <div className="section-head"><span className="section-title">NAIG 2027 Sports</span><span className="tag tag-navy">{SPORTS.length} sports</span></div>
@@ -1712,6 +1772,70 @@ function ScorekeeperView({db,onUpdate,user,onLogout}){
         </div>
       </div>
     </div>}
+  </div>;
+}
+
+/* ── DATA MANAGEMENT COMPONENT (proper React component — no hooks violation) ── */
+function DataMgmt({db,onUpdate}){
+  const [delSport,setDelSport]=useState('');
+  const [delRegion,setDelRegion]=useState('');
+  const [msg,setMsg]=useState('');
+  function flash(m){setMsg(m);setTimeout(()=>setMsg(''),3000);}
+  function bySport(){
+    if(!delSport){flash('Pick a sport first');return;}
+    const sp=SPORTS.find(s=>s.id===delSport);
+    const n=db.teams.filter(t=>t.sid===delSport).length+db.games.filter(g=>g.sid===delSport).length+db.athletes.filter(a=>a.sid===delSport).length;
+    if(!confirm('Delete ALL '+n+' teams, athletes & games for '+sp?.n+'? Cannot be undone.'))return;
+    onUpdate({...db,teams:db.teams.filter(t=>t.sid!==delSport),athletes:db.athletes.filter(a=>a.sid!==delSport),games:db.games.filter(g=>g.sid!==delSport),medals:db.medals.filter(m=>m.sid!==delSport)});
+    flash('Deleted all '+sp?.n+' data');setDelSport('');
+  }
+  function byRegion(){
+    if(!delRegion){flash('Pick a region first');return;}
+    const hit=db.teams.filter(t=>t.region===delRegion);
+    const ids=new Set(hit.map(t=>t.id));
+    const na=db.athletes.filter(a=>a.region===delRegion).length;
+    const ng=db.games.filter(g=>ids.has(g.hid)||ids.has(g.aid)).length;
+    if(!confirm('Delete ALL data for '+delRegion+'? ('+hit.length+' teams, '+na+' athletes, '+ng+' games)'))return;
+    onUpdate({...db,teams:db.teams.filter(t=>t.region!==delRegion),athletes:db.athletes.filter(a=>a.region!==delRegion),games:db.games.filter(g=>!ids.has(g.hid)&&!ids.has(g.aid))});
+    flash('Deleted all '+delRegion+' data');setDelRegion('');
+  }
+  function clearGames(){
+    if(!confirm('Clear ALL games? Teams and athletes stay.'))return;
+    onUpdate({...db,games:[]});flash('All games cleared');
+  }
+  return<div className="card" style={{marginBottom:20}}>
+    <div className="card-head"><h3 className="card-title">🗑️ Delete by Sport or Region</h3></div>
+    <div className="card-body">
+      {msg&&<div className="alert alert-green" style={{marginBottom:12}}>{msg}</div>}
+      <div className="row2" style={{marginBottom:14}}>
+        <div>
+          <div style={{fontWeight:700,fontSize:13,color:'var(--navy-dk)',marginBottom:6}}>By Sport</div>
+          <p style={{fontSize:12,color:'var(--txt2)',marginBottom:8}}>Removes all teams, athletes, games and medals for that sport.</p>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+            <select className="form-input" style={{flex:1,minWidth:160}} value={delSport} onChange={e=>setDelSport(e.target.value)}>
+              <option value="">Select sport…</option>
+              {SPORTS.map(s=>{const n=db.teams.filter(t=>t.sid===s.id).length+db.games.filter(g=>g.sid===s.id).length;return<option key={s.id} value={s.id}>{s.icon} {s.n} ({n})</option>;})}
+            </select>
+            <button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={bySport}>Delete Sport</button>
+          </div>
+        </div>
+        <div>
+          <div style={{fontWeight:700,fontSize:13,color:'var(--navy-dk)',marginBottom:6}}>By Region</div>
+          <p style={{fontSize:12,color:'var(--txt2)',marginBottom:8}}>Removes all teams, athletes, and their games from that region.</p>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+            <select className="form-input" style={{flex:1,minWidth:160}} value={delRegion} onChange={e=>setDelRegion(e.target.value)}>
+              <option value="">Select region…</option>
+              {REGIONS.map(r=>{const n=db.teams.filter(t=>t.region===r).length+db.athletes.filter(a=>a.region===r).length;return<option key={r} value={r}>{r} ({n})</option>;})}
+            </select>
+            <button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={byRegion}>Delete Region</button>
+          </div>
+        </div>
+      </div>
+      <div style={{paddingTop:12,borderTop:'1px solid var(--border)'}}>
+        <button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={clearGames}>🗑 Clear All Games</button>
+        <span style={{fontSize:12,color:'var(--txt3)',marginLeft:10}}>Keeps teams — wipes the schedule</span>
+      </div>
+    </div>
   </div>;
 }
 
@@ -2184,85 +2308,7 @@ function AdminPanel({db,onUpdate,scope}){
         </div>}
         {tab==='export'&&<div>
           <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Export & Backup</h2></div>
-
-          {}
-          {(()=>{
-            const [delSport,setDelSport]=React.useState('');
-            const [delRegion,setDelRegion]=React.useState('');
-            const [delMsg,setDelMsg]=React.useState('');
-            function flashDel(m){setDelMsg(m);setTimeout(()=>setDelMsg(''),3000);}
-            function deleteBySport(){
-              if(!delSport){flashDel('Select a sport first');return;}
-              const sp=SPORTS.find(s=>s.id===delSport);
-              const count=db.teams.filter(t=>t.sid===delSport).length+db.games.filter(g=>g.sid===delSport).length+db.athletes.filter(a=>a.sid===delSport).length;
-              if(!confirm(`Delete ALL ${count} teams, athletes & games for ${sp?.n}? This cannot be undone.`))return;
-              onUpdate({...db,
-                teams:db.teams.filter(t=>t.sid!==delSport),
-                athletes:db.athletes.filter(a=>a.sid!==delSport),
-                games:db.games.filter(g=>g.sid!==delSport),
-                medals:db.medals.filter(m=>m.sid!==delSport)
-              });
-              flashDel(`✅ All ${sp?.n} data deleted`);
-            }
-            function deleteByRegion(){
-              if(!delRegion){flashDel('Select a region first');return;}
-              const teamsHit=db.teams.filter(t=>t.region===delRegion);
-              const teamIds=new Set(teamsHit.map(t=>t.id));
-              const athleteCount=db.athletes.filter(a=>a.region===delRegion).length;
-              const gameCount=db.games.filter(g=>teamIds.has(g.hid)||teamIds.has(g.aid)).length;
-              if(!confirm(`Delete ALL data for ${delRegion}? (${teamsHit.length} teams, ${athleteCount} athletes, ${gameCount} games)`))return;
-              onUpdate({...db,
-                teams:db.teams.filter(t=>t.region!==delRegion),
-                athletes:db.athletes.filter(a=>a.region!==delRegion),
-                games:db.games.filter(g=>!teamIds.has(g.hid)&&!teamIds.has(g.aid))
-              });
-              flashDel(`✅ All ${delRegion} data deleted`);
-            }
-            function clearAllGames(){
-              if(!confirm('Delete ALL scheduled games? Teams and athletes stay. This cannot be undone.'))return;
-              onUpdate({...db,games:[]});flashDel('✅ All games cleared');
-            }
-            return<div className="card" style={{marginBottom:20}}>
-              <div className="card-head"><h3 className="card-title">🗑️ Data Management — Delete by Sport or Region</h3></div>
-              <div className="card-body">
-                {delMsg&&<div className="alert alert-green" style={{marginBottom:14}}>{delMsg}</div>}
-                <div className="row2" style={{marginBottom:16}}>
-                  <div>
-                    <div style={{fontWeight:700,fontSize:14,color:'var(--navy-dk)',marginBottom:8}}>Delete by Sport</div>
-                    <p style={{fontSize:12,color:'var(--txt2)',marginBottom:10}}>Removes all teams, athletes, games, and medals for the selected sport.</p>
-                    <div style={{display:'flex',gap:8}}>
-                      <select className="form-input" style={{flex:1}} value={delSport} onChange={e=>setDelSport(e.target.value)}>
-                        <option value="">Select sport…</option>
-                        {SPORTS.map(s=>{
-                          const cnt=db.teams.filter(t=>t.sid===s.id).length+db.games.filter(g=>g.sid===s.id).length;
-                          return<option key={s.id} value={s.id}>{s.icon} {s.n} ({cnt} records)</option>;
-                        })}
-                      </select>
-                      <button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)',borderColor:'var(--crimson)',whiteSpace:'nowrap'}} onClick={deleteBySport}>Delete Sport Data</button>
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{fontWeight:700,fontSize:14,color:'var(--navy-dk)',marginBottom:8}}>Delete by Region</div>
-                    <p style={{fontSize:12,color:'var(--txt2)',marginBottom:10}}>Removes all teams and athletes from the selected region and any games they are part of.</p>
-                    <div style={{display:'flex',gap:8}}>
-                      <select className="form-input" style={{flex:1}} value={delRegion} onChange={e=>setDelRegion(e.target.value)}>
-                        <option value="">Select region…</option>
-                        {REGIONS.map(r=>{
-                          const cnt=db.teams.filter(t=>t.region===r).length+db.athletes.filter(a=>a.region===r).length;
-                          return<option key={r} value={r}>{r} ({cnt} records)</option>;
-                        })}
-                      </select>
-                      <button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)',borderColor:'var(--crimson)',whiteSpace:'nowrap'}} onClick={deleteByRegion}>Delete Region Data</button>
-                    </div>
-                  </div>
-                </div>
-                <div style={{paddingTop:14,borderTop:'1px solid var(--border)'}}>
-                  <button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={clearAllGames}>🗑 Clear All Games (keep teams)</button>
-                  <span style={{fontSize:12,color:'var(--txt3)',marginLeft:12}}>Useful for resetting the schedule without losing registration data</span>
-                </div>
-              </div>
-            </div>;
-          })()}
+          <DataMgmt db={db} onUpdate={onUpdate}/>
 
           <div className="g2">
             <div className="card"><div className="card-head"><h3 className="card-title">💾 JSON Backup</h3></div><div className="card-body">
