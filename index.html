@@ -50,6 +50,7 @@ h1,h2,h3,h4,h5{font-family:'Outfit',sans-serif;line-height:1.2}
 .app-body{display:flex;flex:1}
 .content-area{flex:1;overflow:hidden;min-width:0}
 .page{max-width:1320px;margin:0 auto;padding:28px 24px}
+.admin-content{width:100%;padding:20px 24px;box-sizing:border-box}
 
 .topbar{
  background:var(--navy-dk);
@@ -452,6 +453,23 @@ const SPORTS=[
  {id:'s14',n:'Volleyball (Int\'l)',t:'team',ages:['U18','18+'],icon:'',dur:60,scoring:'points',genders:['Girls/Women\'s','Open'],rMin:7,rMax:12,rules:'6 on court, min 6 to play. Sets to 25, deciding set to 15. RR best-of-3, playoffs best-of-5.'},
 ];
 
+const SPORT_STATS={
+  s2:{periods:4,periodName:'Qtr',stats:[{k:'fouls',l:'Fouls',warn:4},{k:'timeouts',l:'Timeouts',max:2},{k:'fg_made',l:'FG Made'},{k:'fg_att',l:'FG Att'},{k:'3p_made',l:'3-Pt Made'},{k:'ft_made',l:'FT Made'},{k:'ft_att',l:'FT Att'},{k:'rebounds',l:'Rebounds'},{k:'assists',l:'Assists'},{k:'steals',l:'Steals'},{k:'turnovers',l:'TOV'},{k:'blocks',l:'Blocks'}],events:['Basket (2)','3-Pointer','Free Throw Made','Foul','Timeout','Turnover','Block','Rebound']},
+  s8:{periods:2,periodName:'Half',stats:[{k:'yellow_cards',l:'Yellow Cards',warn:1},{k:'red_cards',l:'Red Cards'},{k:'corners',l:'Corners'},{k:'shots',l:'Shots'},{k:'shots_on',l:'On Target'},{k:'offsides',l:'Offsides'},{k:'fouls',l:'Fouls'}],events:['Goal','Yellow Card','Red Card','Corner','Free Kick','Offside','Substitution','Penalty']},
+  s14:{periods:5,periodName:'Set',stats:[{k:'aces',l:'Aces'},{k:'errors',l:'Errors'},{k:'blocks',l:'Blocks'},{k:'digs',l:'Digs'},{k:'timeouts',l:'Timeouts',max:2},{k:'attack_err',l:'Attack Errors'}],events:['Ace','Point Won','Error','Block','Timeout','Challenge']},
+  s4:{periods:2,periodName:'Innings',stats:[{k:'wickets',l:'Wickets'},{k:'overs',l:'Overs'},{k:'extras',l:'Extras'},{k:'fours',l:'Fours'},{k:'sixes',l:'Sixes'},{k:'wides',l:'Wides'},{k:'no_balls',l:'No Balls'}],events:['Wicket','Four','Six','Wide','No Ball','Run Out','Bye','LBW']},
+  s5:{periods:2,periodName:'Innings',stats:[{k:'wickets',l:'Wickets'},{k:'overs',l:'Overs'},{k:'extras',l:'Extras'},{k:'fours',l:'Fours'},{k:'sixes',l:'Sixes'}],events:['Wicket','Four','Six','Wide','Run Out']},
+  s7:{periods:2,periodName:'Half',stats:[{k:'touchdowns',l:'TDs'},{k:'conversions',l:'Conversions'},{k:'flags',l:'Flags'},{k:'first_downs',l:'1st Downs'},{k:'timeouts',l:'Timeouts',max:2},{k:'turnovers',l:'Turnovers'}],events:['Touchdown','2-Pt Conversion','Flag Penalty','Turnover','Timeout','Safety']},
+  s12:{periods:3,periodName:'Set',stats:[{k:'aces',l:'Aces'},{k:'faults',l:'Faults'},{k:'timeouts',l:'Timeouts',max:1}],events:['Ace','Fault','Timeout']},
+};
+function getSS(sid){return SPORT_STATS[sid]||{periods:2,periodName:'Period',stats:[],events:[]};}
+function initGS(sid){
+  const def=getSS(sid);
+  const periods=Array.from({length:def.periods},(_,i)=>({n:i+1,home:0,away:0}));
+  const mk=()=>{const s={};(def.stats||[]).forEach(st=>{s[st.k]=0;});return s;};
+  return{periods,home:mk(),away:mk(),events:[],period:1};
+}
+
 const REGIONS=[
  'BC','Alberta','Saskatchewan/Manitoba','Ontario West','Ontario East','Quebec','Atlantic Canada',
  'Northeast USA','Mid-Atlantic USA','Southeast USA','Great Lakes USA','Central USA','Southwest USA','Pacific USA',
@@ -477,207 +495,253 @@ const SEED={
  {id:'v8',name:'Chess & Table Sports Hall',location:'Convention Centre',courts:16},
  ],
  teams:[
- 
- {id:'t01',n:'BC Falcons',sid:'s2',age:'18+',gender:'Open',region:'BC',pool:'A'},
- {id:'t02',n:'Alberta Storm',sid:'s2',age:'18+',gender:'Open',region:'Alberta',pool:'A'},
- {id:'t03',n:'Ontario West Force',sid:'s2',age:'18+',gender:'Open',region:'Ontario West',pool:'A'},
- {id:'t04',n:'Ontario East Fire',sid:'s2',age:'18+',gender:'Open',region:'Ontario East',pool:'A'},
- {id:'t05',n:'Prairie Thunder',sid:'s2',age:'18+',gender:'Open',region:'Saskatchewan/Manitoba',pool:'B'},
- {id:'t06',n:'Quebec Royals',sid:'s2',age:'18+',gender:'Open',region:'Quebec',pool:'B'},
- {id:'t07',n:'Northeast Blaze',sid:'s2',age:'18+',gender:'Open',region:'Northeast USA',pool:'B'},
- {id:'t08',n:'Pacific Stars',sid:'s2',age:'18+',gender:'Open',region:'Pacific USA',pool:'B'},
- 
- {id:'t09',n:'BC Phoenix',sid:'s2',age:'18+',gender:"Girls/Women's",region:'BC',pool:'A'},
- {id:'t10',n:'Ontario West Lightning',sid:'s2',age:'18+',gender:"Girls/Women's",region:'Ontario West',pool:'A'},
- {id:'t11',n:'Alberta Raptors',sid:'s2',age:'18+',gender:"Girls/Women's",region:'Alberta',pool:'A'},
- {id:'t12',n:'Southeast Rush',sid:'s2',age:'18+',gender:"Girls/Women's",region:'Southeast USA',pool:'B'},
- {id:'t13',n:'Great Lakes Wave',sid:'s2',age:'18+',gender:"Girls/Women's",region:'Great Lakes USA',pool:'B'},
- {id:'t14',n:'Atlantic Sparks',sid:'s2',age:'18+',gender:"Girls/Women's",region:'Atlantic Canada',pool:'B'},
- 
- {id:'t15',n:'BC Jr Falcons',sid:'s2',age:'U18',gender:'Open',region:'BC',pool:'A'},
- {id:'t16',n:'Ontario West Jr Force',sid:'s2',age:'U18',gender:'Open',region:'Ontario West',pool:'A'},
- {id:'t17',n:'Alberta Jr Storm',sid:'s2',age:'U18',gender:'Open',region:'Alberta',pool:'A'},
- {id:'t18',n:'Central USA Jr',sid:'s2',age:'U18',gender:'Open',region:'Central USA',pool:'B'},
- 
- {id:'t19',n:'BC FC',sid:'s8',age:'18+',gender:'Open',region:'BC',pool:'A'},
- {id:'t20',n:'Alberta United',sid:'s8',age:'18+',gender:'Open',region:'Alberta',pool:'A'},
- {id:'t21',n:'Ontario East FC',sid:'s8',age:'18+',gender:'Open',region:'Ontario East',pool:'A'},
- {id:'t22',n:'Great Lakes FC',sid:'s8',age:'18+',gender:'Open',region:'Great Lakes USA',pool:'B'},
- {id:'t23',n:'Prairie FC',sid:'s8',age:'18+',gender:'Open',region:'Saskatchewan/Manitoba',pool:'B'},
- {id:'t24',n:'Southwest FC',sid:'s8',age:'18+',gender:'Open',region:'Southwest USA',pool:'B'},
- 
- {id:'t25',n:'BC United Women',sid:'s8',age:'18+',gender:"Girls/Women's",region:'BC',pool:'A'},
- {id:'t26',n:'Ontario West Waves',sid:'s8',age:'18+',gender:"Girls/Women's",region:'Ontario West',pool:'A'},
- {id:'t27',n:'Mid-Atlantic Stars',sid:'s8',age:'18+',gender:"Girls/Women's",region:'Mid-Atlantic USA',pool:'B'},
- {id:'t28',n:'Prairie Foxes',sid:'s8',age:'18+',gender:"Girls/Women's",region:'Saskatchewan/Manitoba',pool:'B'},
- 
- {id:'t29',n:'BC Setters',sid:'s14',age:'18+',gender:"Girls/Women's",region:'BC',pool:'A'},
- {id:'t30',n:'Ontario Spikes',sid:'s14',age:'18+',gender:"Girls/Women's",region:'Ontario East',pool:'A'},
- {id:'t31',n:'Alberta Aces',sid:'s14',age:'18+',gender:"Girls/Women's",region:'Alberta',pool:'A'},
- {id:'t32',n:'Pacific Smash',sid:'s14',age:'18+',gender:"Girls/Women's",region:'Pacific USA',pool:'B'},
- {id:'t33',n:'Central Serve',sid:'s14',age:'18+',gender:"Girls/Women's",region:'Central USA',pool:'B'},
- {id:'t34',n:'Quebec Volley',sid:'s14',age:'18+',gender:"Girls/Women's",region:'Quebec',pool:'B'},
- 
- {id:'t35',n:'BC Block Party',sid:'s14',age:'18+',gender:'Open',region:'BC',pool:'A'},
- {id:'t36',n:'Ontario West Net',sid:'s14',age:'18+',gender:'Open',region:'Ontario West',pool:'A'},
- {id:'t37',n:'Northeast Diggers',sid:'s14',age:'18+',gender:'Open',region:'Northeast USA',pool:'B'},
- {id:'t38',n:'Alberta Killshots',sid:'s14',age:'18+',gender:'Open',region:'Alberta',pool:'B'},
- 
- {id:'t39',n:'BC Lions XI',sid:'s4',age:'18+',gender:'Open',region:'BC',pool:'A'},
- {id:'t40',n:'Ontario East XI',sid:'s4',age:'18+',gender:'Open',region:'Ontario East',pool:'A'},
- {id:'t41',n:'Alberta Thunderbolts',sid:'s4',age:'18+',gender:'Open',region:'Alberta',pool:'A'},
- {id:'t42',n:'Central USA CC',sid:'s4',age:'18+',gender:'Open',region:'Central USA',pool:'B'},
- {id:'t43',n:'Atlantic Islanders',sid:'s4',age:'18+',gender:'Open',region:'Atlantic Canada',pool:'B'},
- {id:'t44',n:'Great Lakes CC',sid:'s4',age:'18+',gender:'Open',region:'Great Lakes USA',pool:'B'},
- 
- {id:'t45',n:'BC Tapeball Queens',sid:'s5',age:'18+',gender:"Girls/Women's",region:'BC',pool:'A'},
- {id:'t46',n:'Ontario West Tapeball',sid:'s5',age:'18+',gender:"Girls/Women's",region:'Ontario West',pool:'A'},
- {id:'t47',n:'Alberta Tapeball Stars',sid:'s5',age:'18+',gender:"Girls/Women's",region:'Alberta',pool:'B'},
- {id:'t48',n:'Northeast Tapeball',sid:'s5',age:'18+',gender:"Girls/Women's",region:'Northeast USA',pool:'B'},
- 
- {id:'t49',n:'BC Blitz',sid:'s7',age:'18+',gender:'Open',region:'BC',pool:'A'},
- {id:'t50',n:'Ontario West Rush',sid:'s7',age:'18+',gender:'Open',region:'Ontario West',pool:'A'},
- {id:'t51',n:'Central Gridiron',sid:'s7',age:'18+',gender:'Open',region:'Central USA',pool:'B'},
- {id:'t52',n:'Alberta Hail Mary',sid:'s7',age:'18+',gender:'Open',region:'Alberta',pool:'B'},
- 
- {id:'t53',n:'BC Flag Queens',sid:'s7',age:'18+',gender:"Girls/Women's",region:'BC',pool:'A'},
- {id:'t54',n:'Prairie Pigskin',sid:'s7',age:'18+',gender:"Girls/Women's",region:'Saskatchewan/Manitoba',pool:'B'},
- 
- {id:'t55',n:'BC Throwball',sid:'s12',age:'18+',gender:"Girls/Women's",region:'BC',pool:'A'},
- {id:'t56',n:'Ontario East Throw',sid:'s12',age:'18+',gender:"Girls/Women's",region:'Ontario East',pool:'A'},
- {id:'t57',n:'Alberta Toss',sid:'s12',age:'18+',gender:"Girls/Women's",region:'Alberta',pool:'B'},
- {id:'t58',n:'Pacific Throwball',sid:'s12',age:'18+',gender:"Girls/Women's",region:'Pacific USA',pool:'B'},
- ],
+ /* BASKETBALL 18+ Open — 14 teams (Canada Pool A, USA Pool B) */
+ {id:'t01',n:'Canada BC — A',sid:'s2',age:'18+',gender:'Open',region:'BC',pool:'A'},
+ {id:'t02',n:'Canada Alberta — A',sid:'s2',age:'18+',gender:'Open',region:'Alberta',pool:'A'},
+ {id:'t03',n:'Canada Sask/Man — A',sid:'s2',age:'18+',gender:'Open',region:'Saskatchewan/Manitoba',pool:'A'},
+ {id:'t04',n:'Canada Ontario West — A',sid:'s2',age:'18+',gender:'Open',region:'Ontario West',pool:'A'},
+ {id:'t05',n:'Canada Ontario East — A',sid:'s2',age:'18+',gender:'Open',region:'Ontario East',pool:'A'},
+ {id:'t06',n:'Canada Quebec — A',sid:'s2',age:'18+',gender:'Open',region:'Quebec',pool:'A'},
+ {id:'t07',n:'Canada Atlantic — A',sid:'s2',age:'18+',gender:'Open',region:'Atlantic Canada',pool:'A'},
+ {id:'t08',n:'USA Northeast — A',sid:'s2',age:'18+',gender:'Open',region:'Northeast USA',pool:'B'},
+ {id:'t09',n:'USA Mid-Atlantic — A',sid:'s2',age:'18+',gender:'Open',region:'Mid-Atlantic USA',pool:'B'},
+ {id:'t10',n:'USA Southeast — A',sid:'s2',age:'18+',gender:'Open',region:'Southeast USA',pool:'B'},
+ {id:'t11',n:'USA Great Lakes — A',sid:'s2',age:'18+',gender:'Open',region:'Great Lakes USA',pool:'B'},
+ {id:'t12',n:'USA Central — A',sid:'s2',age:'18+',gender:'Open',region:'Central USA',pool:'B'},
+ {id:'t13',n:'USA Southwest — A',sid:'s2',age:'18+',gender:'Open',region:'Southwest USA',pool:'B'},
+ {id:'t14',n:'USA Pacific — A',sid:'s2',age:'18+',gender:'Open',region:'Pacific USA',pool:'B'},
+ /* BASKETBALL 18+ Women — 14 teams */
+ {id:'t15',n:"Canada BC — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'BC',pool:'A'},
+ {id:'t16',n:"Canada Alberta — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Alberta',pool:'A'},
+ {id:'t17',n:"Canada Sask/Man — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Saskatchewan/Manitoba',pool:'A'},
+ {id:'t18',n:"Canada Ontario West — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Ontario West',pool:'A'},
+ {id:'t19',n:"Canada Ontario East — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Ontario East',pool:'A'},
+ {id:'t20',n:"Canada Quebec — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Quebec',pool:'A'},
+ {id:'t21',n:"Canada Atlantic — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Atlantic Canada',pool:'A'},
+ {id:'t22',n:"USA Northeast — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Northeast USA',pool:'B'},
+ {id:'t23',n:"USA Mid-Atlantic — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Mid-Atlantic USA',pool:'B'},
+ {id:'t24',n:"USA Southeast — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Southeast USA',pool:'B'},
+ {id:'t25',n:"USA Great Lakes — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Great Lakes USA',pool:'B'},
+ {id:'t26',n:"USA Central — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Central USA',pool:'B'},
+ {id:'t27',n:"USA Southwest — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Southwest USA',pool:'B'},
+ {id:'t28',n:"USA Pacific — W",sid:'s2',age:'18+',gender:"Girls/Women's",region:'Pacific USA',pool:'B'},
+ /* SOCCER 18+ Open — 14 teams */
+ {id:'t29',n:'Canada BC — SC',sid:'s8',age:'18+',gender:'Open',region:'BC',pool:'A'},
+ {id:'t30',n:'Canada Alberta — SC',sid:'s8',age:'18+',gender:'Open',region:'Alberta',pool:'A'},
+ {id:'t31',n:'Canada Sask/Man — SC',sid:'s8',age:'18+',gender:'Open',region:'Saskatchewan/Manitoba',pool:'A'},
+ {id:'t32',n:'Canada Ontario West — SC',sid:'s8',age:'18+',gender:'Open',region:'Ontario West',pool:'A'},
+ {id:'t33',n:'Canada Ontario East — SC',sid:'s8',age:'18+',gender:'Open',region:'Ontario East',pool:'A'},
+ {id:'t34',n:'Canada Quebec — SC',sid:'s8',age:'18+',gender:'Open',region:'Quebec',pool:'A'},
+ {id:'t35',n:'Canada Atlantic — SC',sid:'s8',age:'18+',gender:'Open',region:'Atlantic Canada',pool:'A'},
+ {id:'t36',n:'USA Northeast — SC',sid:'s8',age:'18+',gender:'Open',region:'Northeast USA',pool:'B'},
+ {id:'t37',n:'USA Mid-Atlantic — SC',sid:'s8',age:'18+',gender:'Open',region:'Mid-Atlantic USA',pool:'B'},
+ {id:'t38',n:'USA Southeast — SC',sid:'s8',age:'18+',gender:'Open',region:'Southeast USA',pool:'B'},
+ {id:'t39',n:'USA Great Lakes — SC',sid:'s8',age:'18+',gender:'Open',region:'Great Lakes USA',pool:'B'},
+ {id:'t40',n:'USA Central — SC',sid:'s8',age:'18+',gender:'Open',region:'Central USA',pool:'B'},
+ {id:'t41',n:'USA Southwest — SC',sid:'s8',age:'18+',gender:'Open',region:'Southwest USA',pool:'B'},
+ {id:'t42',n:'USA Pacific — SC',sid:'s8',age:'18+',gender:'Open',region:'Pacific USA',pool:'B'},
+ /* VOLLEYBALL 18+ Women — 14 teams */
+ {id:'t43',n:"Canada BC — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'BC',pool:'A'},
+ {id:'t44',n:"Canada Alberta — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Alberta',pool:'A'},
+ {id:'t45',n:"Canada Sask/Man — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Saskatchewan/Manitoba',pool:'A'},
+ {id:'t46',n:"Canada Ontario West — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Ontario West',pool:'A'},
+ {id:'t47',n:"Canada Ontario East — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Ontario East',pool:'A'},
+ {id:'t48',n:"Canada Quebec — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Quebec',pool:'A'},
+ {id:'t49',n:"Canada Atlantic — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Atlantic Canada',pool:'A'},
+ {id:'t50',n:"USA Northeast — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Northeast USA',pool:'B'},
+ {id:'t51',n:"USA Mid-Atlantic — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Mid-Atlantic USA',pool:'B'},
+ {id:'t52',n:"USA Southeast — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Southeast USA',pool:'B'},
+ {id:'t53',n:"USA Great Lakes — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Great Lakes USA',pool:'B'},
+ {id:'t54',n:"USA Central — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Central USA',pool:'B'},
+ {id:'t55',n:"USA Southwest — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Southwest USA',pool:'B'},
+ {id:'t56',n:"USA Pacific — VB",sid:'s14',age:'18+',gender:"Girls/Women's",region:'Pacific USA',pool:'B'},
+ /* CRICKET Hardball — 14 teams */
+ {id:'t57',n:'Canada BC — CK',sid:'s4',age:'18+',gender:'Open',region:'BC',pool:'A'},
+ {id:'t58',n:'Canada Alberta — CK',sid:'s4',age:'18+',gender:'Open',region:'Alberta',pool:'A'},
+ {id:'t59',n:'Canada Ontario West — CK',sid:'s4',age:'18+',gender:'Open',region:'Ontario West',pool:'A'},
+ {id:'t60',n:'Canada Ontario East — CK',sid:'s4',age:'18+',gender:'Open',region:'Ontario East',pool:'A'},
+ {id:'t61',n:'Canada Quebec — CK',sid:'s4',age:'18+',gender:'Open',region:'Quebec',pool:'A'},
+ {id:'t62',n:'Canada Sask/Man — CK',sid:'s4',age:'18+',gender:'Open',region:'Saskatchewan/Manitoba',pool:'A'},
+ {id:'t63',n:'Canada Atlantic — CK',sid:'s4',age:'18+',gender:'Open',region:'Atlantic Canada',pool:'A'},
+ {id:'t64',n:'USA Northeast — CK',sid:'s4',age:'18+',gender:'Open',region:'Northeast USA',pool:'B'},
+ {id:'t65',n:'USA Great Lakes — CK',sid:'s4',age:'18+',gender:'Open',region:'Great Lakes USA',pool:'B'},
+ {id:'t66',n:'USA Central — CK',sid:'s4',age:'18+',gender:'Open',region:'Central USA',pool:'B'},
+ {id:'t67',n:'USA Southeast — CK',sid:'s4',age:'18+',gender:'Open',region:'Southeast USA',pool:'B'},
+ {id:'t68',n:'USA Mid-Atlantic — CK',sid:'s4',age:'18+',gender:'Open',region:'Mid-Atlantic USA',pool:'B'},
+ {id:'t69',n:'USA Southwest — CK',sid:'s4',age:'18+',gender:'Open',region:'Southwest USA',pool:'B'},
+ {id:'t70',n:'USA Pacific — CK',sid:'s4',age:'18+',gender:'Open',region:'Pacific USA',pool:'B'},
+ /* FLAG FOOTBALL — 14 teams */
+ {id:'t71',n:'Canada BC — FF',sid:'s7',age:'18+',gender:'Open',region:'BC',pool:'A'},
+ {id:'t72',n:'Canada Alberta — FF',sid:'s7',age:'18+',gender:'Open',region:'Alberta',pool:'A'},
+ {id:'t73',n:'Canada Ontario West — FF',sid:'s7',age:'18+',gender:'Open',region:'Ontario West',pool:'A'},
+ {id:'t74',n:'Canada Ontario East — FF',sid:'s7',age:'18+',gender:'Open',region:'Ontario East',pool:'A'},
+ {id:'t75',n:'Canada Quebec — FF',sid:'s7',age:'18+',gender:'Open',region:'Quebec',pool:'A'},
+ {id:'t76',n:'Canada Sask/Man — FF',sid:'s7',age:'18+',gender:'Open',region:'Saskatchewan/Manitoba',pool:'A'},
+ {id:'t77',n:'Canada Atlantic — FF',sid:'s7',age:'18+',gender:'Open',region:'Atlantic Canada',pool:'A'},
+ {id:'t78',n:'USA Northeast — FF',sid:'s7',age:'18+',gender:'Open',region:'Northeast USA',pool:'B'},
+ {id:'t79',n:'USA Mid-Atlantic — FF',sid:'s7',age:'18+',gender:'Open',region:'Mid-Atlantic USA',pool:'B'},
+ {id:'t80',n:'USA Southeast — FF',sid:'s7',age:'18+',gender:'Open',region:'Southeast USA',pool:'B'},
+ {id:'t81',n:'USA Great Lakes — FF',sid:'s7',age:'18+',gender:'Open',region:'Great Lakes USA',pool:'B'},
+ {id:'t82',n:'USA Central — FF',sid:'s7',age:'18+',gender:'Open',region:'Central USA',pool:'B'},
+ {id:'t83',n:'USA Southwest — FF',sid:'s7',age:'18+',gender:'Open',region:'Southwest USA',pool:'B'},
+ {id:'t84',n:'USA Pacific — FF',sid:'s7',age:'18+',gender:'Open',region:'Pacific USA',pool:'B'},
+
  athletes:[
- /* BADMINTON 18+ Open */
+ /* BADMINTON — 14 athletes across all divisions */
  {id:'a01',n:'Ayaan Merchant',sid:'s1',age:'18+',gender:'Open',region:'BC',event:'Singles'},
- {id:'a02',n:'Omar Dewji',sid:'s1',age:'18+',gender:'Open',region:'Ontario East',event:'Doubles'},
- {id:'a03',n:'Zain Kanji',sid:'s1',age:'18+',gender:'Open',region:'Alberta',event:'Mixed Doubles'},
- {id:'a04',n:'Imran Fazal',sid:'s1',age:'18+',gender:'Open',region:'Great Lakes USA',event:'Singles'},
- /* BADMINTON 18+ Women's */
- {id:'a05',n:'Zara Alibhai',sid:'s1',age:'18+',gender:"Girls/Women's",region:'Ontario West',event:'Singles'},
- {id:'a06',n:'Rania Virani',sid:'s1',age:'18+',gender:"Girls/Women's",region:'BC',event:'Doubles'},
- {id:'a07',n:'Sofia Rashid',sid:'s1',age:'18+',gender:"Girls/Women's",region:'Northeast USA',event:'Mixed Doubles'},
- /* BADMINTON 45+ Women's */
- {id:'a08',n:'Nadia Karimji',sid:'s1',age:'45+',gender:"Girls/Women's",region:'Pacific USA',event:'Doubles'},
- {id:'a09',n:'Amina Lalji',sid:'s1',age:'45+',gender:"Girls/Women's",region:'Alberta',event:'Singles'},
- /* CHESS 18+ Open */
- {id:'a10',n:'Hassan Dharani',sid:'s3',age:'18+',gender:'Open',region:'Ontario West',event:'Singles'},
- {id:'a11',n:'Tariq Bhimani',sid:'s3',age:'18+',gender:'Open',region:'BC',event:'Singles'},
- {id:'a12',n:'Khalil Remtulla',sid:'s3',age:'18+',gender:'Open',region:'Alberta',event:'Singles'},
- /* CHESS U18 Open */
- {id:'a13',n:'Deen Hirji',sid:'s3',age:'U18',gender:'Open',region:'Ontario East',event:'Singles'},
- /* PICKLEBALL 18+ Open */
- {id:'a14',n:'Nadim Walji',sid:'s7',age:'18+',gender:'Open',region:'BC',event:'Singles'},
- {id:'a15',n:'Rahim Somani',sid:'s7',age:'18+',gender:'Open',region:'Alberta',event:'Doubles'},
- /* PICKLEBALL 18+ Women's */
- {id:'a16',n:'Layla Virani',sid:'s7',age:'18+',gender:"Girls/Women's",region:'Ontario East',event:'Singles'},
- {id:'a17',n:'Mehrun Bhanji',sid:'s7',age:'18+',gender:"Girls/Women's",region:'Pacific USA',event:'Doubles'},
- /* PICKLEBALL 45+ Open */
- {id:'a18',n:'Azim Nazerali',sid:'s7',age:'45+',gender:'Open',region:'Central USA',event:'Mixed Doubles'},
- /* TABLE TENNIS 18+ Open */
- {id:'a19',n:'Shaffin Jetha',sid:'s10',age:'18+',gender:'Open',region:'BC',event:'Singles'},
- {id:'a20',n:'Murad Kara',sid:'s10',age:'18+',gender:'Open',region:'Ontario West',event:'Doubles'},
- /* TABLE TENNIS 18+ Women's */
- {id:'a21',n:'Yasmin Dhanani',sid:'s10',age:'18+',gender:"Girls/Women's",region:'Northeast USA',event:'Singles'},
- {id:'a22',n:'Laila Momin',sid:'s10',age:'18+',gender:"Girls/Women's",region:'Alberta',event:'Mixed Doubles'},
- /* TENNIS 18+ Open */
- {id:'a23',n:'Arif Kassam',sid:'s11',age:'18+',gender:'Open',region:'Ontario East',event:'Singles'},
- {id:'a24',n:'Tariq Lalji',sid:'s11',age:'18+',gender:'Open',region:'Atlantic Canada',event:'Doubles'},
- /* TENNIS 18+ Women's */
- {id:'a25',n:'Sana Bandali',sid:'s11',age:'18+',gender:"Girls/Women's",region:'BC',event:'Singles'},
- /* TRACK 18+ Open */
- {id:'a26',n:'Karim Nasser',sid:'s13',age:'18+',gender:'Open',region:'Alberta',event:'400m'},
- {id:'a27',n:'Zubair Fazal',sid:'s13',age:'18+',gender:'Open',region:'Ontario West',event:'100m'},
- {id:'a28',n:'Iqbal Devji',sid:'s13',age:'18+',gender:'Open',region:'BC',event:'1500m'},
- {id:'a29',n:'Rizwan Bharmal',sid:'s13',age:'18+',gender:'Open',region:'Pacific USA',event:'5000m'},
- /* TRACK 18+ Women's */
- {id:'a30',n:'Salma Hussain',sid:'s13',age:'U18',gender:"Girls/Women's",region:'Quebec',event:'100m'},
- {id:'a31',n:'Kiran Lakhani',sid:'s13',age:'18+',gender:"Girls/Women's",region:'Alberta',event:'200m'},
- {id:'a32',n:'Fatima Habib',sid:'s13',age:'18+',gender:"Girls/Women's",region:'Ontario East',event:'800m'},
- /* DANCE 18+ Open */
- {id:'a33',n:'Team Nur — Ontario West',sid:'s6',age:'18+',gender:'Open',region:'Ontario West',event:'Group'},
- {id:'a34',n:'Team Sama — BC',sid:'s6',age:'18+',gender:'Open',region:'BC',event:'Group'},
- {id:'a35',n:'Team Noor — Alberta',sid:'s6',age:'18+',gender:'Open',region:'Alberta',event:'Group'},
- {id:'a36',n:'Team Roshni — Northeast USA',sid:'s6',age:'18+',gender:'Open',region:'Northeast USA',event:'Group'},
- /* GOLF 18+ Open */
- {id:'a37',n:'Ameer Boghani',sid:'s6g',age:'18+',gender:'Open',region:'BC',event:'Stroke Play'},
- /* WRESTLING 18+ Men */
- {id:'a38',n:'Amirali Noorani',sid:'s14w',age:'18+',gender:'Open',region:'Alberta',event:'74kg'},
- {id:'a39',n:'Dost Mohammed',sid:'s14w',age:'18+',gender:'Open',region:'Central USA',event:'90kg'},
+ {id:'a02',n:'Zubair Fazal',sid:'s1',age:'18+',gender:'Open',region:'Alberta',event:'Doubles'},
+ {id:'a03',n:'Karim Remtulla',sid:'s1',age:'18+',gender:'Open',region:'Ontario West',event:'Mixed Doubles'},
+ {id:'a04',n:'Arif Lalji',sid:'s1',age:'18+',gender:'Open',region:'Ontario East',event:'Singles'},
+ {id:'a05',n:'Hassan Mawji',sid:'s1',age:'18+',gender:'Open',region:'Northeast USA',event:'Doubles'},
+ {id:'a06',n:'Dost Bhimji',sid:'s1',age:'18+',gender:'Open',region:'Pacific USA',event:'Mixed Doubles'},
+ {id:'a07',n:'Salim Verjee',sid:'s1',age:'18+',gender:'Open',region:'Great Lakes USA',event:'Singles'},
+ {id:'a08',n:'Zara Alibhai',sid:'s1',age:'18+',gender:"Girls/Women's",region:'BC',event:'Singles'},
+ {id:'a09',n:'Rania Virani',sid:'s1',age:'18+',gender:"Girls/Women's",region:'Ontario West',event:'Doubles'},
+ {id:'a10',n:'Sofia Ladha',sid:'s1',age:'18+',gender:"Girls/Women's",region:'Alberta',event:'Mixed Doubles'},
+ {id:'a11',n:'Layla Kara',sid:'s1',age:'18+',gender:"Girls/Women's",region:'Ontario East',event:'Singles'},
+ {id:'a12',n:'Yasmin Dhanani',sid:'s1',age:'45+',gender:"Girls/Women's",region:'Central USA',event:'Doubles'},
+ {id:'a13',n:'Nadia Janmohamed',sid:'s1',age:'45+',gender:"Girls/Women's",region:'Southeast USA',event:'Singles'},
+ {id:'a14',n:'Amina Hirji',sid:'s1',age:'U18',gender:"Girls/Women's",region:'Quebec',event:'Singles'},
+ /* CHESS — 14 athletes */
+ {id:'a15',n:'Hassan Dharani',sid:'s3',age:'18+',gender:'Open',region:'Ontario West',event:'Singles'},
+ {id:'a16',n:'Tariq Bhimani',sid:'s3',age:'18+',gender:'Open',region:'BC',event:'Singles'},
+ {id:'a17',n:'Khalil Remtulla',sid:'s3',age:'18+',gender:'Open',region:'Alberta',event:'Singles'},
+ {id:'a18',n:'Aamir Momin',sid:'s3',age:'18+',gender:'Open',region:'Ontario East',event:'Singles'},
+ {id:'a19',n:'Riaz Walji',sid:'s3',age:'18+',gender:'Open',region:'Northeast USA',event:'Singles'},
+ {id:'a20',n:'Nasir Mawji',sid:'s3',age:'18+',gender:'Open',region:'Great Lakes USA',event:'Singles'},
+ {id:'a21',n:'Bilal Hasham',sid:'s3',age:'18+',gender:'Open',region:'Pacific USA',event:'Singles'},
+ {id:'a22',n:'Jamal Somani',sid:'s3',age:'18+',gender:'Open',region:'Central USA',event:'Singles'},
+ {id:'a23',n:'Faizal Esmail',sid:'s3',age:'18+',gender:'Open',region:'Southeast USA',event:'Singles'},
+ {id:'a24',n:'Anees Bandali',sid:'s3',age:'18+',gender:'Open',region:'Mid-Atlantic USA',event:'Singles'},
+ {id:'a25',n:'Murad Juma',sid:'s3',age:'18+',gender:'Open',region:'Southwest USA',event:'Singles'},
+ {id:'a26',n:'Deen Hirji',sid:'s3',age:'U18',gender:'Open',region:'Ontario East',event:'Singles'},
+ {id:'a27',n:'Azim Nazerali',sid:'s3',age:'45+',gender:'Open',region:'Atlantic Canada',event:'Singles'},
+ {id:'a28',n:'Shaffin Jetha',sid:'s3',age:'18+',gender:'Open',region:'Saskatchewan/Manitoba',event:'Singles'},
+ /* TABLE TENNIS — 14 athletes */
+ {id:'a29',n:'Murad Kara',sid:'s10',age:'18+',gender:'Open',region:'Ontario West',event:'Singles'},
+ {id:'a30',n:'Rahim Somani',sid:'s10',age:'18+',gender:'Open',region:'BC',event:'Doubles'},
+ {id:'a31',n:'Murtaza Lalji',sid:'s10',age:'18+',gender:'Open',region:'Alberta',event:'Mixed Doubles'},
+ {id:'a32',n:'Anees Walji',sid:'s10',age:'18+',gender:'Open',region:'Ontario East',event:'Singles'},
+ {id:'a33',n:'Iqbal Devji',sid:'s10',age:'18+',gender:'Open',region:'Northeast USA',event:'Doubles'},
+ {id:'a34',n:'Yasmin Dhanani',sid:'s10',age:'18+',gender:"Girls/Women's",region:'Pacific USA',event:'Singles'},
+ {id:'a35',n:'Laila Momin',sid:'s10',age:'18+',gender:"Girls/Women's",region:'Great Lakes USA',event:'Doubles'},
+ {id:'a36',n:'Sofia Bandali',sid:'s10',age:'18+',gender:"Girls/Women's",region:'Ontario West',event:'Mixed Doubles'},
+ {id:'a37',n:'Nuzhat Devji',sid:'s10',age:'45+',gender:"Girls/Women's",region:'Central USA',event:'Doubles'},
+ {id:'a38',n:'Dilara Manji',sid:'s10',age:'45+',gender:"Girls/Women's",region:'BC',event:'Singles'},
+ {id:'a39',n:'Aisha Bhimani',sid:'s10',age:'U18',gender:"Girls/Women's",region:'Alberta',event:'Singles'},
+ {id:'a40',n:'Roshni Fazaldeen',sid:'s10',age:'U18',gender:"Girls/Women's",region:'Quebec',event:'Doubles'},
+ {id:'a41',n:'Arif Kassam',sid:'s10',age:'18+',gender:'Open',region:'Mid-Atlantic USA',event:'Singles'},
+ {id:'a42',n:'Tariq Noormohamed',sid:'s10',age:'18+',gender:'Open',region:'Southwest USA',event:'Singles'},
+ /* TENNIS — 14 athletes */
+ {id:'a43',n:'Arif Kassam',sid:'s11',age:'18+',gender:'Open',region:'Ontario East',event:'Singles'},
+ {id:'a44',n:'Tariq Lalji',sid:'s11',age:'18+',gender:'Open',region:'Atlantic Canada',event:'Doubles'},
+ {id:'a45',n:'Karim Nasser',sid:'s11',age:'18+',gender:'Open',region:'Alberta',event:'Mixed Doubles'},
+ {id:'a46',n:'Imran Fazal',sid:'s11',age:'18+',gender:'Open',region:'BC',event:'Singles'},
+ {id:'a47',n:'Zain Virani',sid:'s11',age:'18+',gender:'Open',region:'Ontario West',event:'Doubles'},
+ {id:'a48',n:'Dost Remtulla',sid:'s11',age:'18+',gender:'Open',region:'Northeast USA',event:'Singles'},
+ {id:'a49',n:'Aamir Bhimji',sid:'s11',age:'18+',gender:'Open',region:'Great Lakes USA',event:'Singles'},
+ {id:'a50',n:'Sana Bandali',sid:'s11',age:'18+',gender:"Girls/Women's",region:'BC',event:'Singles'},
+ {id:'a51',n:'Mehrun Bhanji',sid:'s11',age:'18+',gender:"Girls/Women's",region:'Pacific USA',event:'Doubles'},
+ {id:'a52',n:'Rania Alibhai',sid:'s11',age:'18+',gender:"Girls/Women's",region:'Ontario West',event:'Mixed Doubles'},
+ {id:'a53',n:'Nadia Walji',sid:'s11',age:'18+',gender:"Girls/Women's",region:'Alberta',event:'Singles'},
+ {id:'a54',n:'Layla Hirji',sid:'s11',age:'18+',gender:"Girls/Women's",region:'Ontario East',event:'Doubles'},
+ {id:'a55',n:'Sofia Mawji',sid:'s11',age:'U18',gender:"Girls/Women's",region:'Quebec',event:'Singles'},
+ {id:'a56',n:'Amina Juma',sid:'s11',age:'45+',gender:"Girls/Women's",region:'Southeast USA',event:'Singles'},
+ /* TRACK — 14 athletes */
+ {id:'a57',n:'Karim Nasser',sid:'s13',age:'18+',gender:'Open',region:'Alberta',event:'400m'},
+ {id:'a58',n:'Zubair Fazal',sid:'s13',age:'18+',gender:'Open',region:'Ontario West',event:'100m'},
+ {id:'a59',n:'Iqbal Devji',sid:'s13',age:'18+',gender:'Open',region:'BC',event:'1500m'},
+ {id:'a60',n:'Rizwan Bharmal',sid:'s13',age:'18+',gender:'Open',region:'Pacific USA',event:'5000m'},
+ {id:'a61',n:'Hassan Momin',sid:'s13',age:'18+',gender:'Open',region:'Ontario East',event:'200m'},
+ {id:'a62',n:'Arif Somani',sid:'s13',age:'18+',gender:'Open',region:'Mid-Atlantic USA',event:'800m'},
+ {id:'a63',n:'Nasir Esmail',sid:'s13',age:'18+',gender:'Open',region:'Central USA',event:'400m'},
+ {id:'a64',n:'Salma Hussain',sid:'s13',age:'U18',gender:"Girls/Women's",region:'Quebec',event:'100m'},
+ {id:'a65',n:'Kiran Lakhani',sid:'s13',age:'18+',gender:"Girls/Women's",region:'Alberta',event:'200m'},
+ {id:'a66',n:'Fatima Habib',sid:'s13',age:'18+',gender:"Girls/Women's",region:'Ontario East',event:'800m'},
+ {id:'a67',n:'Nadia Karimji',sid:'s13',age:'18+',gender:"Girls/Women's",region:'BC',event:'1500m'},
+ {id:'a68',n:'Layla Murji',sid:'s13',age:'18+',gender:"Girls/Women's",region:'Northeast USA',event:'5000m'},
+ {id:'a69',n:'Sana Verjee',sid:'s13',age:'18+',gender:"Girls/Women's",region:'Pacific USA',event:'400m'},
+ {id:'a70',n:'Amina Juma',sid:'s13',age:'45+',gender:"Girls/Women's",region:'Great Lakes USA',event:'200m'},
+ /* PICKLEBALL — 14 athletes */
+ {id:'a71',n:'Nadim Walji',sid:'s9',age:'18+',gender:'Open',region:'BC',event:'Singles'},
+ {id:'a72',n:'Rahim Somani',sid:'s9',age:'18+',gender:'Open',region:'Alberta',event:'Doubles'},
+ {id:'a73',n:'Azim Nazerali',sid:'s9',age:'45+',gender:'Open',region:'Central USA',event:'Mixed Doubles'},
+ {id:'a74',n:'Anees Bharmal',sid:'s9',age:'45+',gender:'Open',region:'Ontario West',event:'Singles'},
+ {id:'a75',n:'Layla Virani',sid:'s9',age:'18+',gender:"Girls/Women's",region:'Ontario East',event:'Singles'},
+ {id:'a76',n:'Mehrun Bhanji',sid:'s9',age:'18+',gender:"Girls/Women's",region:'Pacific USA',event:'Doubles'},
+ {id:'a77',n:'Nadia Esmail',sid:'s9',age:'45+',gender:"Girls/Women's",region:'Northeast USA',event:'Mixed Doubles'},
+ {id:'a78',n:'Yasmin Hirji',sid:'s9',age:'45+',gender:"Girls/Women's",region:'Great Lakes USA',event:'Singles'},
+ {id:'a79',n:'Zain Bhimani',sid:'s9',age:'18+',gender:'Open',region:'Ontario East',event:'Singles'},
+ {id:'a80',n:'Tariq Mawji',sid:'s9',age:'18+',gender:'Open',region:'Southeast USA',event:'Doubles'},
+ {id:'a81',n:'Salim Fazaldeen',sid:'s9',age:'18+',gender:'Open',region:'Southwest USA',event:'Singles'},
+ {id:'a82',n:'Sofia Lalji',sid:'s9',age:'U18',gender:"Girls/Women's",region:'BC',event:'Singles'},
+ {id:'a83',n:'Rania Merchant',sid:'s9',age:'U18',gender:"Girls/Women's",region:'Alberta',event:'Doubles'},
+ {id:'a84',n:'Dilnoza Kara',sid:'s9',age:'18+',gender:"Girls/Women's",region:'Mid-Atlantic USA',event:'Mixed Doubles'},
+
  ],
  games:[
- /* ── BASKETBALL 18+ Open ── Pool A */
- {id:'g01',sid:'s2',age:'18+',gender:'Open',hid:'t01',aid:'t02',vid:'v1',date:'2027-07-14',time:'09:00',status:'completed',hs:78,as:65,round:'Pool Play'},
- {id:'g02',sid:'s2',age:'18+',gender:'Open',hid:'t03',aid:'t04',vid:'v1',date:'2027-07-14',time:'10:00',status:'completed',hs:55,as:62,round:'Pool Play'},
- {id:'g03',sid:'s2',age:'18+',gender:'Open',hid:'t01',aid:'t03',vid:'v1',date:'2027-07-14',time:'11:30',status:'completed',hs:70,as:58,round:'Pool Play'},
- {id:'g04',sid:'s2',age:'18+',gender:'Open',hid:'t02',aid:'t04',vid:'v1',date:'2027-07-15',time:'09:00',status:'completed',hs:66,as:71,round:'Pool Play'},
- /* Pool B */
- {id:'g05',sid:'s2',age:'18+',gender:'Open',hid:'t05',aid:'t06',vid:'v1',date:'2027-07-14',time:'09:00',status:'completed',hs:82,as:71,round:'Pool Play'},
- {id:'g06',sid:'s2',age:'18+',gender:'Open',hid:'t07',aid:'t08',vid:'v1',date:'2027-07-14',time:'14:00',status:'in_progress',hs:41,as:38,round:'Pool Play'},
- {id:'g07',sid:'s2',age:'18+',gender:'Open',hid:'t05',aid:'t07',vid:'v1',date:'2027-07-15',time:'11:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- /* Bracket */
- {id:'g08',sid:'s2',age:'18+',gender:'Open',hid:'t01',aid:'t05',vid:'v1',date:'2027-07-17',time:'10:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
- {id:'g09',sid:'s2',age:'18+',gender:'Open',hid:'t04',aid:'t07',vid:'v1',date:'2027-07-17',time:'12:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
- {id:'g10',sid:'s2',age:'18+',gender:'Open',hid:'t05',aid:'t04',vid:'v1',date:'2027-07-18',time:'10:00',status:'scheduled',hs:0,as:0,round:'Bronze Final'},
- {id:'g11',sid:'s2',age:'18+',gender:'Open',hid:'t01',aid:'t07',vid:'v1',date:'2027-07-18',time:'15:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
- 
- {id:'g12',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t09',aid:'t10',vid:'v1',date:'2027-07-14',time:'09:30',status:'completed',hs:62,as:55,round:'Pool Play'},
- {id:'g13',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t11',aid:'t12',vid:'v1',date:'2027-07-14',time:'11:00',status:'completed',hs:48,as:67,round:'Pool Play'},
- {id:'g14',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t09',aid:'t11',vid:'v1',date:'2027-07-15',time:'09:00',status:'in_progress',hs:33,as:29,round:'Pool Play'},
- {id:'g15',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t13',aid:'t14',vid:'v1',date:'2027-07-15',time:'14:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- {id:'g16',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t09',aid:'t13',vid:'v1',date:'2027-07-17',time:'09:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
- {id:'g17',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t12',aid:'t14',vid:'v1',date:'2027-07-17',time:'11:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
- {id:'g18',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t09',aid:'t12',vid:'v1',date:'2027-07-18',time:'14:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
- 
- {id:'g19',sid:'s8',age:'18+',gender:'Open',hid:'t19',aid:'t20',vid:'v2',date:'2027-07-14',time:'09:00',status:'completed',hs:3,as:1,round:'Pool Play'},
- {id:'g20',sid:'s8',age:'18+',gender:'Open',hid:'t21',aid:'t22',vid:'v2',date:'2027-07-14',time:'11:00',status:'completed',hs:1,as:1,round:'Pool Play'},
- {id:'g21',sid:'s8',age:'18+',gender:'Open',hid:'t23',aid:'t24',vid:'v2',date:'2027-07-14',time:'14:00',status:'in_progress',hs:2,as:1,round:'Pool Play'},
- {id:'g22',sid:'s8',age:'18+',gender:'Open',hid:'t19',aid:'t21',vid:'v2',date:'2027-07-15',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- {id:'g23',sid:'s8',age:'18+',gender:'Open',hid:'t20',aid:'t22',vid:'v2',date:'2027-07-15',time:'11:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- {id:'g24',sid:'s8',age:'18+',gender:'Open',hid:'t19',aid:'t23',vid:'v7',date:'2027-07-17',time:'10:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
- {id:'g25',sid:'s8',age:'18+',gender:'Open',hid:'t21',aid:'t24',vid:'v7',date:'2027-07-17',time:'12:30',status:'scheduled',hs:0,as:0,round:'Semifinal'},
- {id:'g26',sid:'s8',age:'18+',gender:'Open',hid:'t19',aid:'t21',vid:'v7',date:'2027-07-18',time:'15:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
- 
- {id:'g27',sid:'s8',age:'18+',gender:"Girls/Women's",hid:'t25',aid:'t26',vid:'v7',date:'2027-07-14',time:'10:00',status:'completed',hs:2,as:0,round:'Pool Play'},
- {id:'g28',sid:'s8',age:'18+',gender:"Girls/Women's",hid:'t27',aid:'t28',vid:'v7',date:'2027-07-14',time:'13:00',status:'completed',hs:1,as:3,round:'Pool Play'},
- {id:'g29',sid:'s8',age:'18+',gender:"Girls/Women's",hid:'t25',aid:'t27',vid:'v7',date:'2027-07-15',time:'10:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- 
- {id:'g30',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t29',aid:'t30',vid:'v3',date:'2027-07-14',time:'10:00',status:'completed',hs:25,as:22,round:'Pool Play'},
- {id:'g31',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t31',aid:'t32',vid:'v3',date:'2027-07-14',time:'12:00',status:'completed',hs:19,as:25,round:'Pool Play'},
- {id:'g32',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t33',aid:'t34',vid:'v3',date:'2027-07-14',time:'14:00',status:'completed',hs:25,as:18,round:'Pool Play'},
- {id:'g33',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t29',aid:'t31',vid:'v3',date:'2027-07-15',time:'10:00',status:'in_progress',hs:18,as:21,round:'Pool Play'},
- {id:'g34',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t32',aid:'t34',vid:'v3',date:'2027-07-15',time:'12:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- {id:'g35',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t29',aid:'t33',vid:'v3',date:'2027-07-17',time:'10:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
- {id:'g36',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t32',aid:'t31',vid:'v3',date:'2027-07-17',time:'12:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
- {id:'g37',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t29',aid:'t32',vid:'v3',date:'2027-07-18',time:'14:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
- 
- {id:'g38',sid:'s14',age:'18+',gender:'Open',hid:'t35',aid:'t36',vid:'v3',date:'2027-07-14',time:'09:00',status:'completed',hs:25,as:20,round:'Pool Play'},
- {id:'g39',sid:'s14',age:'18+',gender:'Open',hid:'t37',aid:'t38',vid:'v3',date:'2027-07-14',time:'11:00',status:'completed',hs:22,as:25,round:'Pool Play'},
- {id:'g40',sid:'s14',age:'18+',gender:'Open',hid:'t35',aid:'t37',vid:'v3',date:'2027-07-15',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- 
- {id:'g41',sid:'s4',age:'18+',gender:'Open',hid:'t39',aid:'t40',vid:'v4',date:'2027-07-14',time:'09:00',status:'completed',hs:187,as:142,round:'Pool Play'},
- {id:'g42',sid:'s4',age:'18+',gender:'Open',hid:'t41',aid:'t42',vid:'v4',date:'2027-07-14',time:'09:00',status:'completed',hs:156,as:201,round:'Pool Play'},
- {id:'g43',sid:'s4',age:'18+',gender:'Open',hid:'t43',aid:'t44',vid:'v4',date:'2027-07-14',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- {id:'g44',sid:'s4',age:'18+',gender:'Open',hid:'t39',aid:'t41',vid:'v4',date:'2027-07-15',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- {id:'g45',sid:'s4',age:'18+',gender:'Open',hid:'t40',aid:'t42',vid:'v4',date:'2027-07-15',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- {id:'g46',sid:'s4',age:'18+',gender:'Open',hid:'t39',aid:'t42',vid:'v4',date:'2027-07-17',time:'09:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
- 
- {id:'g47',sid:'s5',age:'18+',gender:"Girls/Women's",hid:'t45',aid:'t46',vid:'v4',date:'2027-07-14',time:'14:00',status:'completed',hs:112,as:98,round:'Pool Play'},
- {id:'g48',sid:'s5',age:'18+',gender:"Girls/Women's",hid:'t47',aid:'t48',vid:'v4',date:'2027-07-14',time:'14:00',status:'completed',hs:87,as:103,round:'Pool Play'},
- {id:'g49',sid:'s5',age:'18+',gender:"Girls/Women's",hid:'t45',aid:'t47',vid:'v4',date:'2027-07-15',time:'14:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
- 
- {id:'g50',sid:'s7',age:'18+',gender:'Open',hid:'t49',aid:'t50',vid:'v2',date:'2027-07-14',time:'10:00',status:'completed',hs:28,as:14,round:'Pool Play'},
- {id:'g51',sid:'s7',age:'18+',gender:'Open',hid:'t51',aid:'t52',vid:'v2',date:'2027-07-14',time:'12:00',status:'completed',hs:21,as:21,round:'Pool Play'},
- {id:'g52',sid:'s7',age:'18+',gender:'Open',hid:'t49',aid:'t51',vid:'v2',date:'2027-07-15',time:'10:00',status:'in_progress',hs:14,as:7,round:'Pool Play'},
- {id:'g53',sid:'s7',age:'18+',gender:'Open',hid:'t49',aid:'t52',vid:'v7',date:'2027-07-17',time:'14:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
- 
- {id:'g54',sid:'s7',age:'18+',gender:"Girls/Women's",hid:'t53',aid:'t54',vid:'v7',date:'2027-07-14',time:'13:00',status:'completed',hs:35,as:21,round:'Gold Final'},
- 
- {id:'g55',sid:'s12',age:'18+',gender:"Girls/Women's",hid:'t55',aid:'t56',vid:'v3',date:'2027-07-14',time:'16:00',status:'completed',hs:25,as:18,round:'Pool Play'},
- {id:'g56',sid:'s12',age:'18+',gender:"Girls/Women's",hid:'t57',aid:'t58',vid:'v3',date:'2027-07-14',time:'16:00',status:'completed',hs:20,as:25,round:'Pool Play'},
- {id:'g57',sid:'s12',age:'18+',gender:"Girls/Women's",hid:'t55',aid:'t57',vid:'v3',date:'2027-07-15',time:'16:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
- {id:'g58',sid:'s12',age:'18+',gender:"Girls/Women's",hid:'t55',aid:'t58',vid:'v3',date:'2027-07-17',time:'14:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
+ /* BASKETBALL 18+ Open — Pool A (Canada) */
+ {id:'g01',sid:'s2',age:'18+',gender:'Open',hid:'t01',aid:'t02',vid:'v1',date:'2027-07-14',time:'09:00',status:'completed',hs:78,as:65,round:'Pool Play',stats:{periods:[{n:1,home:18,away:15},{n:2,home:22,away:17},{n:3,home:20,away:18},{n:4,home:18,away:15}],home:{fouls:12,timeouts:1,fg_made:31,fg_att:68,ft_made:14,ft_att:18,rebounds:38,assists:22,steals:8,turnovers:11,blocks:4,'3p_made':2},away:{fouls:15,timeouts:2,fg_made:26,fg_att:71,ft_made:11,ft_att:16,rebounds:34,assists:18,steals:6,turnovers:13,blocks:2,'3p_made':1},events:[{t:'Q1 4:22',type:'Foul',team:'home',note:'Personal foul'},{t:'Q2 2:15',type:'Timeout',team:'away',note:'Full timeout'},{t:'Q3 6:44',type:'Foul',team:'away',note:'Personal foul'},{t:'Q4 1:30',type:'Timeout',team:'home',note:'20-second'}],period:4}},
+ {id:'g02',sid:'s2',age:'18+',gender:'Open',hid:'t03',aid:'t04',vid:'v1',date:'2027-07-14',time:'10:30',status:'completed',hs:62,as:71,round:'Pool Play'},
+ {id:'g03',sid:'s2',age:'18+',gender:'Open',hid:'t05',aid:'t06',vid:'v1',date:'2027-07-14',time:'12:00',status:'completed',hs:85,as:74,round:'Pool Play'},
+ {id:'g04',sid:'s2',age:'18+',gender:'Open',hid:'t07',aid:'t01',vid:'v1',date:'2027-07-14',time:'13:30',status:'completed',hs:55,as:68,round:'Pool Play'},
+ {id:'g05',sid:'s2',age:'18+',gender:'Open',hid:'t02',aid:'t05',vid:'v1',date:'2027-07-15',time:'09:00',status:'completed',hs:71,as:66,round:'Pool Play'},
+ /* BASKETBALL 18+ Open — Pool B (USA) */
+ {id:'g06',sid:'s2',age:'18+',gender:'Open',hid:'t08',aid:'t09',vid:'v1',date:'2027-07-14',time:'09:00',status:'completed',hs:82,as:71,round:'Pool Play'},
+ {id:'g07',sid:'s2',age:'18+',gender:'Open',hid:'t10',aid:'t11',vid:'v1',date:'2027-07-14',time:'10:30',status:'completed',hs:67,as:72,round:'Pool Play'},
+ {id:'g08',sid:'s2',age:'18+',gender:'Open',hid:'t12',aid:'t13',vid:'v1',date:'2027-07-14',time:'14:00',status:'in_progress',hs:41,as:38,round:'Pool Play',stats:{periods:[{n:1,home:11,away:14},{n:2,home:12,away:11},{n:3,home:9,away:8},{n:4,home:9,away:5}],home:{fouls:8,timeouts:0,'3p_made':3,rebounds:22,assists:11},away:{fouls:10,timeouts:1,'3p_made':1,rebounds:19,assists:8},events:[{t:'Q2 8:11',type:'Timeout',team:'away',note:'Timeout'},{t:'Q3 3:40',type:'Foul',team:'home',note:'Technical foul'}],period:4}},
+ {id:'g09',sid:'s2',age:'18+',gender:'Open',hid:'t14',aid:'t08',vid:'v1',date:'2027-07-15',time:'10:30',status:'scheduled',hs:0,as:0,round:'Pool Play'},
+ {id:'g10',sid:'s2',age:'18+',gender:'Open',hid:'t09',aid:'t11',vid:'v1',date:'2027-07-15',time:'12:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
+ /* BASKETBALL 18+ Open — Bracket */
+ {id:'g11',sid:'s2',age:'18+',gender:'Open',hid:'t01',aid:'t08',vid:'v1',date:'2027-07-17',time:'10:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
+ {id:'g12',sid:'s2',age:'18+',gender:'Open',hid:'t05',aid:'t10',vid:'v1',date:'2027-07-17',time:'12:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
+ {id:'g13',sid:'s2',age:'18+',gender:'Open',hid:'t01',aid:'t05',vid:'v1',date:'2027-07-18',time:'14:00',status:'scheduled',hs:0,as:0,round:'Bronze Final'},
+ {id:'g14',sid:'s2',age:'18+',gender:'Open',hid:'t01',aid:'t10',vid:'v1',date:'2027-07-18',time:'16:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
+ /* BASKETBALL 18+ Women — Pool A */
+ {id:'g15',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t15',aid:'t16',vid:'v1',date:'2027-07-14',time:'09:30',status:'completed',hs:62,as:55,round:'Pool Play'},
+ {id:'g16',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t17',aid:'t18',vid:'v1',date:'2027-07-14',time:'11:00',status:'completed',hs:48,as:67,round:'Pool Play'},
+ {id:'g17',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t19',aid:'t20',vid:'v1',date:'2027-07-14',time:'14:00',status:'in_progress',hs:33,as:29,round:'Pool Play'},
+ {id:'g18',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t21',aid:'t22',vid:'v1',date:'2027-07-15',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
+ {id:'g19',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t23',aid:'t24',vid:'v1',date:'2027-07-17',time:'09:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
+ {id:'g20',sid:'s2',age:'18+',gender:"Girls/Women's",hid:'t15',aid:'t23',vid:'v1',date:'2027-07-18',time:'14:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
+ /* SOCCER 18+ Open — Pool A (Canada) */
+ {id:'g21',sid:'s8',age:'18+',gender:'Open',hid:'t29',aid:'t30',vid:'v2',date:'2027-07-14',time:'09:00',status:'completed',hs:3,as:1,round:'Pool Play',stats:{periods:[{n:1,home:2,away:0},{n:2,home:1,away:1}],home:{yellow_cards:1,red_cards:0,corners:6,shots:14,shots_on:8,offsides:2,fouls:9},away:{yellow_cards:2,red_cards:0,corners:3,shots:7,shots_on:3,offsides:1,fouls:14},events:[{t:"23'",type:'Goal',team:'home',note:'Corner kick header'},{t:"38'",type:'Yellow Card',team:'away',note:'Tactical foul'},{t:"44'",type:'Goal',team:'home',note:'Penalty kick'},{t:"67'",type:'Goal',team:'home',note:'Counter attack'},{t:"74'",type:'Goal',team:'away',note:'Long-range strike'},{t:"88'",type:'Yellow Card',team:'away',note:'Dissent'}],period:2}},
+ {id:'g22',sid:'s8',age:'18+',gender:'Open',hid:'t31',aid:'t32',vid:'v2',date:'2027-07-14',time:'11:00',status:'completed',hs:1,as:1,round:'Pool Play'},
+ {id:'g23',sid:'s8',age:'18+',gender:'Open',hid:'t33',aid:'t34',vid:'v2',date:'2027-07-14',time:'14:00',status:'in_progress',hs:2,as:1,round:'Pool Play'},
+ {id:'g24',sid:'s8',age:'18+',gender:'Open',hid:'t35',aid:'t29',vid:'v2',date:'2027-07-15',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
+ /* SOCCER 18+ Open — Pool B (USA) */
+ {id:'g25',sid:'s8',age:'18+',gender:'Open',hid:'t36',aid:'t37',vid:'v7',date:'2027-07-14',time:'10:00',status:'completed',hs:2,as:2,round:'Pool Play'},
+ {id:'g26',sid:'s8',age:'18+',gender:'Open',hid:'t38',aid:'t39',vid:'v7',date:'2027-07-14',time:'12:30',status:'completed',hs:4,as:1,round:'Pool Play'},
+ {id:'g27',sid:'s8',age:'18+',gender:'Open',hid:'t40',aid:'t41',vid:'v7',date:'2027-07-14',time:'15:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
+ {id:'g28',sid:'s8',age:'18+',gender:'Open',hid:'t42',aid:'t36',vid:'v7',date:'2027-07-15',time:'10:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
+ /* SOCCER — Bracket */
+ {id:'g29',sid:'s8',age:'18+',gender:'Open',hid:'t29',aid:'t38',vid:'v7',date:'2027-07-17',time:'10:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
+ {id:'g30',sid:'s8',age:'18+',gender:'Open',hid:'t29',aid:'t38',vid:'v7',date:'2027-07-18',time:'15:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
+ /* VOLLEYBALL 18+ Women — Pool A */
+ {id:'g31',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t43',aid:'t44',vid:'v3',date:'2027-07-14',time:'10:00',status:'completed',hs:25,as:22,round:'Pool Play'},
+ {id:'g32',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t45',aid:'t46',vid:'v3',date:'2027-07-14',time:'12:00',status:'completed',hs:19,as:25,round:'Pool Play'},
+ {id:'g33',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t47',aid:'t48',vid:'v3',date:'2027-07-14',time:'14:00',status:'completed',hs:25,as:18,round:'Pool Play'},
+ {id:'g34',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t49',aid:'t43',vid:'v3',date:'2027-07-15',time:'10:00',status:'in_progress',hs:18,as:21,round:'Pool Play'},
+ /* VOLLEYBALL — Pool B */
+ {id:'g35',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t50',aid:'t51',vid:'v3',date:'2027-07-14',time:'11:00',status:'completed',hs:21,as:25,round:'Pool Play'},
+ {id:'g36',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t52',aid:'t53',vid:'v3',date:'2027-07-14',time:'13:00',status:'completed',hs:25,as:23,round:'Pool Play'},
+ {id:'g37',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t43',aid:'t52',vid:'v3',date:'2027-07-17',time:'10:00',status:'scheduled',hs:0,as:0,round:'Semifinal'},
+ {id:'g38',sid:'s14',age:'18+',gender:"Girls/Women's",hid:'t43',aid:'t52',vid:'v3',date:'2027-07-18',time:'14:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
+ /* CRICKET Hardball — Pool A */
+ {id:'g39',sid:'s4',age:'18+',gender:'Open',hid:'t57',aid:'t58',vid:'v4',date:'2027-07-14',time:'09:00',status:'completed',hs:187,as:142,round:'Pool Play'},
+ {id:'g40',sid:'s4',age:'18+',gender:'Open',hid:'t59',aid:'t60',vid:'v4',date:'2027-07-14',time:'09:00',status:'completed',hs:156,as:201,round:'Pool Play'},
+ {id:'g41',sid:'s4',age:'18+',gender:'Open',hid:'t61',aid:'t62',vid:'v4',date:'2027-07-15',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
+ /* CRICKET — Pool B */
+ {id:'g42',sid:'s4',age:'18+',gender:'Open',hid:'t64',aid:'t65',vid:'v4',date:'2027-07-14',time:'14:00',status:'completed',hs:203,as:178,round:'Pool Play'},
+ {id:'g43',sid:'s4',age:'18+',gender:'Open',hid:'t66',aid:'t67',vid:'v4',date:'2027-07-15',time:'09:00',status:'scheduled',hs:0,as:0,round:'Pool Play'},
+ {id:'g44',sid:'s4',age:'18+',gender:'Open',hid:'t57',aid:'t64',vid:'v4',date:'2027-07-17',time:'09:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
+ /* FLAG FOOTBALL — Pool A & B */
+ {id:'g45',sid:'s7',age:'18+',gender:'Open',hid:'t71',aid:'t72',vid:'v2',date:'2027-07-14',time:'10:00',status:'completed',hs:28,as:14,round:'Pool Play'},
+ {id:'g46',sid:'s7',age:'18+',gender:'Open',hid:'t73',aid:'t74',vid:'v2',date:'2027-07-14',time:'12:00',status:'completed',hs:21,as:21,round:'Pool Play'},
+ {id:'g47',sid:'s7',age:'18+',gender:'Open',hid:'t75',aid:'t76',vid:'v2',date:'2027-07-14',time:'14:00',status:'in_progress',hs:14,as:7,round:'Pool Play'},
+ {id:'g48',sid:'s7',age:'18+',gender:'Open',hid:'t78',aid:'t79',vid:'v7',date:'2027-07-14',time:'13:00',status:'completed',hs:35,as:21,round:'Pool Play'},
+ {id:'g49',sid:'s7',age:'18+',gender:'Open',hid:'t71',aid:'t78',vid:'v7',date:'2027-07-17',time:'14:00',status:'scheduled',hs:0,as:0,round:'Gold Final'},
+
  ],
  scorekeepers:[
  {id:'sk0',name:'Tournament Director',username:'admin',pin:'1234',role:'admin',sports:[],qr:'QR-ADMIN-NAIG27'},
@@ -936,6 +1000,186 @@ function Rulebook({onExport}){
  </div> <div className="card" style={{marginTop:24}}> <div className="card-head"><h3 className="card-title"> Team Roster Requirements</h3></div> <div className="card-body"> <table className="data-table"> <thead><tr><th>Sport</th><th>Min</th><th>Max</th><th>On Field/Court</th><th>Notes</th></tr></thead> <tbody> <tr><td> Basketball</td><td>8</td><td>12</td><td>5</td><td>—</td></tr> <tr><td> Cricket (Hardball)</td><td>12</td><td>18</td><td>11</td><td>Min 11 to start</td></tr> <tr><td> Cricket (Tapeball)</td><td>11</td><td>18</td><td>11</td><td>Min 7 to play</td></tr> <tr><td> Flag Football</td><td>9</td><td>15</td><td>7</td><td>Min 5 to avoid forfeit</td></tr> <tr><td> Football (Soccer)</td><td>12</td><td>18</td><td>11 + GK</td><td>Min 7 to play</td></tr> <tr><td> Throwball</td><td>8</td><td>15</td><td>7</td><td>Min 7 to play · Women's only</td></tr> <tr><td> Volleyball</td><td>7</td><td>12</td><td>6</td><td>Min 6 to play</td></tr> </tbody> </table> </div> </div> <div className="card" style={{marginTop:16}}> <div className="card-head"><h3 className="card-title"> Official Documents</h3></div> <div className="card-body"> <div style={{display:'flex',gap:12,flexWrap:'wrap'}}> <a href="https://naismailigames.com/rulebooks" target="_blank" rel="noreferrer" className="btn btn-navy"> Official NAIG Rulebooks</a> <a href="https://naismailigames.com/eligibility" target="_blank" rel="noreferrer" className="btn btn-outline-navy"> Eligibility Guidelines</a> <button className="btn btn-ghost" onClick={printRules}> Print Full Rulebook PDF</button> </div> </div> </div> </div>;
 }
 
+/* ── GAME DETAIL MODAL ── */
+function GameDetailModal({game,db,onClose,onUpdate}){
+  if(!game)return null;
+  const sp=SPORTS.find(s=>s.id===game.sid);
+  const def=getSS(game.sid);
+  const tn=id=>db.teams.find(t=>t.id===id)?.n||'TBD';
+  const vn=id=>db.venues.find(v=>v.id===id)?.name||'TBD';
+  const stats=game.stats||initGS(game.sid);
+  const [activeTab,setActiveTab]=useState('overview');
+  const totalPeriods=stats.periods||[];
+  const hmTeam=tn(game.hid),awTeam=tn(game.aid);
+
+  function statPct(made,att){
+    if(!att||att===0)return '—';
+    return Math.round(made/att*100)+'%';
+  }
+  function exportGame(){
+    const data={game:{id:game.id,sport:sp?.n,date:game.date,time:game.time,venue:vn(game.vid),round:game.round,status:game.status},teams:{home:{name:hmTeam,score:game.hs,stats:stats.home},away:{name:awTeam,score:game.as,stats:stats.away}},periods:stats.periods,events:stats.events||[]};
+    const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`NAIG_${sp?.n?.replace(/\s/g,'_')}_${game.date}_${hmTeam.replace(/\s/g,'_')}.json`;a.click();
+  }
+  function exportCSV(){
+    const rows=[['Stat',hmTeam,awTeam]];
+    (def.stats||[]).forEach(st=>rows.push([st.l,stats.home[st.k]??0,stats.away[st.k]??0]));
+    rows.push(['Final Score',game.hs,game.as]);
+    const csv=rows.map(r=>r.join(',')).join('\n');
+    const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`NAIG_${sp?.n?.replace(/\s/g,'_')}_${game.date}.csv`;a.click();
+  }
+
+  const TABS=[{id:'overview',l:'Overview'},{id:'stats',l:'Box Score'},{id:'periods',l:`${def.periodName||'Period'} Scores`},{id:'timeline',l:'Timeline'}];
+
+  return<div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+    <div className="modal" style={{maxWidth:720,width:'100%',maxHeight:'90vh',overflowY:'auto',padding:0}}>
+      {/* Header */}
+      <div style={{background:'var(--navy-dk)',padding:'16px 20px',borderRadius:'16px 16px 0 0',borderBottom:'3px solid var(--crimson)'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:12}}>
+          <div>
+            <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:4}}>
+              <span className="sport-code" style={{background:'var(--crimson)'}}>{sp?.abbr}</span>
+              <span style={{color:'rgba(255,255,255,.7)',fontSize:12,textTransform:'uppercase',letterSpacing:'.5px'}}>{sp?.n} — {game.age} {game.gender}</span>
+            </div>
+            <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:13,color:'rgba(255,255,255,.55)',letterSpacing:'.4px',textTransform:'uppercase'}}>{game.round} · {game.date} · {game.time} · {vn(game.vid)}</div>
+          </div>
+          <div style={{display:'flex',gap:6,alignItems:'center'}}>
+            {game.status==='completed'&&<span className="status-final">Final</span>}
+            {game.status==='in_progress'&&<span className="status-live">Live</span>}
+            {game.status==='scheduled'&&<span className="status-sched">Scheduled</span>}
+            <button className="modal-close" style={{color:'rgba(255,255,255,.6)'}} onClick={onClose}>×</button>
+          </div>
+        </div>
+        {/* Score */}
+        <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:16,alignItems:'center',marginTop:20,marginBottom:16,textAlign:'center'}}>
+          <div>
+            <div style={{fontFamily:'Outfit',fontWeight:800,fontSize:14,color:'rgba(255,255,255,.7)',marginBottom:6,textTransform:'uppercase',letterSpacing:'.3px'}}>{hmTeam}</div>
+            <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:52,color:game.status!=='scheduled'&&+game.hs>+game.as?'var(--gold2)':'white',lineHeight:1}}>{game.status!=='scheduled'?game.hs:'—'}</div>
+          </div>
+          <div style={{color:'rgba(255,255,255,.3)',fontWeight:700,fontSize:18}}>vs</div>
+          <div>
+            <div style={{fontFamily:'Outfit',fontWeight:800,fontSize:14,color:'rgba(255,255,255,.7)',marginBottom:6,textTransform:'uppercase',letterSpacing:'.3px'}}>{tn(game.aid)}</div>
+            <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:52,color:game.status!=='scheduled'&&+game.as>+game.hs?'var(--gold2)':'white',lineHeight:1}}>{game.status!=='scheduled'?game.as:'—'}</div>
+          </div>
+        </div>
+        {/* Period scores mini */}
+        {totalPeriods.length>0&&game.status!=='scheduled'&&<div style={{display:'flex',gap:4,justifyContent:'center',marginBottom:8}}>
+          {totalPeriods.map((p,i)=><div key={i} style={{background:'rgba(255,255,255,.08)',borderRadius:4,padding:'4px 8px',textAlign:'center',minWidth:40}}>
+            <div style={{fontSize:9,color:'rgba(255,255,255,.4)',letterSpacing:'.4px',textTransform:'uppercase'}}>{def.periodName||'P'}{p.n}</div>
+            <div style={{fontSize:13,fontWeight:700,color:'white'}}>{p.home}–{p.away}</div>
+          </div>)}
+        </div>}
+      </div>
+
+      {/* Tabs */}
+      <div style={{background:'#F8FAFF',borderBottom:'1px solid var(--border)',display:'flex',padding:'0 20px',gap:0}}>
+        {TABS.map(t=><button key={t.id} className={`vtab${activeTab===t.id?' on':''}`} onClick={()=>setActiveTab(t.id)} style={{fontSize:12,padding:'10px 14px'}}>{t.l}</button>)}
+        <div style={{marginLeft:'auto',display:'flex',gap:6,alignItems:'center',padding:'6px 0'}}>
+          <button className="btn btn-ghost btn-sm" onClick={exportCSV} style={{fontSize:10}}>CSV</button>
+          <button className="btn btn-navy btn-sm" onClick={exportGame} style={{fontSize:10}}>Export JSON</button>
+        </div>
+      </div>
+
+      <div style={{padding:'20px'}}>
+        {/* OVERVIEW */}
+        {activeTab==='overview'&&<div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+            {[{label:'Sport',val:sp?.n},{label:'Category',val:game.age+' '+game.gender},{label:'Round',val:game.round},{label:'Venue',val:vn(game.vid)},{label:'Date',val:game.date},{label:'Time',val:game.time},{label:'Status',val:game.status},{label:'Game ID',val:game.id?.slice(-8).toUpperCase()}].map(item=>(
+              <div key={item.label} style={{background:'var(--navy-lt)',borderRadius:6,padding:'10px 14px'}}>
+                <div style={{fontSize:10,fontWeight:700,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:3}}>{item.label}</div>
+                <div style={{fontSize:14,fontWeight:600,color:'var(--navy-dk)'}}>{item.val}</div>
+              </div>
+            ))}
+          </div>
+          {def.stats?.length>0&&<div style={{marginTop:20}}>
+            <div style={{fontSize:11,fontWeight:800,color:'var(--navy-dk)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:12}}>Key Stats</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+              {def.stats.slice(0,6).map(st=>(
+                <div key={st.k} style={{background:'white',border:'1px solid var(--border)',borderRadius:6,padding:'10px 12px',textAlign:'center'}}>
+                  <div style={{fontSize:11,color:'var(--txt2)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:4}}>{st.l}</div>
+                  <div style={{display:'flex',justifyContent:'space-around',alignItems:'center'}}>
+                    <span style={{fontFamily:'Outfit',fontWeight:800,fontSize:20,color:'var(--navy)'}}>{stats.home[st.k]??0}</span>
+                    <span style={{fontSize:10,color:'var(--txt3)'}}>vs</span>
+                    <span style={{fontFamily:'Outfit',fontWeight:800,fontSize:20,color:'var(--crimson)'}}>{stats.away[st.k]??0}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>}
+        </div>}
+
+        {/* BOX SCORE */}
+        {activeTab==='stats'&&<div>
+          {def.stats?.length===0&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:'var(--border)',fontWeight:900}}>—</div><p className="empty-title">No stat definitions</p><p className="empty-sub">Stats not configured for this sport</p></div>}
+          {def.stats?.length>0&&<div className="table-scroll">
+            <table className="data-table" style={{width:'100%'}}>
+              <thead><tr><th>Stat</th><th style={{textAlign:'center',color:'var(--navy)'}}>{hmTeam.slice(0,20)}</th><th style={{textAlign:'center',color:'var(--crimson)'}}>{tn(game.aid).slice(0,20)}</th></tr></thead>
+              <tbody>
+                {def.stats.map(st=>{
+                  const hv=stats.home[st.k]??0,av=stats.away[st.k]??0;
+                  const hWin=hv>av,aWin=av>hv;
+                  return<tr key={st.k}>
+                    <td style={{fontWeight:600}}>{st.l}</td>
+                    <td style={{textAlign:'center',fontWeight:hWin?800:400,color:hWin?'var(--navy)':'var(--txt)',fontSize:15}}>{hv}</td>
+                    <td style={{textAlign:'center',fontWeight:aWin?800:400,color:aWin?'var(--crimson)':'var(--txt)',fontSize:15}}>{av}</td>
+                  </tr>;
+                })}
+                {(game.sid==='s2')&&<>
+                  <tr style={{background:'var(--navy-lt)'}}><td style={{fontWeight:700}}>FG%</td><td style={{textAlign:'center',fontWeight:700}}>{statPct(stats.home.fg_made,stats.home.fg_att)}</td><td style={{textAlign:'center',fontWeight:700}}>{statPct(stats.away.fg_made,stats.away.fg_att)}</td></tr>
+                  <tr style={{background:'var(--navy-lt)'}}><td style={{fontWeight:700}}>FT%</td><td style={{textAlign:'center',fontWeight:700}}>{statPct(stats.home.ft_made,stats.home.ft_att)}</td><td style={{textAlign:'center',fontWeight:700}}>{statPct(stats.away.ft_made,stats.away.ft_att)}</td></tr>
+                </>}
+                <tr style={{borderTop:'2px solid var(--border)',background:'#F8FAFF'}}>
+                  <td style={{fontWeight:800,textTransform:'uppercase',letterSpacing:'.4px',fontSize:11}}>Final Score</td>
+                  <td style={{textAlign:'center',fontFamily:'Outfit',fontWeight:900,fontSize:24,color:'var(--navy)'}}>{game.hs}</td>
+                  <td style={{textAlign:'center',fontFamily:'Outfit',fontWeight:900,fontSize:24,color:'var(--crimson)'}}>{game.as}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>}
+        </div>}
+
+        {/* PERIOD SCORES */}
+        {activeTab==='periods'&&<div>
+          {totalPeriods.length===0&&<div className="empty"><p className="empty-title">No period data available</p></div>}
+          {totalPeriods.length>0&&<div className="table-scroll">
+            <table className="data-table" style={{width:'100%'}}>
+              <thead><tr><th>Team</th>{totalPeriods.map(p=><th key={p.n} style={{textAlign:'center'}}>{def.periodName||'P'}{p.n}</th>)}<th style={{textAlign:'center',background:'var(--navy-lt)'}}>Total</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style={{fontWeight:700,color:'var(--navy)'}}>{hmTeam}</td>
+                  {totalPeriods.map(p=><td key={p.n} style={{textAlign:'center',fontWeight:p.home>p.away?700:400}}>{p.home}</td>)}
+                  <td style={{textAlign:'center',fontFamily:'Outfit',fontWeight:900,fontSize:20,color:'var(--navy)',background:'var(--navy-lt)'}}>{game.hs}</td>
+                </tr>
+                <tr>
+                  <td style={{fontWeight:700,color:'var(--crimson)'}}>{tn(game.aid)}</td>
+                  {totalPeriods.map(p=><td key={p.n} style={{textAlign:'center',fontWeight:p.away>p.home?700:400}}>{p.away}</td>)}
+                  <td style={{textAlign:'center',fontFamily:'Outfit',fontWeight:900,fontSize:20,color:'var(--crimson)',background:'var(--navy-lt)'}}>{game.as}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>}
+        </div>}
+
+        {/* TIMELINE */}
+        {activeTab==='timeline'&&<div>
+          {(!stats.events||stats.events.length===0)&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:'var(--border)',fontWeight:900}}>—</div><p className="empty-title">No timeline events recorded</p><p className="empty-sub">Events are added during live scoring</p></div>}
+          {stats.events?.length>0&&<div>
+            {stats.events.map((ev,i)=>(
+              <div key={i} style={{display:'flex',gap:12,padding:'10px 0',borderBottom:'1px solid var(--border)',alignItems:'flex-start'}}>
+                <div style={{background:ev.team==='home'?'var(--navy-lt)':'#FEF2F2',border:'1px solid '+(ev.team==='home'?'var(--navy)':'var(--crimson)'),borderRadius:4,padding:'3px 8px',fontFamily:'Outfit',fontWeight:800,fontSize:12,color:ev.team==='home'?'var(--navy)':'var(--crimson)',whiteSpace:'nowrap',flexShrink:0}}>{ev.t||'—'}</div>
+                <div>
+                  <div style={{fontWeight:700,fontSize:13,color:ev.team==='home'?'var(--navy)':'var(--crimson)'}}>{ev.type}</div>
+                  <div style={{fontSize:12,color:'var(--txt2)',marginTop:2}}>{ev.note} — {ev.team==='home'?hmTeam:tn(game.aid)}</div>
+                </div>
+              </div>
+            ))}
+          </div>}
+        </div>}
+      </div>
+    </div>
+  </div>;
+}
+
 function ScoresheetExport({db}){
  const [sid,setSid]=useState('s2');
  const [dateFilter,setDateFilter]=useState('');
@@ -1090,7 +1334,14 @@ function AIHelpChat({view}){
  const [msgs,setMsgs]=useState([{from:'bot',text:'Hi! I\'m the NAIG Help Assistant. Ask me anything about scores, login, standings, scorekeeping, or tournament setup.'}]);
  const [input,setInput]=useState('');
  const endRef=React.useRef(null);
- const quickQ=['How do I log in?','Where are live scores?','How do I enter a score?','What sports are at NAIG 2027?','How do I read the standings?'];
+ const quickQ=[
+  'How do I log in?',
+  'Where are live scores?',
+  'How do I enter a score?',
+  'What sports are at NAIG 2027?',
+  'How do the schedules work?',
+  'What is the medal table?',
+];
  function send(q){
  const question=q||input.trim();
  if(!question)return;
@@ -1101,8 +1352,8 @@ function AIHelpChat({view}){
  }
  return<> {/* Floating button */}
  <button onClick={()=>setOpen(o=>!o)} style={{position:'fixed',bottom:28,right:28,width:56,height:56,borderRadius:'50%',background:'var(--navy)',color:'white',border:'none',cursor:'pointer',boxShadow:'0 4px 20px rgba(30,58,138,.4)',fontSize:24,display:'grid',placeItems:'center',zIndex:1000,transition:'all .2s'}}> {open?'×':' '}
- </button> {open&&<div style={{position:'fixed',bottom:96,right:28,width:360,maxHeight:520,background:'white',borderRadius:16,boxShadow:'0 8px 40px rgba(0,0,0,.2)',zIndex:999,display:'flex',flexDirection:'column',overflow:'hidden',border:'1px solid var(--border)'}}> {/* Header */}
- <div style={{background:'var(--navy-dk)',padding:'14px 18px',display:'flex',alignItems:'center',gap:10}}> <div style={{width:36,height:36,borderRadius:'50%',background:'var(--crimson)',display:'grid',placeItems:'center',fontSize:16,flexShrink:0}}></div> <div><div style={{fontFamily:'Outfit',fontWeight:800,color:'white',fontSize:14}}>NAIG Help Assistant</div> <div style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Ask me anything about the tournament</div> </div> </div> {/* Messages */}
+ </button> {open&&<div style={{position:'fixed',bottom:'calc(env(safe-area-inset-bottom, 0px) + 140px)',right:16,width:360,maxHeight:520,background:'white',borderRadius:16,boxShadow:'0 8px 40px rgba(0,0,0,.2)',zIndex:999,display:'flex',flexDirection:'column',overflow:'hidden',border:'1px solid var(--border)'}}> {/* Header */}
+ <div style={{background:'var(--navy-dk)',padding:'12px 16px',display:'flex',alignItems:'center',gap:10,borderRadius:'8px 8px 0 0'}}> <div style={{width:36,height:36,borderRadius:'50%',background:'var(--crimson)',display:'grid',placeItems:'center',fontSize:16,flexShrink:0}}></div> <div><div style={{fontFamily:'Outfit',fontWeight:800,color:'white',fontSize:14}}>NAIG Help Assistant</div> <div style={{fontSize:11,color:'rgba(255,255,255,.55)'}}>Ask me anything about the tournament</div> </div> </div> {/* Messages */}
  <div style={{flex:1,overflowY:'auto',padding:'14px 14px 8px'}}> {msgs.map((m,i)=>(
  <div key={i} style={{marginBottom:10,display:'flex',justifyContent:m.from==='user'?'flex-end':'flex-start'}}> <div style={{maxWidth:'85%',padding:'9px 12px',borderRadius:m.from==='user'?'12px 12px 2px 12px':'12px 12px 12px 2px',background:m.from==='user'?'var(--navy)':' #F3F5FA',color:m.from==='user'?'white':'var(--txt)',fontSize:13,lineHeight:1.5}}> {m.text}
  </div> </div> ))}
@@ -1185,6 +1436,9 @@ function SpectatorView({db}){
  const [tab,setTab]=useState('schedule');
  const [sf,setSf]=useState('all');
  const [ageF,setAgeF]=useState('');
+ const [teamFilter,setTeamFilter]=useState('');
+ const [typeFilter,setTypeFilter]=useState('all'); // 'all','team','individual'
+ const [selectedGame,setSelectedGame]=useState(null);
  const curSp=sf!=='all'?SPORTS.find(s=>s.id===sf):null;
  const tn=id=>db.teams.find(t=>t.id===id)?.n||'TBD';
  const vn=id=>db.venues.find(v=>v.id===id)?.name||'TBD';
@@ -1195,8 +1449,11 @@ function SpectatorView({db}){
  let g=db.games;
  if(sf!=='all')g=g.filter(x=>x.sid===sf);
  if(ageF)g=g.filter(x=>x.age===ageF||x.age===ageF.replace(' Open','').replace(' (15–17)','').replace(' (45+)',''));
+ if(typeFilter==='team')g=g.filter(x=>SPORTS.find(s=>s.id===x.sid)?.t==='team');
+ if(typeFilter==='individual')g=g.filter(x=>SPORTS.find(s=>s.id===x.sid)?.t==='individual');
+ if(teamFilter)g=g.filter(x=>x.hid===teamFilter||x.aid===teamFilter);
  return g.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
- },[db.games,sf,ageF]);
+ },[db.games,sf,ageF,typeFilter,teamFilter]);
  function sbadge(s){
  if(s==='completed')return<span className="status-final">Final</span>;
  if(s==='in_progress')return<span className="tag tag-live"> LIVE</span>;
@@ -1221,9 +1478,36 @@ function SpectatorView({db}){
  </div> {tab==='live'&&<LiveScoring db={db}/>}
  {tab==='help'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Help & User Guides</h2></div> <div className="alert alert-blue" style={{marginBottom:20}}> <strong> Help:</strong> Use the chat bubble in the bottom-right corner to ask questions any time — it knows the rulebook and every feature.
  </div> <SOPHelp/> </div>}
- {tab==='schedule'&&<div> <div className="section-head"><span className="section-title">Full Schedule</span><span className="tag tag-navy">{filtered.length} games</span></div> {!filtered.length&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">No games have been scheduled</p></div>}
- {filtered.map(g=>{const s=SPORTS.find(x=>x.id===g.sid);const hw=g.status==='completed'&&+g.hs>+g.as,aw=g.status==='completed'&&+g.as>+g.hs;return(
- <div key={g.id} className="game-row" style={{cursor:"pointer"}}> <div className="game-vs"> <div><div className={`game-team${hw?' winner':''}`}>{hw?' ':''}{tn(g.hid)}</div><div style={{fontSize:12,color:'var(--txt2)',marginTop:3}}>{s?.abbr} {s?.n}</div></div> <div className="game-score-box"><div className="game-score">{g.status!=='scheduled'?`${g.hs}–${g.as}`:'vs'}</div><div style={{marginTop:4}}>{sbadge(g.status)}</div></div> <div style={{textAlign:'right'}}><div className={`game-team${aw?' winner':''}`}>{aw?' ':''}{tn(g.aid)}</div><div style={{fontSize:12,color:'var(--txt2)',marginTop:3}}>{g.age} · {g.gender}</div></div> </div> <div className="game-meta"><span> {g.date}</span><span> {g.time}</span><span> {vn(g.vid)}</span><span> {g.round}</span></div> </div> );})}
+ {selectedGame&&<GameDetailModal game={selectedGame} db={db} onClose={()=>setSelectedGame(null)} onUpdate={()=>{}}/>}
+ {tab==='schedule'&&<div>
+  {/* FILTERS */}
+  <div style={{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap',alignItems:'center',padding:'12px 16px',background:'var(--navy-lt)',borderRadius:8,border:'1px solid var(--border)'}}>
+   <div style={{fontSize:11,fontWeight:800,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.5px',flexShrink:0}}>Filter By:</div>
+   <div style={{display:'flex',gap:6}}>
+    {['all','team','individual'].map(t=><button key={t} className={`btn btn-sm ${typeFilter===t?'btn-navy':'btn-ghost'}`} onClick={()=>setTypeFilter(t)} style={{textTransform:'capitalize'}}>{t==='all'?'All Types':t==='team'?'Team Sports':'Individual'}</button>)}
+   </div>
+   <select className="form-input" style={{maxWidth:220,fontSize:12}} value={teamFilter} onChange={e=>setTeamFilter(e.target.value)}>
+    <option value="">All Teams / Athletes</option>
+    {db.teams.filter(t=>sf==='all'||t.sid===sf).map(t=><option key={t.id} value={t.id}>{t.n}</option>)}
+   </select>
+   {(teamFilter||typeFilter!=='all'||sf!=='all')&&<button className="btn btn-ghost btn-sm" onClick={()=>{setTeamFilter('');setTypeFilter('all');setSf('all');}} style={{color:'var(--crimson)'}}>Clear Filters</button>}
+   <span className="tag tag-navy" style={{marginLeft:'auto'}}>{filtered.length} games</span>
+  </div>
+  {!filtered.length&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">No games match your filters</p></div>}
+  {filtered.map(g=>{const s=SPORTS.find(x=>x.id===g.sid);const hw=g.status==='completed'&&+g.hs>+g.as,aw=g.status==='completed'&&+g.as>+g.hs;return(
+  <div key={g.id} className="game-row" style={{cursor:'pointer'}} onClick={()=>setSelectedGame(g)}
+   onMouseEnter={e=>e.currentTarget.style.boxShadow='var(--shadow-md)'}
+   onMouseLeave={e=>e.currentTarget.style.boxShadow='var(--shadow)'}>
+   <div className="game-vs">
+    <div><div className={`game-team${hw?' winner':''}`}>{hw?'+ ':''}{tn(g.hid)}</div><div style={{fontSize:12,color:'var(--txt2)',marginTop:3}}><span className="sport-code" style={{fontSize:8,padding:'1px 4px'}}>{s?.abbr}</span> {s?.n}</div></div>
+    <div className="game-score-box"><div className="game-score">{g.status!=='scheduled'?`${g.hs}–${g.as}`:'vs'}</div><div style={{marginTop:4}}>{sbadge(g.status)}</div></div>
+    <div style={{textAlign:'right'}}><div className={`game-team${aw?' winner':''}`}>{aw?'+ ':''}{tn(g.aid)}</div><div style={{fontSize:12,color:'var(--txt2)',marginTop:3}}>{g.age} · {g.gender}</div></div>
+   </div>
+   <div className="game-meta">
+    <span>{g.date}</span><span>{g.time}</span><span>{vn(g.vid)}</span><span>{g.round}</span>
+    <span style={{marginLeft:'auto',fontSize:11,color:'var(--navy)',fontWeight:700,opacity:.6}}>Click for details →</span>
+   </div>
+  </div>);})}
  </div>}
  {tab==='standings'&&<div> {sf==='all'&&<div className="alert alert-blue">Pick a sport above to see standings</div>}
  {sf!=='all'&&(ageF?(curSp?.genders||[]).map(g=>[ageF,g]):(curSp?.ages||[]).flatMap(a=>(curSp?.genders||[]).map(g=>[a,g]))||[]).map(([age,gender])=>(
@@ -1265,14 +1549,49 @@ function ScorekeeperView({db,onUpdate,user,onLogout}){
  const [hsT,setHsT]=useState('');
  const [asT,setAsT]=useState('');
  const [msg,setMsg]=useState('');
+ const [skTab,setSkTab]=useState('score'); // 'score' | 'stats' | 'timeline'
+ const [gameStats,setGameStats]=useState(null);
+ const [newEvent,setNewEvent]=useState({type:'',team:'home',note:''});
  function flash(m){setMsg(m);setTimeout(()=>setMsg(''),2500);}
  const myGames=useMemo(()=>{
  if(user.role==='admin')return db.games.filter(g=>g.status!=='completed');
  return db.games.filter(g=>g.status!=='completed'&&(user.sports.length===0||user.sports.includes(g.sid)));
  },[user,db.games]);
- function open(g){setGame(g);setHs(+g.hs||0);setAs(+g.as||0);setHsT(String(g.hs||''));setAsT(String(g.as||''));}
- function start(){onUpdate({...db,games:db.games.map(g=>g.id===game.id?{...g,status:'in_progress',hs,as:as2}:g)});setGame({...game,status:'in_progress'});}
+ function open(g){
+   setGame(g);setHs(+g.hs||0);setAs(+g.as||0);
+   setHsT(String(g.hs||''));setAsT(String(g.as||''));
+   setGameStats(g.stats||initGS(g.sid));
+   setSkTab('score');
+ }
+ function start(){onUpdate({...db,games:db.games.map(g=>g.id===game.id?{...g,status:'in_progress',hs,as:as2,stats:gameStats}:g)});setGame({...game,status:'in_progress'});}
+ function saveWithStats(final){
+   const updated={...game,hs,as:as2,stats:{...gameStats},status:final?'completed':'in_progress'};
+   onUpdate({...db,games:db.games.map(g=>g.id===game.id?updated:g)});
+   if(final){setGame(null);flash('Final score recorded');}
+   else flash('Saved');
+ }
+ function adjustStat(team,key,delta){
+   setGameStats(prev=>{
+     const side={...prev[team],[key]:Math.max(0,(prev[team][key]||0)+delta)};
+     return {...prev,[team]:side};
+   });
+ }
+ function addEvent(){
+   if(!newEvent.type)return;
+   const ev={t:`${getSS(game?.sid).periodName||'P'}${gameStats.period||1} ${new Date().toTimeString().slice(0,5)}`,type:newEvent.type,team:newEvent.team,note:newEvent.note};
+   setGameStats(prev=>({...prev,events:[...(prev.events||[]),ev]}));
+   setNewEvent({type:'',team:'home',note:''});
+   flash('Event logged');
+ }
+ function advancePeriod(){
+   const def=getSS(game?.sid);
+   const cur=gameStats.period||1;
+   if(cur>=def.periods)return;
+   setGameStats(prev=>({...prev,period:cur+1,periods:[...prev.periods.slice(0,cur-1),{...prev.periods[cur-1],home:hs,away:as2},...prev.periods.slice(cur)]}));
+   flash(`${def.periodName||'Period'} ${cur+1} started`);
+ }
  const sp2=game?SPORTS.find(s=>s.id===game.sid):null;
+ const def2=game?getSS(game.sid):{periods:2,periodName:'Period',stats:[],events:[]};
  const isTap=sp2&&!['time','strokes','score','classification'].includes(sp2?.scoring);
  function doSave(){
  const{h,a}=isTap?{h:hs,a:as2}:{h:+hsT||hsT,a:+asT||asT};
@@ -1293,13 +1612,139 @@ function ScorekeeperView({db,onUpdate,user,onLogout}){
  {g.status==='scheduled'&&<span className="status-sched">Score</span>}
  </div> </div> </div> );})}
  </div>}
- {game&&<div className="card"> <div style={{background:'var(--navy-dk)',padding:'16px 20px',borderRadius:'12px 12px 0 0',borderBottom:'3px solid var(--crimson)'}}> <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}> <span style={{fontFamily:'Outfit',fontWeight:800,color:'white',fontSize:15}}>{sp2?.n} — {game.age} {game.gender}</span> <button onClick={()=>setGame(null)} style={{background:'rgba(255,255,255,.12)',border:'none',color:'white',borderRadius:6,padding:'4px 10px',cursor:'pointer',fontSize:12}}>← Back</button> </div> <div style={{fontSize:12,color:'rgba(255,255,255,.55)',marginTop:4}}>{game.round} · {game.date} {game.time} · {vn(game.vid)}</div> </div> <div className="card-body"> {msg&&<div className="alert alert-green">{msg}</div>}
- {sp2?.rules&&<div className="alert alert-blue" style={{fontSize:12}}><strong>Rules:</strong> {sp2.rules.slice(0,180)}…</div>}
- {game.status==='scheduled'&&<button className="btn btn-navy btn-w" style={{marginBottom:16}} onClick={start}> Start this game</button>}
- {isTap&&<div className="score-panel"> <div><div className="score-team-name">{tn(game.hid)}</div> <div className="score-controls"> <button className="score-btn-minus" onClick={()=>setHs(h=>Math.max(0,h-1))}>−</button> <div className="score-display">{hs}</div> <button className="score-btn-plus" onClick={()=>setHs(h=>h+1)}>+</button> </div> </div> <div className="vs-divider">vs</div> <div><div className="score-team-name">{tn(game.aid)}</div> <div className="score-controls"> <button className="score-btn-minus" onClick={()=>setAs(a=>Math.max(0,a-1))}>−</button> <div className="score-display">{as2}</div> <button className="score-btn-plus" onClick={()=>setAs(a=>a+1)}>+</button> </div> </div> </div>}
- {!isTap&&<div style={{marginBottom:16}}> <div className="alert alert-blue" style={{marginBottom:12,fontSize:12}}> {sp2?.scoring==='time'?' Enter finish time (e.g. 1:23.45)':sp2?.scoring==='strokes'?' Enter total strokes':' Enter final score'}
- </div> <div className="row2"> <div className="form-field"><label className="form-label">{tn(game.hid)}</label><input className="form-input" value={hsT} onChange={e=>setHsT(e.target.value)} style={{textAlign:'center',fontWeight:700,fontSize:18}} placeholder="Score"/></div> <div className="form-field"><label className="form-label">{tn(game.aid)}</label><input className="form-input" value={asT} onChange={e=>setAsT(e.target.value)} style={{textAlign:'center',fontWeight:700,fontSize:18}} placeholder="Score"/></div> </div> </div>}
- <div style={{display:'flex',gap:10}}> <button className="btn btn-ghost" style={{flex:1}} onClick={doSave}>Save progress</button> <button className="btn btn-navy" style={{flex:1}} onClick={doFinal}>Record final score</button> </div> </div> </div>}
+ {game&&<div className="card">
+  {/* Header */}
+  <div style={{background:'var(--navy-dk)',padding:'14px 18px',borderRadius:'12px 12px 0 0',borderBottom:'3px solid var(--crimson)'}}>
+   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+    <div>
+     <span style={{fontFamily:'Outfit',fontWeight:800,color:'white',fontSize:14}}>{sp2?.n} — {game.age} {game.gender}</span>
+     <div style={{fontSize:11,color:'rgba(255,255,255,.5)',marginTop:2}}>{game.round} · {game.date} {game.time} · {vn(game.vid)}</div>
+    </div>
+    <button onClick={()=>setGame(null)} style={{background:'rgba(255,255,255,.12)',border:'none',color:'white',borderRadius:5,padding:'4px 10px',cursor:'pointer',fontSize:11}}>Back</button>
+   </div>
+   {/* Scoreboard */}
+   <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:8,alignItems:'center',marginTop:14,textAlign:'center'}}>
+    <div><div style={{fontSize:11,fontWeight:800,color:'rgba(255,255,255,.6)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:4}}>{tn(game.hid)}</div>
+     <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10}}>
+      <button className="score-btn-minus" onClick={()=>setHs(h=>Math.max(0,h-1))}>−</button>
+      <span style={{fontFamily:'Outfit',fontWeight:900,fontSize:44,color:'white',lineHeight:1,minWidth:60,textAlign:'center'}}>{hs}</span>
+      <button className="score-btn-plus" onClick={()=>setHs(h=>h+1)}>+</button>
+     </div>
+    </div>
+    <div style={{color:'rgba(255,255,255,.25)',fontWeight:700}}>vs</div>
+    <div><div style={{fontSize:11,fontWeight:800,color:'rgba(255,255,255,.6)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:4}}>{tn(game.aid)}</div>
+     <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10}}>
+      <button className="score-btn-minus" onClick={()=>setAs(a=>Math.max(0,a-1))}>−</button>
+      <span style={{fontFamily:'Outfit',fontWeight:900,fontSize:44,color:'white',lineHeight:1,minWidth:60,textAlign:'center'}}>{as2}</span>
+      <button className="score-btn-plus" onClick={()=>setAs(a=>a+1)}>+</button>
+     </div>
+    </div>
+   </div>
+   {/* Period indicator */}
+   <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:10,alignItems:'center'}}>
+    {Array.from({length:def2.periods},(_,i)=>(
+     <div key={i} style={{width:28,height:6,borderRadius:3,background:i<(gameStats?.period||1)?'var(--gold2)':'rgba(255,255,255,.15)'}}/>
+    ))}
+    <span style={{fontSize:11,color:'rgba(255,255,255,.5)',marginLeft:4}}>{def2.periodName||'P'} {gameStats?.period||1} of {def2.periods}</span>
+    {(gameStats?.period||1)<def2.periods&&<button className="btn btn-sm" onClick={advancePeriod} style={{background:'rgba(255,255,255,.1)',color:'white',border:'none',fontSize:10,padding:'3px 8px',marginLeft:4}}>End {def2.periodName||'Period'}</button>}
+   </div>
+  </div>
+
+  {/* Action tabs */}
+  <div style={{background:'#F8FAFF',borderBottom:'1px solid var(--border)',display:'flex'}}>
+   {[{id:'score',l:'Score'},{id:'stats',l:'Box Stats'},{id:'events',l:'Timeline'},{id:'rules',l:'Rules'}].map(t=>(
+    <button key={t.id} className={`vtab${skTab===t.id?' on':''}`} onClick={()=>setSkTab(t.id)} style={{fontSize:11,padding:'8px 14px'}}>{t.l}</button>
+   ))}
+  </div>
+
+  <div className="card-body">
+   {msg&&<div className="alert alert-green" style={{marginBottom:12}}>{msg}</div>}
+   {game.status==='scheduled'&&<button className="btn btn-navy btn-w" style={{marginBottom:14}} onClick={start}>Start Game</button>}
+
+   {/* SCORE TAB */}
+   {skTab==='score'&&<div>
+    {!isTap&&<div className="row2" style={{marginBottom:14}}>
+     <div className="form-field"><label className="form-label">{tn(game.hid)}</label><input className="form-input" value={hsT} onChange={e=>{setHsT(e.target.value);setHs(+e.target.value||0);}} style={{textAlign:'center',fontWeight:700,fontSize:18}} placeholder="Score"/></div>
+     <div className="form-field"><label className="form-label">{tn(game.aid)}</label><input className="form-input" value={asT} onChange={e=>{setAsT(e.target.value);setAs(+e.target.value||0);}} style={{textAlign:'center',fontWeight:700,fontSize:18}} placeholder="Score"/></div>
+    </div>}
+    <div style={{display:'flex',gap:10,marginTop:8}}>
+     <button className="btn btn-ghost" style={{flex:1}} onClick={()=>saveWithStats(false)}>Save Progress</button>
+     <button className="btn btn-navy" style={{flex:1}} onClick={()=>saveWithStats(true)}>Record Final Score</button>
+    </div>
+   </div>}
+
+   {/* STATS TAB */}
+   {skTab==='stats'&&gameStats&&<div>
+    {def2.stats?.length===0&&<div className="alert alert-blue">Stats not configured for this sport.</div>}
+    {def2.stats?.length>0&&<div>
+     <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:4,marginBottom:4}}>
+      <div style={{fontSize:10,fontWeight:800,color:'var(--txt3)',textTransform:'uppercase',letterSpacing:'.4px',padding:'6px 0',textAlign:'center'}}>Stat</div>
+      <div style={{fontSize:10,fontWeight:800,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.4px',padding:'6px 0',textAlign:'center'}}>{tn(game.hid).slice(0,14)}</div>
+      <div style={{fontSize:10,fontWeight:800,color:'var(--crimson)',textTransform:'uppercase',letterSpacing:'.4px',padding:'6px 0',textAlign:'center'}}>{tn(game.aid).slice(0,14)}</div>
+     </div>
+     {def2.stats.map(st=>(
+      <div key={st.k} style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:4,marginBottom:6,alignItems:'center'}}>
+       <div style={{fontSize:12,fontWeight:600,color:'var(--txt)',padding:'0 4px'}}>{st.l}{st.warn&&gameStats.home[st.k]>=st.warn?<span style={{color:'var(--crimson)',marginLeft:4}}>!</span>:null}</div>
+       <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+        <button onClick={()=>adjustStat('home',st.k,-1)} style={{width:24,height:24,border:'1px solid var(--border)',borderRadius:4,background:'white',cursor:'pointer',fontSize:14,fontWeight:700,display:'grid',placeItems:'center'}}>−</button>
+        <span style={{fontFamily:'Outfit',fontWeight:800,fontSize:16,minWidth:24,textAlign:'center',color:st.warn&&gameStats.home[st.k]>=st.warn?'var(--crimson)':'var(--navy)'}}>{gameStats.home[st.k]||0}</span>
+        <button onClick={()=>adjustStat('home',st.k,1)} style={{width:24,height:24,border:'1px solid var(--border)',borderRadius:4,background:'white',cursor:'pointer',fontSize:14,fontWeight:700,display:'grid',placeItems:'center'}}>+</button>
+       </div>
+       <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+        <button onClick={()=>adjustStat('away',st.k,-1)} style={{width:24,height:24,border:'1px solid var(--border)',borderRadius:4,background:'white',cursor:'pointer',fontSize:14,fontWeight:700,display:'grid',placeItems:'center'}}>−</button>
+        <span style={{fontFamily:'Outfit',fontWeight:800,fontSize:16,minWidth:24,textAlign:'center',color:st.warn&&gameStats.away[st.k]>=st.warn?'var(--crimson)':'var(--navy)'}}>{gameStats.away[st.k]||0}</span>
+        <button onClick={()=>adjustStat('away',st.k,1)} style={{width:24,height:24,border:'1px solid var(--border)',borderRadius:4,background:'white',cursor:'pointer',fontSize:14,fontWeight:700,display:'grid',placeItems:'center'}}>+</button>
+       </div>
+      </div>
+     ))}
+     <button className="btn btn-ghost btn-sm btn-w" style={{marginTop:8}} onClick={()=>saveWithStats(false)}>Save Stats</button>
+    </div>}
+   </div>}
+
+   {/* EVENTS/TIMELINE TAB */}
+   {skTab==='events'&&<div>
+    {/* Log new event */}
+    <div style={{background:'var(--navy-lt)',borderRadius:8,padding:'12px 14px',marginBottom:14}}>
+     <div style={{fontSize:11,fontWeight:800,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}}>Log Event</div>
+     <div className="row3" style={{marginBottom:8}}>
+      <div className="form-field">
+       <label className="form-label">Type</label>
+       <select className="form-input" value={newEvent.type} onChange={e=>setNewEvent(p=>({...p,type:e.target.value}))}>
+        <option value="">Select…</option>
+        {(def2.events||[]).map(ev=><option key={ev} value={ev}>{ev}</option>)}
+       </select>
+      </div>
+      <div className="form-field">
+       <label className="form-label">Team</label>
+       <select className="form-input" value={newEvent.team} onChange={e=>setNewEvent(p=>({...p,team:e.target.value}))}>
+        <option value="home">{tn(game.hid)}</option>
+        <option value="away">{tn(game.aid)}</option>
+       </select>
+      </div>
+      <div className="form-field">
+       <label className="form-label">Note (optional)</label>
+       <input className="form-input" value={newEvent.note} onChange={e=>setNewEvent(p=>({...p,note:e.target.value}))} placeholder="Player #, detail…"/>
+      </div>
+     </div>
+     <button className="btn btn-navy btn-sm" onClick={addEvent} disabled={!newEvent.type}>Log Event</button>
+    </div>
+    {/* Event list */}
+    {!(gameStats?.events?.length)&&<div style={{textAlign:'center',color:'var(--txt3)',fontSize:13,padding:'20px 0'}}>No events logged yet</div>}
+    {(gameStats?.events||[]).map((ev,i)=>(
+     <div key={i} style={{display:'flex',gap:10,padding:'8px 0',borderBottom:'1px solid var(--border)',alignItems:'flex-start'}}>
+      <span style={{background:ev.team==='home'?'var(--navy-lt)':'#FEF2F2',border:'1px solid '+(ev.team==='home'?'var(--navy)':'var(--crimson)'),borderRadius:3,padding:'2px 7px',fontSize:11,fontWeight:800,color:ev.team==='home'?'var(--navy)':'var(--crimson)',flexShrink:0}}>{ev.t}</span>
+      <div><div style={{fontWeight:700,fontSize:13}}>{ev.type}</div><div style={{fontSize:11,color:'var(--txt2)'}}>{ev.note} — {ev.team==='home'?tn(game.hid):tn(game.aid)}</div></div>
+     </div>
+    ))}
+   </div>}
+
+   {/* RULES TAB */}
+   {skTab==='rules'&&<div>
+    <div className="alert alert-blue" style={{marginBottom:12}}><strong>Sport:</strong> {sp2?.n} — {game.age} {game.gender}</div>
+    <p style={{fontSize:13,color:'var(--txt)',lineHeight:1.7}}>{sp2?.rules}</p>
+   </div>}
+  </div>
+ </div>}
  </div>;
 }
 
@@ -1426,9 +1871,9 @@ function AdminPanel({db,onUpdate,scope}){
  </button> ))}
  {scope==='national'&&<><div className="sidebar-section">Awards</div> <button className={`sb${tab==='scorekeepers'?' on':''}`} onClick={()=>setTab('scorekeepers')}><span className="sb-icon"></span>Scorekeepers</button> <button className={`sb${tab==='medals'?' on':''}`} onClick={()=>setTab('medals')}><span className="sb-icon"></span>Medals</button> </>}
  <div className="sidebar-section">Resources</div> <button className={`sb${tab==='rulebook'?' on':''}`} onClick={()=>setTab('rulebook')}><span className="sb-icon"></span>Rulebook</button> <button className={`sb${tab==='scoresheets'?' on':''}`} onClick={()=>setTab('scoresheets')}><span className="sb-icon"></span>Scoresheets</button> <button className={`sb${tab==='export'?' on':''}`} onClick={()=>setTab('export')}><span className="sb-icon"></span>{scope==='national'?'Export & Data':'Data Mgmt'}</button> <div className="sidebar-section">Help</div> <button className={`sb${tab==='help_sop'?' on':''}`} onClick={()=>setTab('help_sop')}><span className="sb-icon"></span>User Guides</button> <div style={{marginTop:'auto',paddingTop:20,borderTop:'1px solid rgba(255,255,255,.08)'}}> <div style={{fontSize:11,color:'rgba(255,255,255,.35)',padding:'0 10px'}}>NAIG 2027 · {scope==='national'?'National Admin':'Regional Coordinator'}</div> </div> </nav> {/* MAIN */}
- <div className="content-area"> <div className="page"> {msg&&<div className="alert alert-green" style={{marginBottom:16}}>{msg}</div>}
+ <div className="content-area"> <div className="admin-content"> {msg&&<div className="alert alert-green" style={{marginBottom:16}}>{msg}</div>}
 
- {tab==='dashboard'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Dashboard</h2></div> <div className="g4" style={{marginBottom:20}}> {[
+ {tab==='dashboard'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Dashboard</h2></div> <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:20,width:"100%"}}> {[
   {n:db.teams.length,l:'Teams',t:'teams',sub:'Registered teams'},
   {n:db.athletes.length,l:'Athletes',t:'athletes',sub:'Individual entries'},
   {n:db.venues.length,l:'Venues',t:'venues',sub:'Competition venues'},
@@ -1443,7 +1888,7 @@ function AdminPanel({db,onUpdate,scope}){
    <div style={{fontSize:10,color:'var(--navy)',marginTop:6,letterSpacing:'.4px',textTransform:'uppercase',opacity:.7}}>{s.sub}</div>
   </div>
 ))}
- </div> <div className="g3" style={{marginBottom:20}}> <div className="stat-card" style={{borderTop:`4px solid #16A34A`}}><div className="stat-n" style={{color:'#16A34A'}}>{live2}</div><div className="stat-l">Live now</div></div> <div className="stat-card" style={{borderTop:`4px solid var(--amber)`}}><div className="stat-n" style={{color:'var(--amber)'}}>{sched2}</div><div className="stat-l">Upcoming</div></div> <div className="stat-card" style={{borderTop:`4px solid var(--navy)`}}><div className="stat-n">{done2}</div><div className="stat-l">Completed</div></div> </div> <div className="card"><div className="card-head"><h3 className="card-title">Sport Overview</h3></div> <table className="data-table"> <thead><tr><th>Sport</th><th>Type</th><th>Teams</th><th>Athletes</th><th>Games</th><th>Progress</th></tr></thead> <tbody>{SPORTS.map(s=>{
+ </div> <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:16,marginBottom:20,width:"100%"}}> <div className="stat-card" style={{borderTop:`4px solid #16A34A`}}><div className="stat-n" style={{color:'#16A34A'}}>{live2}</div><div className="stat-l">Live now</div></div> <div className="stat-card" style={{borderTop:`4px solid var(--amber)`}}><div className="stat-n" style={{color:'var(--amber)'}}>{sched2}</div><div className="stat-l">Upcoming</div></div> <div className="stat-card" style={{borderTop:`4px solid var(--navy)`}}><div className="stat-n">{done2}</div><div className="stat-l">Completed</div></div> </div> <div className="card"><div className="card-head"><h3 className="card-title">Sport Overview</h3></div> <table className="data-table"> <thead><tr><th>Sport</th><th>Type</th><th>Teams</th><th>Athletes</th><th>Games</th><th>Progress</th></tr></thead> <tbody>{SPORTS.map(s=>{
  const te=db.teams.filter(t=>t.sid===s.id).length,at=db.athletes.filter(a=>a.sid===s.id).length;
  const ga=db.games.filter(g=>g.sid===s.id),dn=ga.filter(g=>g.status==='completed').length;
  return<tr key={s.id}> <td style={{fontWeight:700}}>{s.n}</td> <td><span className={`tag ${s.t==='team'?'tag-navy':'tag-crimson'}`}>{s.t}</span></td> <td>{te||<span style={{color:'#D1D5DB'}}>—</span>}</td> <td>{at||<span style={{color:'#D1D5DB'}}>—</span>}</td> <td>{ga.length||<span style={{color:'#D1D5DB'}}>—</span>}</td> <td>{ga.length?<span style={{fontWeight:700,color:dn===ga.length?'var(--green)':'var(--amber)'}}>{dn}/{ga.length}</span>:<span style={{color:'#D1D5DB'}}>—</span>}</td> </tr>;
