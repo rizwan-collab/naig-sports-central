@@ -241,6 +241,8 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 .calc-result-row:last-child{border:none;padding-top:14px;font-family:'Outfit',sans-serif;font-size:18px;font-weight:800;color:#FDE68A}
 .calc-tip{background:rgba(255,255,255,.06);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12px;color:rgba(255,255,255,.7);line-height:1.6}
 
+.bracket-match{transition:all .15s}
+.bracket-match[style*="pointer"]:hover{border-color:var(--navy);box-shadow:var(--shadow-md)}
 .bracket-scroll{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding:8px 2px}
 .bracket-col{display:flex;flex-direction:column;gap:16px;min-width:200px}
 .bracket-round-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);background:var(--navy-lt);padding:4px 10px;border-radius:6px;text-align:center;margin-bottom:4px}
@@ -1046,14 +1048,14 @@ function Standings({teams,games,sid,age,gender}){
  <tr key={r.name}> <td><span className="rank-circle" style={{background:i<4?'var(--navy)':' #D1D5DB'}}>{i+1}</span></td> <td style={{fontWeight:700}}>{r.name}</td> <td style={{color:'var(--txt2)',fontSize:12}}>{r.region}</td> <td style={{fontWeight:700,color:'var(--green)'}}>{r.w}</td> <td style={{color:'var(--crimson)'}}>{r.l}</td> <td style={{color:'var(--txt3)'}}>{r.d}</td> <td>{r.gf}</td><td>{r.ga}</td> <td style={{fontWeight:600,color:r.gf-r.ga>=0?'var(--green)':'var(--crimson)'}}>{r.gf-r.ga>=0?'+':''}{r.gf-r.ga}</td> <td style={{fontWeight:900,color:'var(--navy)',fontSize:15}}>{r.pts}</td> </tr> ))}</tbody> </table> </div>;
 }
 
-function Bracket({teams,games,sid,age,gender}){
+function Bracket({teams,games,sid,age,gender,onGameClick}){
  const rnds=['Quarterfinal','Semifinal','Bronze Final','Gold Final'];
  const byR=rnds.map(r=>games.filter(g=>g.sid===sid&&g.age===age&&g.gender===gender&&g.round===r));
  if(!byR.some(r=>r.length))return<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">Bracket not set up yet</p><p className="empty-sub">Pool play wraps up first</p></div>;
  const tn=id=>teams.find(t=>t.id===id)?.n||'TBD';
  return<div className="bracket-scroll"> {byR.map((rg,ri)=>rg.length?(
  <div key={ri} className="bracket-col"> <div className="bracket-round-label">{rnds[ri]}</div> {rg.map(g=>(
- <div key={g.id} className="bracket-match"> <div className={`bracket-team${g.status==='completed'&&+g.hs>+g.as?' w':''}`}> <span>{tn(g.hid)}</span><span style={{fontWeight:800}}>{g.status!=='scheduled'?g.hs:'—'}</span> </div> <div className="bracket-sep"/> <div className={`bracket-team${g.status==='completed'&&+g.as>+g.hs?' w':''}`}> <span>{tn(g.aid)||'TBD'}</span><span style={{fontWeight:800}}>{g.status!=='scheduled'?g.as:'—'}</span> </div> </div> ))}
+ <div key={g.id} className="bracket-match" style={{cursor:g.status!=="scheduled"?"pointer":"default"}} onClick={()=>g.status!=="scheduled"&&onGameClick&&onGameClick(g)}> <div className={`bracket-team${g.status==='completed'&&+g.hs>+g.as?' w':''}`}> <span>{tn(g.hid)}</span><span style={{fontWeight:800}}>{g.status!=='scheduled'?g.hs:'—'}</span> </div> <div className="bracket-sep"/> <div className={`bracket-team${g.status==='completed'&&+g.as>+g.hs?' w':''}`}> <span>{tn(g.aid)||'TBD'}</span><span style={{fontWeight:800}}>{g.status!=='scheduled'?g.as:'—'}</span> </div> </div> ))}
  </div> ):null)}
  </div>;
 }
@@ -1154,7 +1156,7 @@ function GameDetailModal({game,db,onClose,onUpdate}){
             {game.status==='in_progress'&&<span className="status-live">Live</span>}
             {game.status==='scheduled'&&<span className="status-sched">Scheduled</span>}
             <div style={{display:'flex',gap:8,alignItems:'center'}}>
-              <button onClick={onClose} style={{background:'rgba(255,255,255,.12)',border:'none',color:'white',borderRadius:6,padding:'6px 14px',cursor:'pointer',fontSize:12,fontWeight:700,letterSpacing:'.3px',textTransform:'uppercase'}}>Back</button>
+              <button onClick={onClose} style={{background:'rgba(255,255,255,.12)',border:'none',color:'white',borderRadius:6,padding:'6px 14px',cursor:'pointer',fontSize:12,fontWeight:700,letterSpacing:'.3px',textTransform:'uppercase'}}><span style={{marginRight:4}}>&#8592;</span>Back</button>
               <button className="modal-close" style={{color:'rgba(255,255,255,.6)'}} onClick={onClose}>×</button>
             </div>
           </div>
@@ -1734,7 +1736,7 @@ function ScorekeeperView({db,onUpdate,user,onLogout}){
      <span style={{fontFamily:'Outfit',fontWeight:800,color:'white',fontSize:14}}>{sp2?.n} — {game.age} {game.gender}</span>
      <div style={{fontSize:11,color:'rgba(255,255,255,.5)',marginTop:2}}>{game.round} · {game.date} {game.time} · {vn(game.vid)}</div>
     </div>
-    <button onClick={()=>setGame(null)} style={{background:'rgba(255,255,255,.12)',border:'none',color:'white',borderRadius:5,padding:'4px 10px',cursor:'pointer',fontSize:11}}>Back</button>
+    <button onClick={()=>setGame(null)} style={{background:'rgba(255,255,255,.12)',border:'none',color:'white',borderRadius:5,padding:'4px 10px',cursor:'pointer',fontSize:11}}><span style={{marginRight:4}}>&#8592;</span>Back</button>
    </div>
    {/* Scoreboard */}
    <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:8,alignItems:'center',marginTop:14,textAlign:'center'}}>
@@ -1908,6 +1910,7 @@ function DataMgmt({db,onUpdate}){
 
 function AdminPanel({db,onUpdate,scope}){
  const [tab,setTab]=useState('dashboard');
+ const [selAdminGame,setSelAdminGame]=useState(null);
  const [msg,setMsg]=useState('');
  function flash(m){setMsg(m);setTimeout(()=>setMsg(''),3000);}
  const [aSp,setASp]=useState('s2');const [aAge,setAAge]=useState('18+');const [aGen,setAGen]=useState('Open');
@@ -1986,7 +1989,8 @@ function AdminPanel({db,onUpdate,scope}){
  const regionalTabs=nationalTabs.filter(t=>!['medals','scorekeepers','export'].includes(t.id));
  const tabs=scope==='national'?nationalTabs:regionalTabs;
 
- return<div style={{display:'flex',gap:0,minHeight:'calc(100vh - 60px)',width:'100%',flex:1,minWidth:0}}> {/* SIDEBAR */}
+ return<div style={{display:'flex',gap:0,minHeight:'calc(100vh - 60px)',width:'100%',flex:1,minWidth:0}}>
+ {selAdminGame&&<GameDetailModal game={selAdminGame} db={db} onClose={()=>setSelAdminGame(null)} onUpdate={d=>onUpdate(d)}/>} {/* SIDEBAR */}
  <nav className="sidebar"> <div className="sidebar-section">Management</div> {tabs.slice(0,2).map(t=>(
  <button key={t.id} className={`sb${tab===t.id?' on':''}`} onClick={()=>setTab(t.id)}><span className="sb-icon">{t.icon}</span>{t.l}</button> ))}
  <div className="sidebar-section">Tournament</div> {tabs.slice(2,8).map(t=>(
@@ -2051,7 +2055,7 @@ function AdminPanel({db,onUpdate,scope}){
 
  {tab==='schedule'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Schedule</h2> <div style={{display:'flex',gap:8}}><button className="btn btn-ghost" onClick={autoSched}>Auto-Generate Pool Play</button><button className="btn btn-navy" onClick={()=>setShowGm(true)}>+ Add game</button></div> </div> {!db.games.length&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">Nothing scheduled yet</p><p className="empty-sub">Add teams and venues, then hit Auto-generate</p></div>}
  {db.games.map(g=>{const s=SPORTS.find(x=>x.id===g.sid);return(
- <div key={g.id} className="game-row"> <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:8}}> <div><div style={{fontWeight:700,fontSize:14}}>{tn(g.hid)} vs {tn(g.aid)||'TBD'}</div> <div style={{fontSize:12,color:'var(--txt2)',marginTop:2}}>{s?.abbr} {s?.n} · {g.age} {g.gender} · {g.round}</div> </div> <div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}> {g.status==='completed'&&<span className="tag tag-gray">Final {g.hs}–{g.as}</span>}
+ <div key={g.id} className="game-row" style={{cursor:"pointer"}} onClick={()=>setSelAdminGame(g)}> <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:8}}> <div><div style={{fontWeight:700,fontSize:14}}>{tn(g.hid)} vs {tn(g.aid)||'TBD'}</div> <div style={{fontSize:12,color:'var(--txt2)',marginTop:2}}>{s?.abbr} {s?.n} · {g.age} {g.gender} · {g.round}</div> </div> <div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}> {g.status==='completed'&&<span className="tag tag-gray">Final {g.hs}–{g.as}</span>}
  {g.status==='in_progress'&&<span className="tag tag-live"> Live {g.hs}–{g.as}</span>}
  {g.status==='scheduled'&&<span className="status-sched">Scheduled</span>}
  {g.status==='completed'&&g.round!=='Gold Final'&&<button className="btn btn-ghost btn-sm" onClick={()=>advance(g)}>Advance winner</button>}
@@ -2068,7 +2072,7 @@ function AdminPanel({db,onUpdate,scope}){
 
  {tab==='brackets'&&<div> <div style={{display:'flex',gap:8,marginBottom:14,flexWrap:'wrap'}}> {SPORTS.filter(s=>s.t==='team').map(s=><button key={s.id} className={`sport-chip${aSp===s.id?' on':''}`} onClick={()=>{setASp(s.id);setAAge(s.ages[0]);setAGen(s.genders[0]);}}>{s.n}</button>)}
  </div> {curSp2.ages.flatMap(a=>curSp2.genders.map(g=>[a,g])).map(([age,gen])=>(
- <div key={age+gen} className="card" style={{marginBottom:16}}> <div className="card-head"><h3 className="card-title">{curSp2.icon} {curSp2.n} — {age} {gen}</h3></div> <div className="card-body"> <Standings teams={db.teams} games={db.games} sid={aSp} age={age} gender={gen}/> <div className="divider"/> <div style={{fontWeight:700,fontSize:13,color:'var(--navy)',marginBottom:12}}>Bracket</div> <Bracket teams={db.teams} games={db.games} sid={aSp} age={age} gender={gen}/> </div> </div> ))}
+ <div key={age+gen} className="card" style={{marginBottom:16}}> <div className="card-head"><h3 className="card-title">{curSp2.icon} {curSp2.n} — {age} {gen}</h3></div> <div className="card-body"> <Standings teams={db.teams} games={db.games} sid={aSp} age={age} gender={gen}/> <div className="divider"/> <div style={{fontWeight:700,fontSize:13,color:'var(--navy)',marginBottom:12}}>Bracket</div> <Bracket teams={db.teams} games={db.games} sid={aSp} age={age} gender={gen} onGameClick={g=>setSelAdminGame(g)}/> </div> </div> ))}
  </div>}
 
  {tab==='scorekeepers'&&scope==='national'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Scorekeepers</h2><button className="btn btn-navy" onClick={()=>setShowSk(true)}>Add Scorekeeper</button></div> <div className="card"><table className="data-table"> <thead><tr><th>Name</th><th>Username</th><th>PIN</th><th>Role</th><th>Sports</th><th>QR Token</th><th></th></tr></thead> <tbody>{db.scorekeepers.map(sk=>(
