@@ -1561,12 +1561,23 @@ function SpectatorView({db}){
  const liveN=db.games.filter(g=>g.status==='in_progress').length;
  const doneN=db.games.filter(g=>g.status==='completed').length;
  const schedN=db.games.filter(g=>g.status==='scheduled').length;
- const filtered=useMemo(()=>{
+  // indSports = set of individual sport IDs
+  const indSports=new Set(SPORTS.filter(s=>s.t==='individual').map(s=>s.id));
+  const filteredInd=useMemo(()=>{
+    const r=db.indResults||[];
+    if(typeFilter==='team') return [];
+    if(sf!=='all'&&!indSports.has(sf)) return [];
+    let res=r;
+    if(sf!=='all') res=res.filter(x=>x.sid===sf);
+    if(ageF) res=res.filter(x=>x.age===ageF);
+    return res;
+  },[db.indResults,sf,ageF,typeFilter]);
+  const filtered=useMemo(()=>{
  let g=db.games;
  if(sf!=='all')g=g.filter(x=>x.sid===sf);
  if(ageF)g=g.filter(x=>x.age===ageF||x.age===ageF.replace(' Open','').replace(' (15–17)','').replace(' (45+)',''));
  if(typeFilter==='team')g=g.filter(x=>SPORTS.find(s=>s.id===x.sid)?.t==='team');
- if(typeFilter==='individual')g=g.filter(x=>SPORTS.find(s=>s.id===x.sid)?.t==='individual');
+ if(typeFilter==='individual') return [];
  if(teamFilter)g=g.filter(x=>x.hid===teamFilter||x.aid===teamFilter);
  return g.sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
  },[db.games,sf,ageF,typeFilter,teamFilter]);
@@ -1604,12 +1615,46 @@ function SpectatorView({db}){
    </div>
    <select className="form-input" style={{maxWidth:220,fontSize:12}} value={teamFilter} onChange={e=>setTeamFilter(e.target.value)}>
     <option value="">All Teams / Athletes</option>
-    {db.teams.filter(t=>sf==='all'||t.sid===sf).map(t=><option key={t.id} value={t.id}>{t.n}</option>)}
+    {typeFilter!=='individual'&&db.teams.filter(t=>sf==='all'||t.sid===sf).map(t=><option key={t.id} value={t.id}>{t.n}</option>)}
+    {typeFilter==='individual'&&db.athletes?.filter(a=>sf==='all'||a.sid===sf).map(a=><option key={a.id} value={a.id}>{a.n}</option>)}
    </select>
    {(teamFilter||typeFilter!=='all'||sf!=='all')&&<button className="btn btn-ghost btn-sm" onClick={()=>{setTeamFilter('');setTypeFilter('all');setSf('all');}} style={{color:'var(--crimson)'}}>Clear Filters</button>}
    <span className="tag tag-navy" style={{marginLeft:'auto'}}>{filtered.length} games</span>
   </div>
-  {!filtered.length&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">No games match your filters</p></div>}
+  {!filtered.length&&filteredInd.length===0&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">No games match your filters</p></div>}
+  {/* Individual sport results */}
+  {filteredInd.length>0&&<div>
+    <div style={{fontSize:12,fontWeight:800,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:12,display:'flex',alignItems:'center',gap:8}}>
+     <span style={{width:8,height:8,borderRadius:'50%',background:'var(--gold)',display:'inline-block'}}></span>
+     Individual Sport Results <span className="tag tag-navy" style={{marginLeft:4}}>{filteredInd.length}</span>
+    </div>
+    {filteredInd.map(r=>{
+     const sp=SPORTS.find(s=>s.id===r.sid);
+     const isDraw=r.winner==='Draw'||r.winner==='Mixed';
+     return<div key={r.id} className="game-row" onClick={()=>{}} style={{cursor:'default',borderLeft:'3px solid var(--gold)'}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:8}}>
+       <div>
+        <div style={{fontWeight:800,fontSize:14,marginBottom:4}}>{r.event}</div>
+        <div style={{fontSize:13,color:'var(--txt2)',marginBottom:3}}>
+         <span style={{fontWeight:isDraw?400:r.winner&&r.p1?.includes(r.winner)?700:400,color:r.winner&&r.p1?.includes(r.winner)?'var(--navy)':'var(--txt2)'}}>{r.p1}</span>
+         <span style={{margin:'0 10px',color:'var(--txt3)',fontWeight:400}}>vs</span>
+         <span style={{fontWeight:isDraw?400:r.winner&&r.p2?.includes(r.winner)?700:400,color:r.winner&&r.p2?.includes(r.winner)?'var(--navy)':'var(--txt2)'}}>{r.p2}</span>
+        </div>
+        <div style={{fontSize:12,color:'var(--muted)'}}>{r.score}</div>
+       </div>
+       <div style={{textAlign:'right',flexShrink:0}}>
+        <span className="tag tag-navy" style={{marginBottom:4,display:'block'}}>{r.round}</span>
+        {r.winner&&!isDraw&&<div style={{fontSize:12,fontWeight:700,color:'var(--green)',marginTop:4}}>Won: {r.winner}</div>}
+        {isDraw&&<div style={{fontSize:12,fontWeight:700,color:'var(--amber)',marginTop:4}}>Draw</div>}
+        <div style={{fontSize:11,color:'var(--txt3)',marginTop:2}}>{r.date}</div>
+       </div>
+      </div>
+      <div className="gc-meta" style={{marginTop:8}}>
+       <span style={{fontWeight:700}}>{sp?.n}</span><span>{r.age} {r.gender}</span>
+      </div>
+     </div>;
+    })}
+  </div>}
   {filtered.map(g=>{const s=SPORTS.find(x=>x.id===g.sid);const hw=g.status==='completed'&&+g.hs>+g.as,aw=g.status==='completed'&&+g.as>+g.hs;return(
   <div key={g.id} className="game-row" style={{cursor:'pointer'}} onClick={()=>setSelectedGame(g)}
    onMouseEnter={e=>e.currentTarget.style.boxShadow='var(--shadow-md)'}
