@@ -1618,15 +1618,14 @@ function SpectatorView({db}){
    <select className="form-input" style={{maxWidth:220,fontSize:12}} value={teamFilter} onChange={e=>setTeamFilter(e.target.value)}>
     <option value="">All Teams / Athletes</option>
     {typeFilter!=='individual'&&db.teams.filter(t=>sf==='all'||t.sid===sf).map(t=><option key={t.id} value={t.id}>{t.n}</option>)}
-    {typeFilter==='individual'&&db.athletes?.filter(a=>sf==='all'||a.sid===sf).map(a=><option key={a.id} value={a.id}>{a.n}</option>)}
+    {typeFilter==='individual'&&<option disabled>-- Athletes ({db.athletes?.filter(a=>sf==='all'||a.sid===sf).length} total) --</option>}{typeFilter==='individual'&&db.athletes?.filter(a=>sf==='all'||a.sid===sf).slice(0,30).map(a=><option key={a.id} value={a.id}>{a.n}</option>)}
    </select>
    {(teamFilter||typeFilter!=='all'||sf!=='all')&&<button className="btn btn-ghost btn-sm" onClick={()=>{setTeamFilter('');setTypeFilter('all');setSf('all');}} style={{color:'var(--crimson)'}}>Clear Filters</button>}
-   <span className="tag tag-navy" style={{marginLeft:'auto'}}>{filtered.length} games</span>
+   <span className="tag tag-navy" style={{marginLeft:'auto'}}>{filtered.length+filteredInd.length} {filteredInd.length>0&&filtered.length===0?'individual results':filtered.length>0&&filteredInd.length>0?'results':'games'}</span>
   </div>
-  {!filtered.length&&filteredInd.length===0&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">No games match your filters</p></div>}
-  {/* Individual sport results */}
+  {/* Individual sport results — shown FIRST when individual filter active */}
   {filteredInd.length>0&&<div style={{marginBottom:16}}>
-   <div style={{fontSize:11,fontWeight:800,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:10,paddingBottom:8,borderBottom:'2px solid var(--gold)'}}>Individual Sport Results — {filteredInd.length} events</div>
+   <div style={{background:'linear-gradient(135deg,var(--navy-dk),var(--navy))',color:'white',padding:'10px 16px',borderRadius:8,marginBottom:12,display:'flex',alignItems:'center',justifyContent:'space-between'}}><span style={{fontWeight:900,fontSize:13,letterSpacing:'.4px',textTransform:'uppercase'}}>Individual Sport Results</span><span style={{background:'var(--gold)',color:'var(--navy-dk)',fontWeight:900,fontSize:12,padding:'2px 10px',borderRadius:20}}>{filteredInd.length} events</span></div>
    {filteredInd.map(r=>{const sp2=SPORTS.find(s=>s.id===r.sid);return(
     <div key={r.id} style={{background:'white',border:'1px solid var(--border)',borderLeft:'3px solid var(--gold)',borderRadius:8,padding:'12px 16px',marginBottom:8,boxShadow:'var(--shadow)'}}>
      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:12,flexWrap:'wrap'}}>
@@ -1649,6 +1648,7 @@ function SpectatorView({db}){
     </div>
    );})}
   </div>}
+  {!filtered.length&&filteredInd.length===0&&<div className="empty"><p className="empty-title">No games match your filters</p></div>}
   {filtered.map(g=>{const s=SPORTS.find(x=>x.id===g.sid);const hw=g.status==='completed'&&+g.hs>+g.as,aw=g.status==='completed'&&+g.as>+g.hs;return(
   <div key={g.id} className="game-row" style={{cursor:'pointer'}} onClick={()=>setSelectedGame(g)}
    onMouseEnter={e=>e.currentTarget.style.boxShadow='var(--shadow-md)'}
