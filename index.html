@@ -512,7 +512,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27b_v1';
+const SK='naig27c_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1564,9 +1564,10 @@ function SpectatorView({db}){
   // indSports = set of individual sport IDs
   const indSports=new Set(SPORTS.filter(s=>s.t==='individual').map(s=>s.id));
   const filteredInd=useMemo(()=>{
-    if(!db.indResults||db.indResults.length===0) return [];
+    // Always fallback to SEED.indResults if db.indResults is missing (old localStorage)
+    const indData=db.indResults&&db.indResults.length>0?db.indResults:SEED.indResults||[];
     if(typeFilter==='team') return [];
-    let res=[...db.indResults];
+    let res=[...indData];
     if(sf!=='all') res=res.filter(x=>x.sid===sf);
     if(ageF) res=res.filter(x=>x.age===ageF);
     if(typeFilter==='all'&&sf==='all') return res; // show all individual in default
@@ -1621,7 +1622,7 @@ function SpectatorView({db}){
     {typeFilter==='individual'&&<option disabled>-- Athletes ({db.athletes?.filter(a=>sf==='all'||a.sid===sf).length} total) --</option>}{typeFilter==='individual'&&db.athletes?.filter(a=>sf==='all'||a.sid===sf).slice(0,30).map(a=><option key={a.id} value={a.id}>{a.n}</option>)}
    </select>
    {(teamFilter||typeFilter!=='all'||sf!=='all')&&<button className="btn btn-ghost btn-sm" onClick={()=>{setTeamFilter('');setTypeFilter('all');setSf('all');}} style={{color:'var(--crimson)'}}>Clear Filters</button>}
-   <span className="tag tag-navy" style={{marginLeft:'auto'}}>{filtered.length+filteredInd.length} {filteredInd.length>0&&filtered.length===0?'individual results':filtered.length>0&&filteredInd.length>0?'results':'games'}</span>
+   <span className="tag tag-navy" style={{marginLeft:'auto'}}>{typeFilter==='individual'?filteredInd.length+' individual results':filtered.length+' games'}</span>
   </div>
   {/* Individual sport results — shown FIRST when individual filter active */}
   {filteredInd.length>0&&<div style={{marginBottom:16}}>
@@ -1648,7 +1649,7 @@ function SpectatorView({db}){
     </div>
    );})}
   </div>}
-  {!filtered.length&&filteredInd.length===0&&<div className="empty"><p className="empty-title">No games match your filters</p></div>}
+  {typeFilter!=="individual"&&!filtered.length&&filteredInd.length===0&&<div className="empty"><p className="empty-title">No games match your filters</p></div>}
   {filtered.map(g=>{const s=SPORTS.find(x=>x.id===g.sid);const hw=g.status==='completed'&&+g.hs>+g.as,aw=g.status==='completed'&&+g.as>+g.hs;return(
   <div key={g.id} className="game-row" style={{cursor:'pointer'}} onClick={()=>setSelectedGame(g)}
    onMouseEnter={e=>e.currentTarget.style.boxShadow='var(--shadow-md)'}
