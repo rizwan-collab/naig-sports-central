@@ -611,7 +611,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27aa_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27ab_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -3653,9 +3653,9 @@ function LandingPage({goTo, db, live}){
    },
  ];
  return(
-   <div style={{background:'linear-gradient(160deg,#0F172A 0%,#1E3A8A 50%,#0F172A 100%)'}}>
+   <div style={{background:'linear-gradient(160deg,#0F172A 0%,#1E3A8A 50%,#0F172A 100%)',minHeight:'calc(100vh - 63px)',boxSizing:'border-box'}}>
      {/* Hero */}
-     <div style={{textAlign:'center',padding:'24px 20px 16px',color:'white'}}>
+     <div style={{textAlign:'center',padding:'20px 20px 12px',color:'white',maxWidth:800,margin:'0 auto',width:'100%',boxSizing:'border-box'}}>
        <div style={{fontSize:11,fontWeight:800,letterSpacing:3,opacity:.6,textTransform:'uppercase',marginBottom:16}}>North American Ismaili Games 2027</div>
        <h1 style={{fontFamily:'Outfit',fontWeight:900,fontSize:'clamp(32px,6vw,56px)',margin:'0 0 12px',lineHeight:1.1}}>
          NAIG Sports Central
@@ -3664,21 +3664,21 @@ function LandingPage({goTo, db, live}){
          #CompeteConnectUnite — Live scores, team management, and tournament operations for all 14 regions
        </p>
        {live>0&&(
-         <div style={{display:'inline-flex',alignItems:'center',gap:10,background:'rgba(22,163,74,.2)',border:'1px solid rgba(22,163,74,.4)',borderRadius:99,padding:'8px 20px',color:'#4ADE80',fontWeight:800,fontSize:12,marginBottom:16}}>
+         <div style={{display:'inline-flex',alignItems:'center',gap:10,background:'rgba(22,163,74,.2)',border:'1px solid rgba(22,163,74,.4)',borderRadius:99,padding:'8px 20px',color:'#4ADE80',fontWeight:800,fontSize:12,marginBottom:10}}>
            <span style={{width:10,height:10,borderRadius:'50%',background:'#22C55E',display:'inline-block',animation:'breathe 1.5s infinite'}}></span>
            {live} game{live>1?'s':''} live right now
          </div>
        )}
      </div>
      {/* Role Cards */}
-     <div style={{maxWidth:900,margin:'0 auto',padding:'0 16px 24px',display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:12}}>
+     <div style={{maxWidth:900,margin:'0 auto',padding:'0 16px 16px',display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:12,maxWidth:800,margin:'0 auto',width:'100%',boxSizing:'border-box'}}>
        {cards.map(card=>(
          <div key={card.id}
            onClick={()=>goTo(card.id)}
            style={{
              background:card.bg,
              borderRadius:20,
-             padding:'18px 16px',
+             padding:'16px 14px',
              cursor:'pointer',
              color:'white',
              transition:'transform .2s, box-shadow .2s',
@@ -3687,7 +3687,7 @@ function LandingPage({goTo, db, live}){
              position:'relative',
              overflow:'hidden',
            }}
-           onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 16px 48px rgba(0,0,0,.5)';}}
+           onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 16px 48px rgba(0,0,0,.5)';}}
            onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='0 4px 24px rgba(0,0,0,.3)';}}>
            {/* Icon */}
            <div style={{fontSize:24,marginBottom:10}}>{card.icon}</div>
@@ -3695,7 +3695,7 @@ function LandingPage({goTo, db, live}){
            <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:16,marginBottom:4}}>{card.title}</div>
            <div style={{fontSize:11,opacity:.7,marginBottom:12,lineHeight:1.4}}>{card.sub}</div>
            {/* Stats */}
-           <div style={{display:'flex',flexDirection:'column',gap:4,marginBottom:12}}>
+           <div style={{display:'flex',flexDirection:'column',gap:3,marginBottom:10}}>
              {card.stats.map(({label,val,hot})=>(
                <div key={label} style={{display:'flex',justifyContent:'space-between',fontSize:11,background:'rgba(255,255,255,.1)',borderRadius:6,padding:'4px 10px'}}>
                  <span style={{opacity:.7}}>{label}</span>
@@ -3711,7 +3711,7 @@ function LandingPage({goTo, db, live}){
        ))}
      </div>
      {/* Footer */}
-     <div style={{textAlign:'center',paddingBottom:16,paddingTop:8,color:'rgba(255,255,255,.3)',fontSize:10}}>
+     <div style={{textAlign:'center',paddingBottom:16,paddingTop:8,color:'rgba(255,255,255,.3)',fontSize:10,maxWidth:800,margin:'0 auto'}}>
        NAIG Sports Central · Powered by AKYSB · Houston 2027
      </div>
    </div>
