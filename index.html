@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27f_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27g_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1568,7 +1568,11 @@ function Standings({teams,games,sid,age,gender}){
 function Bracket({teams,games,sid,age,gender,onGameClick}){
  const rnds=['Quarterfinal','Semifinal','Bronze Final','Gold Final'];
  const byR=rnds.map(r=>games.filter(g=>g.sid===sid&&g.age===age&&g.gender===gender&&g.round===r));
- if(!byR.some(r=>r.length))return<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">Bracket not set up yet</p><p className="empty-sub">Pool play wraps up first</p></div>;
+ if(!byR.some(r=>r.length))return<div className="card" style={{textAlign:'center',padding:'32px 20px',border:'2px dashed var(--border)'}}>
+ <div style={{fontSize:36,marginBottom:12,color:'var(--border)'}}>🏆</div>
+ <div style={{fontWeight:800,color:'var(--navy-dk)',fontSize:16,marginBottom:8}}>Bracket Fills as Pool Play Completes</div>
+ <div style={{color:'var(--txt3)',fontSize:13,maxWidth:320,margin:'0 auto',lineHeight:1.6}}>Quarterfinal, Semifinal, and Final matchups appear here once teams advance from Pool Play. Check the Schedule tab for active games.</div>
+</div>;
  const tn=id=>teams.find(t=>t.id===id)?.n||'TBD';
  return<div className="bracket-scroll"> {byR.map((rg,ri)=>rg.length?(
  <div key={ri} className="bracket-col"> <div className="bracket-round-label">{rnds[ri]}</div> {rg.map(g=>(
@@ -2233,7 +2237,13 @@ function SpectatorView({db}){
    onMouseEnter={e=>e.currentTarget.style.boxShadow='var(--shadow-md)'}
    onMouseLeave={e=>e.currentTarget.style.boxShadow='var(--shadow)'}>
    <div className="game-vs">
-    <div><div className={`game-team${hw?' winner':''}`}>{hw?'+ ':''}{tn(g.hid)}</div><div style={{fontSize:12,color:'var(--txt2)',marginTop:3}}><span className="sport-code" style={{fontSize:8,padding:'1px 4px'}}>{s?.abbr}</span> {s?.n}</div></div>
+    <div>
+     <div className={`game-team${hw?' winner':''}`} style={{display:'flex',alignItems:'center',gap:6}}>
+       {hw&&<span style={{color:'var(--gold)',fontWeight:900}}>+</span>}
+       {(()=>{const ht=db.teams.find(t=>t.id===g.hid);return ht?<span className={ht.pool==='A'?'reg-ca':'reg-us'} data-tip={ht.pool==='A'?'Canada region':'USA region'} style={{flexShrink:0}}>{ht.pool==='A'?'CA':'US'}</span>:null;})()}
+       <span>{tn(g.hid)}</span>
+     </div>
+     <div style={{fontSize:12,color:'var(--txt2)',marginTop:3}}><span className="sport-code" style={{fontSize:8,padding:'1px 4px'}}>{s?.abbr}</span> {s?.n}</div></div>
     <div className="game-score-box"><div className="game-score">{g.status!=='scheduled'?`${g.hs}–${g.as}`:'vs'}</div><div style={{marginTop:4}}>{sbadge(g.status)}</div></div>
     <div style={{textAlign:'right'}}><div className={`game-team${aw?' winner':''}`}>{aw?'+ ':''}{tn(g.aid)}</div><div style={{fontSize:12,color:'var(--txt2)',marginTop:3}}>{g.age} · {g.gender}</div></div>
    </div>
@@ -2243,7 +2253,49 @@ function SpectatorView({db}){
    </div>
   </div>);})}
  </div>}
- {tab==='standings'&&<div> {sf==='all'&&<div className="alert alert-blue">Pick a sport above to see standings</div>}
+ {tab==='standings'&&<div> {sf==='all'&&<div>
+ {/* Global summary — medals by region across all sports */}
+ <div className="card" style={{marginBottom:20,padding:0,overflow:'hidden'}}>
+   <div style={{background:'linear-gradient(135deg,var(--navy-dk),var(--navy))',padding:'14px 20px',display:'flex',alignItems:'center',gap:12}}>
+     <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:16,color:'white'}}>Tournament Medal Standings</div>
+     <span style={{background:'var(--gold)',color:'#92400E',fontSize:11,fontWeight:800,padding:'2px 8px',borderRadius:99}}>All Sports</span>
+   </div>
+   <div style={{padding:'0 4px'}}>
+   <table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}>
+     <thead><tr style={{background:'var(--bg2)'}}>
+       <th style={{padding:'10px 16px',textAlign:'left',fontWeight:700,color:'var(--navy)',fontSize:11,textTransform:'uppercase',letterSpacing:'.5px'}}>Region</th>
+       <th style={{padding:'10px 10px',textAlign:'center',fontWeight:700,color:'#B45309',fontSize:12}}>Gold</th>
+       <th style={{padding:'10px 10px',textAlign:'center',fontWeight:700,color:'#6B7280',fontSize:12}}>Silver</th>
+       <th style={{padding:'10px 10px',textAlign:'center',fontWeight:700,color:'#92400E',fontSize:12}}>Bronze</th>
+       <th style={{padding:'10px 10px',textAlign:'center',fontWeight:700,color:'var(--navy)',fontSize:12}}>Total</th>
+     </tr></thead>
+     <tbody>
+     {REGIONS.map((region,i)=>{
+       const rm=db.medals.filter(m=>m.region===region);
+       const g=rm.filter(m=>m.medal==='gold').length;
+       const s=rm.filter(m=>m.medal==='silver').length;
+       const b=rm.filter(m=>m.medal==='bronze').length;
+       const tot=g+s+b;
+       if(!tot) return null;
+       return<tr key={region} style={{borderBottom:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>setSf(SPORTS[0].id)}>
+         <td style={{padding:'10px 16px'}}>
+           <div style={{display:'flex',alignItems:'center',gap:8}}>
+             <span className={i<7?'reg-ca':'reg-us'} data-tip={i<7?'Canada':'United States'}>{i<7?'CA':'US'}</span>
+             <span style={{fontWeight:600,color:'var(--navy-dk)'}}>{region}</span>
+           </div>
+         </td>
+         <td style={{textAlign:'center',padding:'10px',fontWeight:g?800:400,color:g?'#B45309':'var(--txt3)'}}>{g||'—'}</td>
+         <td style={{textAlign:'center',padding:'10px',fontWeight:s?800:400,color:s?'#6B7280':'var(--txt3)'}}>{s||'—'}</td>
+         <td style={{textAlign:'center',padding:'10px',fontWeight:b?800:400,color:b?'#92400E':'var(--txt3)'}}>{b||'—'}</td>
+         <td style={{textAlign:'center',padding:'10px',fontWeight:700,color:'var(--navy)'}}>{tot}</td>
+       </tr>;
+     })}
+     </tbody>
+   </table>
+   </div>
+ </div>
+ <div className="alert alert-blue" style={{fontSize:13}}>Select a sport above to see pool standings and win/loss records.</div>
+</div>}
  {sf!=='all'&&(ageF?(curSp?.genders||[]).map(g=>[ageF,g]):(curSp?.ages||[]).flatMap(a=>(curSp?.genders||[]).map(g=>[a,g]))||[]).map(([age,gender])=>(
  <div key={age+gender} className="card" style={{marginBottom:16}}> <div className="card-head"><h3 className="card-title">{curSp?.icon} {curSp?.n} — {age} {gender}</h3></div> <div className="card-body"><Standings teams={db.teams} games={db.games} sid={sf} age={age} gender={gender}/></div> </div> ))}
  </div>}
