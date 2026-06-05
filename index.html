@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27r_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27t_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -3245,7 +3245,7 @@ function AdminPanel({db,onUpdate,scope}){
 
  {tab==='help_sop'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>User Guides & SOP</h2></div> <div className="alert alert-blue" style={{marginBottom:20}}> <strong> Note:</strong> The chat bubble bottom-right answers questions instantly — it knows every feature and all the rules.
  </div> <SOPHelp role={scope==='national'?'national':'regional'}/> <div style={{marginTop:24}}><SOPHelp role='scorekeeper'/></div> </div>}
- {tab==='export'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Export & Backup</h2></div> <DataMgmt db={db} onUpdate={onUpdate}/> <div className="g2"> <div className="card"><div className="card-head"><h3 className="card-title"> JSON Backup</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Export everything as JSON. Re-import on any device to restore.</p> <button className="btn btn-navy btn-w" style={{marginBottom:10}} onClick={()=>{const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='naig2027_backup_'+new Date().toISOString().split('T')[0]+'.json';a.click();}}>Download Backup</button> <label className="btn btn-ghost btn-w" style={{cursor:'pointer'}}>Restore Backup<input type="file" accept=".json" onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{onUpdate({...SEED,...JSON.parse(ev.target.result)});flash('Data restored');}catch{flash('That file doesn\'t look right');}};r.readAsText(f);}} style={{display:'none'}}/></label> </div></div> <div className="card"><div className="card-head"><h3 className="card-title"> Print to PDF</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Use your browser's Print to PDF to save any page.</p> <button className="btn btn-navy btn-w" onClick={()=>window.print()}>Print</button> </div></div> <div className="card"><div className="card-head"><h3 className="card-title"> Reset</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Wipes all data and reloads defaults. Download a backup first.</p> <button className="btn btn-ghost btn-w" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={()=>{if(confirm('This deletes everything. Are you sure?'))onUpdate(SEED);}}>Reset to defaults</button> </div></div> </div> </div>}
+ {tab==='export'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Export & Backup</h2></div> <DataMgmt db={db} onUpdate={onUpdate}/> <div className="g2"> <div className="card"><div className="card-head"><h3 className="card-title"> JSON Backup</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Export everything as JSON. Re-import on any device to restore.</p> <button className="btn btn-navy btn-w" style={{marginBottom:10}} onClick={()=>{const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='naig2027_backup_'+new Date().toISOString().split('T')[0]+'.json';a.click();}}>Download Backup</button> <label className="btn btn-ghost btn-w" style={{cursor:'pointer'}}>Restore Backup<input type="file" accept=".json" onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{onUpdate({...SEED,...JSON.parse(ev.target.result)});flash('Data restored');}catch{flash('That file doesn\'t look right');}};r.readAsText(f);}} style={{display:'none'}}/></label> </div></div> <div className="card"><div className="card-head"><h3 className="card-title"> Print to PDF</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Use browser Print to PDF to save any page.</p> <button className="btn btn-navy btn-w" onClick={()=>window.print()}>Print</button> </div></div> <div className="card"><div className="card-head"><h3 className="card-title"> Reset</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Wipes all data and reloads defaults. Download a backup first.</p> <button className="btn btn-ghost btn-w" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={()=>{if(confirm('This deletes everything. Are you sure?'))onUpdate(SEED);}}>Reset to defaults</button> </div></div> </div> </div>}
  </div> </div> </div>;
 }
 
@@ -3496,7 +3496,7 @@ function LandingPage({goTo, db, live}){
    {
      id:'regional',
      title:'Regional Coordinator',
-     sub:'Manage your region's teams, rosters, and setup',
+     sub:'Manage your region teams, rosters, and setup',
      color:'#7C3AED',
      bg:'linear-gradient(135deg,#6D28D9,#7C3AED)',
      icon:'🏅',
