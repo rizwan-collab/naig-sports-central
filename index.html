@@ -611,7 +611,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27ac_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27ad_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1512,6 +1512,9 @@ function RoleLogin({role,onSuccess,onCancel}){
  const [pw,setPw]=useState('');
  const [qr,setQr]=useState('');
  const [err,setErr]=useState('');
+ const [selRegion,setSelRegion]=useState('');
+ const allRegions=(()=>{try{const db=load();return(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig)||[];}catch{return SEED.regionConfig||[];}})();
+ const selReg=allRegions.find(r=>r.id===selRegion);
  function tryLogin(db){
  if(role==='national'){
    if(pw===db.adminPass||pw==='naig2027'){onSuccess();return;}
@@ -1534,8 +1537,30 @@ function RoleLogin({role,onSuccess,onCancel}){
  return(
  <div style={{maxWidth:420,margin:'60px auto'}}> <div className="card"> <div style={{background:'var(--navy-dk)',padding:'20px 24px',borderRadius:'12px 12px 0 0',borderBottom:'3px solid var(--crimson)'}}> <div style={{fontSize:28,marginBottom:8}}>{meta.icon}</div> <h2 style={{fontFamily:'Outfit',fontWeight:900,color:'white',fontSize:20,marginBottom:4}}>{meta.label}</h2> <p style={{fontSize:13,color:'rgba(255,255,255,.6)'}}>{meta.sub}</p> </div> <div className="card-body"> {err&&<div className="alert alert-amber" style={{marginBottom:16}}> {err}</div>}
  {(role==='national'||role==='regional')&&(
- <div> <div className="form-field"> <label className="form-label">Password</label> <input className="form-input" type="password" value={pw} onChange={e=>setPw(e.target.value)}
- placeholder="Enter password" autoFocus
+ <div>
+   {role==='regional'&&(
+     <div style={{marginBottom:16}}>
+       <div className="form-field" style={{marginBottom:12}}>
+         <label className="form-label">Select Your Region</label>
+         <select className="form-input" value={selRegion} onChange={e=>{setSelRegion(e.target.value);setPw(allRegions.find(r=>r.id===e.target.value)?.password||'');setErr('');}}>
+           <option value="">-- Choose your region --</option>
+           {allRegions.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}
+         </select>
+       </div>
+       {selReg&&(
+         <div style={{background:'linear-gradient(135deg,var(--navy-lt),#EFF6FF)',border:'2px solid var(--navy)',borderRadius:12,padding:'14px 16px',marginBottom:12}}>
+           <div style={{fontSize:11,fontWeight:700,color:'var(--txt3)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}}>Login Details for {selReg.name}</div>
+           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+             <span style={{fontSize:13,color:'var(--txt2)'}}>Password:</span>
+             <code style={{fontFamily:'monospace',fontWeight:800,fontSize:15,color:'var(--navy-dk)',background:'white',padding:'3px 10px',borderRadius:6,border:'1px solid var(--border)'}}>{selReg.password}</code>
+           </div>
+           <div style={{fontSize:11,color:'var(--txt3)',marginTop:4}}>Share this password only with your regional coordinator.</div>
+         </div>
+       )}
+     </div>
+   )}
+   <div className="form-field"> <label className="form-label">{role==='regional'?'Confirm Password':'Password'}</label> <input className="form-input" type="password" value={pw} onChange={e=>setPw(e.target.value)}
+ placeholder={role==='regional'&&selReg?'Confirm: '+selReg.password:'Enter password'} autoFocus
  onKeyDown={e=>e.key==='Enter'&&tryLogin(load())}/> </div> <button className="btn btn-navy btn-w btn-lg" onClick={()=>tryLogin(load())}>Sign In</button> <p style={{textAlign:'center',fontSize:12,color:'var(--txt3)',marginTop:12}}>{meta.hint}</p> </div> )}
  {role==='scorekeeper'&&(
  <div> <div style={{display:'flex',gap:4,background:'var(--navy-lt)',borderRadius:8,padding:4,marginBottom:20}}> {[{id:'pin',l:'PIN'},{id:'user',l:'Login'},{id:'qr',l:'QR Code'}].map(m=>(
@@ -3595,493 +3620,59 @@ function LandingPage({goTo, db, live}){
  const totalGames=db.games.length;
  const completedGames=db.games.filter(g=>g.status==='completed').length;
  const cards=[
-   {
-     id:'spectator',
-     title:'Spectator View',
-     sub:'Live scores, standings, brackets, schedule, gallery',
-     color:'var(--navy)',
-     bg:'linear-gradient(135deg,var(--navy-dk),var(--navy))',
-     icon:'📊',
-     stats:[
-       {label:'Live Now',val:live>0?live+' games':'—',hot:live>0},
-       {label:'Completed',val:completedGames},
-       {label:'Teams',val:totalTeams},
-     ],
-     cta:'View Scores',
-   },
-   {
-     id:'scorekeeper',
-     title:'Score Entry',
-     sub:'Enter scores, track stats, manage live game data',
-     color:'#0891B2',
-     bg:'linear-gradient(135deg,#0E7490,#0891B2)',
-     icon:'✏️',
-     stats:[
-       {label:'Active Games',val:live>0?live:'0',hot:live>0},
-       {label:'Your Queue',val:'Check in'},
-       {label:'Auth',val:'PIN / QR'},
-     ],
-     cta:'Sign In',
-   },
-   {
-     id:'regional',
-     title:'Regional Coordinator',
-     sub:'Manage your region teams, rosters, and setup',
-     color:'#7C3AED',
-     bg:'linear-gradient(135deg,#6D28D9,#7C3AED)',
-     icon:'🏅',
-     stats:[
-       {label:'14 Regions',val:'CA + USA'},
-       {label:'Teams',val:totalTeams},
-       {label:'Auth',val:'Password'},
-     ],
-     cta:'Coordinator Login',
-   },
-   {
-     id:'national',
-     title:'National Admin',
-     sub:'Full tournament control — schedule, venues, results',
-     color:'var(--crimson)',
-     bg:'linear-gradient(135deg,#991B1B,var(--crimson))',
-     icon:'🏆',
-     stats:[
-       {label:'Sports',val:SPORTS.length},
-       {label:'Total Games',val:totalGames},
-       {label:'Auth',val:'Admin Password'},
-     ],
-     cta:'Admin Login',
-   },
+   {id:'spectator',title:'Live Scores',sub:'Schedules, standings, brackets, gallery',color:'#1E40AF',grad:'linear-gradient(135deg,#1E3A8A,#2563EB)',icon:'L',stats:live>0?'LIVE: '+live+' game'+(live>1?'s':''):completedGames+' completed',hot:live>0,cta:'View Scores'},
+   {id:'scorekeeper',title:'Score Entry',sub:'Enter scores and track game stats',color:'#0891B2',grad:'linear-gradient(135deg,#0E7490,#0891B2)',icon:'S',stats:'PIN / QR login',hot:false,cta:'Sign In'},
+   {id:'regional',title:'Regional',sub:'Manage your region teams and setup',color:'#7C3AED',grad:'linear-gradient(135deg,#6D28D9,#7C3AED)',icon:'R',stats:'14 regions registered',hot:false,cta:'Coordinator Login'},
+   {id:'national',title:'National Admin',sub:'Full tournament control and scheduling',color:'#B91C1C',grad:'linear-gradient(135deg,#991B1B,#DC2626)',icon:'N',stats:totalGames+' games total',hot:false,cta:'Admin Login'},
  ];
  return(
-   <div style={{background:'linear-gradient(160deg,#0F172A 0%,#1E3A8A 50%,#0F172A 100%)',minHeight:'calc(100vh - 63px)',boxSizing:'border-box'}}>
-     {/* Hero */}
-     <div style={{textAlign:'center',padding:'20px 20px 12px',color:'white',maxWidth:800,margin:'0 auto',width:'100%',boxSizing:'border-box'}}>
-       <div style={{fontSize:11,fontWeight:800,letterSpacing:3,opacity:.6,textTransform:'uppercase',marginBottom:16}}>North American Ismaili Games 2027</div>
-       <h1 style={{fontFamily:'Outfit',fontWeight:900,fontSize:'clamp(32px,6vw,56px)',margin:'0 0 12px',lineHeight:1.1}}>
-         NAIG Sports Central
-       </h1>
-       <p style={{fontSize:'clamp(14px,2vw,18px)',opacity:.7,margin:'0 auto 32px',maxWidth:500}}>
-         #CompeteConnectUnite — Live scores, team management, and tournament operations for all 14 regions
-       </p>
-       {live>0&&(
-         <div style={{display:'inline-flex',alignItems:'center',gap:10,background:'rgba(22,163,74,.2)',border:'1px solid rgba(22,163,74,.4)',borderRadius:99,padding:'8px 20px',color:'#4ADE80',fontWeight:800,fontSize:12,marginBottom:10}}>
-           <span style={{width:10,height:10,borderRadius:'50%',background:'#22C55E',display:'inline-block',animation:'breathe 1.5s infinite'}}></span>
-           {live} game{live>1?'s':''} live right now
-         </div>
-       )}
-     </div>
-     {/* Role Cards */}
-     <div style={{maxWidth:900,margin:'0 auto',padding:'0 16px 16px',display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:12,maxWidth:800,margin:'0 auto',width:'100%',boxSizing:'border-box'}}>
-       {cards.map(card=>(
-         <div key={card.id}
-           onClick={()=>goTo(card.id)}
-           style={{
-             background:card.bg,
-             borderRadius:20,
-             padding:'16px 14px',
-             cursor:'pointer',
-             color:'white',
-             transition:'transform .2s, box-shadow .2s',
-             boxShadow:'0 4px 24px rgba(0,0,0,.3)',
-             border:'1px solid rgba(255,255,255,.1)',
-             position:'relative',
-             overflow:'hidden',
-           }}
-           onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 16px 48px rgba(0,0,0,.5)';}}
-           onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='0 4px 24px rgba(0,0,0,.3)';}}>
-           {/* Icon */}
-           <div style={{fontSize:24,marginBottom:10}}>{card.icon}</div>
-           {/* Title */}
-           <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:16,marginBottom:4}}>{card.title}</div>
-           <div style={{fontSize:11,opacity:.7,marginBottom:12,lineHeight:1.4}}>{card.sub}</div>
-           {/* Stats */}
-           <div style={{display:'flex',flexDirection:'column',gap:3,marginBottom:10}}>
-             {card.stats.map(({label,val,hot})=>(
-               <div key={label} style={{display:'flex',justifyContent:'space-between',fontSize:11,background:'rgba(255,255,255,.1)',borderRadius:6,padding:'4px 10px'}}>
-                 <span style={{opacity:.7}}>{label}</span>
-                 <span style={{fontWeight:800,color:hot?'#4ADE80':'white'}}>{val}</span>
-               </div>
-             ))}
-           </div>
-           {/* CTA */}
-           <div style={{background:'rgba(255,255,255,.15)',borderRadius:8,padding:'8px',textAlign:'center',fontWeight:800,fontSize:12,border:'1px solid rgba(255,255,255,.2)'}}>
-             {card.cta} →
-           </div>
-         </div>
-       ))}
-     </div>
-     {/* Footer */}
-     <div style={{textAlign:'center',paddingBottom:16,paddingTop:8,color:'rgba(255,255,255,.3)',fontSize:10,maxWidth:800,margin:'0 auto'}}>
-       NAIG Sports Central · Powered by AKYSB · Houston 2027
-     </div>
-   </div>
- );
-}
-
-
-function RegionalAdminView({db, onUpdate, authed, onHome}){
- const rconf=authed.regionData;
- const isAll=authed.regionId==='national';
- const regionId=authed.regionId;
- // Get this region's config from db
- const allRegions=(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig)||[];
- const myRegion=isAll?null:allRegions.find(r=>r.id===regionId)||rconf;
- const [tab,setTab]=React.useState('overview');
- const [editSports,setEditSports]=React.useState(false);
- const [mySports,setMySports]=React.useState((myRegion&&myRegion.sports)||SPORTS.map(s=>s.id));
- const [showPwModal,setShowPwModal]=React.useState(false);
- const [newPw,setNewPw]=React.useState('');
-
- // Filter data to this region
- function regionMatch(team){
-   if(isAll) return true;
-   const rn=myRegion&&myRegion.name;
-   return team.n&&team.n.startsWith(rn?rn.replace('Canada ','').replace('USA ',''):'');
- }
- const myTeams=db.teams.filter(t=>{
-   if(isAll) return true;
-   const abb=myRegion&&myRegion.abbr;
-   return t.region&&(t.region===abb||t.region===myRegion.name||t.n.includes(myRegion.abbr));
- });
- const myGames=db.games.filter(g=>{
-   if(isAll) return true;
-   return myTeams.some(t=>t.id===g.hid||t.id===g.aid);
- });
- const liveGames=myGames.filter(g=>g.status==='in_progress');
- const doneGames=myGames.filter(g=>g.status==='completed');
-
- function saveSports(){
-   const updated=allRegions.map(r=>r.id===regionId?{...r,sports:mySports}:r);
-   onUpdate({...db,regionConfig:updated});
-   setEditSports(false);
- }
- function savePassword(){
-   if(newPw.length<6){alert('Password must be at least 6 characters');return;}
-   const updated=allRegions.map(r=>r.id===regionId?{...r,password:newPw}:r);
-   onUpdate({...db,regionConfig:updated});
-   setShowPwModal(false);
-   setNewPw('');
-   alert('Password updated. Share the new password with your region coordinator.');
- }
-
- const TABS=[
-   {id:'overview',label:'Overview'},
-   {id:'sports',label:'Our Sports'},
-   {id:'teams',label:'Teams'},
-   {id:'schedule',label:'Schedule'},
-   {id:'standings',label:'Standings'},
-   {id:'setup',label:'Setup'},
- ];
-
- return(
-   <div className="page" style={{paddingBottom:40}}>
-     {/* Header */}
-     <div style={{background:'linear-gradient(135deg,var(--navy-dk),var(--navy))',borderRadius:16,padding:'20px 24px',marginBottom:20,color:'white'}}>
-       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:10}}>
-         <div>
-           <div style={{fontSize:11,fontWeight:700,opacity:.6,letterSpacing:1,textTransform:'uppercase',marginBottom:6}}>Regional Coordinator Dashboard</div>
-           <h1 style={{fontFamily:'Outfit',fontWeight:900,fontSize:'clamp(22px,4vw,32px)',margin:'0 0 4px'}}>{myRegion?myRegion.name:'All Regions'}</h1>
-           <div style={{opacity:.7,fontSize:13}}>{myTeams.length} teams registered across {mySports.length} sports</div>
-         </div>
-         <button onClick={onHome} style={{background:'rgba(255,255,255,.12)',border:'1px solid rgba(255,255,255,.2)',color:'white',borderRadius:8,padding:'8px 14px',cursor:'pointer',fontSize:12,fontWeight:700}}>
-           Home
-         </button>
+   <div style={{minHeight:'calc(100vh - 63px)',background:'linear-gradient(160deg,#0F172A 0%,#1E3A8A 60%,#0F172A 100%)',display:'flex',flexDirection:'column'}}>
+     {/* Live ticker if games in progress */}
+     {live>0&&(
+       <div style={{background:'#15803D',color:'white',textAlign:'center',fontSize:12,fontWeight:700,padding:'6px',letterSpacing:.5}}>
+         {live} game{live>1?'s':''} LIVE right now
        </div>
-       <div style={{display:'flex',gap:10,marginTop:16,flexWrap:'wrap'}}>
-         {[
-           {label:'Live',val:liveGames.length,color:liveGames.length>0?'#4ADE80':'rgba(255,255,255,.4)'},
-           {label:'Done',val:doneGames.length,color:'rgba(255,255,255,.7)'},
-           {label:'Remaining',val:myGames.filter(g=>g.status==='scheduled').length,color:'rgba(255,255,255,.7)'},
-           {label:'Teams',val:myTeams.length,color:'rgba(255,255,255,.7)'},
-         ].map(({label,val,color})=>(
-           <div key={label} style={{background:'rgba(255,255,255,.1)',borderRadius:8,padding:'8px 14px',minWidth:60,textAlign:'center'}}>
-             <div style={{fontSize:20,fontWeight:900,color,fontFamily:'Outfit'}}>{val}</div>
-             <div style={{fontSize:10,opacity:.6,fontWeight:700}}>{label}</div>
+     )}
+     {/* Main content — flex-grow fills space */}
+     <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',padding:'16px',maxWidth:860,margin:'0 auto',width:'100%',boxSizing:'border-box'}}>
+       {/* Title */}
+       <div style={{textAlign:'center',marginBottom:20,color:'white'}}>
+         <div style={{fontSize:10,fontWeight:700,letterSpacing:3,opacity:.5,textTransform:'uppercase',marginBottom:6}}>North American Ismaili Games 2027</div>
+         <h1 style={{fontFamily:'Outfit',fontWeight:900,fontSize:'clamp(28px,5vw,48px)',margin:'0 0 8px',lineHeight:1.1}}>NAIG Sports Central</h1>
+         <p style={{fontSize:'clamp(12px,1.5vw,15px)',opacity:.6,margin:0}}>#CompeteConnectUnite</p>
+       </div>
+       {/* 2x2 Cards */}
+       <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:10}}>
+         {cards.map(card=>(
+           <div key={card.id} onClick={()=>goTo(card.id)}
+             style={{background:card.grad,borderRadius:14,padding:'18px 16px',cursor:'pointer',color:'white',
+               border:'1px solid rgba(255,255,255,.12)',transition:'transform .15s,box-shadow .15s',
+               boxShadow:'0 4px 20px rgba(0,0,0,.3)'}}
+             onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 12px 40px rgba(0,0,0,.4)';}}
+             onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='0 4px 20px rgba(0,0,0,.3)';}}>
+             <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:'clamp(15px,2vw,20px)',marginBottom:4}}>{card.title}</div>
+             <div style={{fontSize:'clamp(10px,1.2vw,12px)',opacity:.7,marginBottom:12,lineHeight:1.4}}>{card.sub}</div>
+             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+               <div style={{fontSize:'clamp(10px,1vw,12px)',background:'rgba(255,255,255,.12)',borderRadius:6,padding:'3px 8px',fontWeight:card.hot?800:400,color:card.hot?'#4ADE80':'rgba(255,255,255,.8)'}}>{card.stats}</div>
+               <div style={{fontSize:'clamp(10px,1vw,11px)',fontWeight:800,opacity:.9}}>{card.cta} &rarr;</div>
+             </div>
+           </div>
+         ))}
+       </div>
+       {/* Footer stats */}
+       <div style={{display:'flex',justifyContent:'center',gap:20,marginTop:16,flexWrap:'wrap'}}>
+         {[{v:totalTeams,l:'Teams'},{v:SPORTS.length,l:'Sports'},{v:14,l:'Regions'},{v:completedGames,l:'Games Done'}].map(({v,l})=>(
+           <div key={l} style={{textAlign:'center',color:'white'}}>
+             <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:20,lineHeight:1}}>{v}</div>
+             <div style={{fontSize:10,opacity:.5,fontWeight:600,marginTop:2}}>{l}</div>
            </div>
          ))}
        </div>
      </div>
-
-     {/* Tabs */}
-     <div className="view-tabs" style={{marginBottom:20,overflowX:'auto',WebkitOverflowScrolling:'touch',flexWrap:'nowrap',scrollbarWidth:'none'}}>
-       {TABS.map(t=>(
-         <button key={t.id} className={`vtab${tab===t.id?' on':''}`} onClick={()=>setTab(t.id)} style={{flexShrink:0,whiteSpace:'nowrap'}}>{t.label}</button>
-       ))}
+     {/* Bottom brand */}
+     <div style={{textAlign:'center',padding:'8px',color:'rgba(255,255,255,.2)',fontSize:10,flexShrink:0}}>
+       NAIG Sports Central &middot; Houston 2027
      </div>
-
-     {/* OVERVIEW */}
-     {tab==='overview'&&(
-       <div>
-         {liveGames.length>0&&(
-           <div style={{background:'linear-gradient(135deg,#F0FDF4,#DCFCE7)',border:'2px solid #16A34A',borderRadius:12,padding:'14px 18px',marginBottom:16}}>
-             <div style={{fontWeight:800,color:'#15803D',marginBottom:10,display:'flex',alignItems:'center',gap:8}}>
-               <span style={{width:10,height:10,borderRadius:'50%',background:'#22C55E',display:'inline-block',animation:'breathe 1.5s infinite'}}></span>
-               {liveGames.length} game{liveGames.length>1?'s':''} live now
-             </div>
-             {liveGames.map(g=>{
-               const ht=db.teams.find(t=>t.id===g.hid);
-               const at=db.teams.find(t=>t.id===g.aid);
-               const sp=SPORTS.find(s=>s.id===g.sid);
-               return(
-                 <div key={g.id} style={{display:'flex',justifyContent:'space-between',fontSize:13,marginBottom:6,padding:'6px 10px',background:'white',borderRadius:8}}>
-                   <span style={{fontWeight:700}}>{ht&&ht.n} <span style={{color:'var(--txt3)'}}>vs</span> {at&&at.n}</span>
-                   <span style={{fontWeight:900,color:'var(--navy)'}}>{g.hs} – {g.as} <span style={{fontSize:11,color:'var(--txt3)'}}>{sp&&sp.abbr}</span></span>
-                 </div>
-               );
-             })}
-           </div>
-         )}
-         <div className="g2">
-           {SPORTS.filter(s=>mySports.includes(s.id)).map(s=>{
-             const sportTeams=myTeams.filter(t=>t.sid===s.id);
-             const sportGames=myGames.filter(g=>g.sid===s.id);
-             const done=sportGames.filter(g=>g.status==='completed').length;
-             return(
-               <div key={s.id} className="card" style={{borderLeft:'3px solid var(--navy)'}}>
-                 <div className="card-head">
-                   <div style={{display:'flex',gap:8,alignItems:'center'}}>
-                     <span className="sport-code" data-tip={s.n}>{s.abbr}</span>
-                     <span style={{fontWeight:700,fontSize:14}}>{s.n}</span>
-                   </div>
-                   <span style={{fontSize:11,color:'var(--txt3)'}}>{sportTeams.length} teams</span>
-                 </div>
-                 <div style={{display:'flex',gap:8,flexWrap:'wrap',marginTop:8}}>
-                   <span style={{fontSize:12,color:'var(--txt2)'}}>Games: {done}/{sportGames.length}</span>
-                   <span style={{height:4,flex:1,background:'var(--bg2)',borderRadius:2,alignSelf:'center',overflow:'hidden'}}>
-                     <div style={{height:'100%',background:'var(--navy)',width:(sportGames.length?done/sportGames.length*100:0)+'%',transition:'width .3s'}}/>
-                   </span>
-                 </div>
-               </div>
-             );
-           })}
-         </div>
-       </div>
-     )}
-
-     {/* SPORTS SELECTION */}
-     {tab==='sports'&&(
-       <div>
-         <div className="section-head">
-           <div>
-             <h2 className="section-title">Sports We Are Offering</h2>
-             <p style={{color:'var(--txt2)',fontSize:13,marginTop:4}}>Select which sports your region is participating in. This affects team registration and scheduling.</p>
-           </div>
-           {editSports
-             ?<div style={{display:'flex',gap:8}}>
-               <button className="btn btn-ghost" onClick={()=>setEditSports(false)}>Cancel</button>
-               <button className="btn btn-navy" onClick={saveSports}>Save Sports</button>
-             </div>
-             :<button className="btn btn-navy" onClick={()=>setEditSports(true)}>Edit Sports</button>
-           }
-         </div>
-         <div className="g2">
-           {SPORTS.map(s=>{
-             const selected=mySports.includes(s.id);
-             const teamCount=myTeams.filter(t=>t.sid===s.id).length;
-             return(
-               <div key={s.id} className="card" onClick={()=>{
-                 if(!editSports) return;
-                 setMySports(p=>selected?p.filter(x=>x!==s.id):[...p,s.id]);
-               }} style={{
-                 cursor:editSports?'pointer':'default',
-                 borderColor:selected?'var(--navy)':'var(--border)',
-                 border:'2px solid',
-                 opacity:editSports&&!selected?.6:1,
-                 transition:'all .15s',
-                 background:selected?'white':'var(--bg2)',
-               }}>
-                 <div className="card-head">
-                   <div style={{display:'flex',gap:8,alignItems:'center'}}>
-                     <span className="sport-code" data-tip={s.n} style={{background:selected?'var(--navy)':'var(--txt3)'}}>{s.abbr}</span>
-                     <div>
-                       <div style={{fontWeight:700,fontSize:14,color:selected?'var(--navy-dk)':'var(--txt3)'}}>{s.n}</div>
-                       <div style={{fontSize:11,color:'var(--txt3)'}}>{s.t} · {s.ages.join(', ')}</div>
-                     </div>
-                   </div>
-                   {editSports&&(
-                     <div style={{width:24,height:24,borderRadius:6,border:'2px solid',borderColor:selected?'var(--navy)':'var(--border)',background:selected?'var(--navy)':'white',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,color:'white',fontWeight:900}}>
-                       {selected?'x':''}
-                     </div>
-                   )}
-                 </div>
-                 <div style={{fontSize:12,color:'var(--txt3)',marginTop:6}}>{teamCount} team{teamCount!==1?'s':''} registered</div>
-                 {!editSports&&selected&&(
-                   <div style={{marginTop:8,background:'var(--bg2)',borderRadius:6,padding:'6px 10px',fontSize:11,color:'var(--txt2)'}}>
-                     Genders: {s.genders.join(' / ')} · Ages: {s.ages.join(', ')}
-                   </div>
-                 )}
-               </div>
-             );
-           })}
-         </div>
-         {!editSports&&(
-           <div className="alert alert-blue" style={{marginTop:16,fontSize:13}}>
-             {mySports.length} of {SPORTS.length} sports selected for {myRegion&&myRegion.name}
-           </div>
-         )}
-       </div>
-     )}
-
-     {/* TEAMS */}
-     {tab==='teams'&&(
-       <div>
-         <div className="section-head">
-           <h2 className="section-title">{myRegion&&myRegion.name} Teams</h2>
-           <span className="tag tag-navy">{myTeams.length} registered</span>
-         </div>
-         {myTeams.length===0
-           ?<div className="empty"><p className="empty-title">No teams registered yet</p><p className="empty-sub">Teams appear here once registered in the National system</p></div>
-           :<div className="g2">
-             {myTeams.map(t=>{
-               const sp=SPORTS.find(s=>s.id===t.sid);
-               const tGames=myGames.filter(g=>g.hid===t.id||g.aid===t.id);
-               const wins=tGames.filter(g=>g.status==='completed'&&((g.hid===t.id&&g.hs>g.as)||(g.aid===t.id&&g.as>g.hs))).length;
-               return(
-                 <div key={t.id} className="card">
-                   <div className="card-head">
-                     <div style={{fontWeight:700}}>{t.n}</div>
-                     <span className="sport-code" data-tip={sp&&sp.n} style={{fontSize:10}}>{sp&&sp.abbr}</span>
-                   </div>
-                   <div style={{display:'flex',gap:10,marginTop:6,flexWrap:'wrap',fontSize:12}}>
-                     <span style={{color:'var(--txt2)'}}>{t.age} · {t.gender}</span>
-                     <span style={{color:'var(--txt3)'}}>Pool {t.pool}</span>
-                     <span style={{fontWeight:700,color:wins>0?'#16A34A':'var(--txt3)'}}>{wins}W / {tGames.filter(g=>g.status==='completed').length-wins}L</span>
-                   </div>
-                 </div>
-               );
-             })}
-           </div>
-         }
-       </div>
-     )}
-
-     {/* SCHEDULE */}
-     {tab==='schedule'&&(
-       <div>
-         <div className="section-head">
-           <h2 className="section-title">Our Schedule</h2>
-           <span className="tag tag-navy">{myGames.length} games</span>
-         </div>
-         {myGames.slice(0,30).map(g=>{
-           const sp=SPORTS.find(s=>s.id===g.sid);
-           const ht=db.teams.find(t=>t.id===g.hid);
-           const at=db.teams.find(t=>t.id===g.aid);
-           const done=g.status==='completed';
-           const live=g.status==='in_progress';
-           return(
-             <div key={g.id} style={{border:'1px solid var(--border)',borderRadius:10,padding:'12px 14px',marginBottom:8,background:live?'#F0FDF4':'white',borderColor:live?'#16A34A':'var(--border)'}}>
-               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                 <div style={{display:'flex',gap:8,alignItems:'center'}}>
-                   <span className="sport-code" data-tip={sp&&sp.n} style={{fontSize:10}}>{sp&&sp.abbr}</span>
-                   <span style={{fontSize:11,color:'var(--txt3)',fontWeight:600}}>{g.round}</span>
-                   {live&&<span className="tag tag-live" style={{fontSize:9}}>LIVE</span>}
-                 </div>
-                 <span style={{fontSize:11,color:'var(--txt3)'}}>{g.date} {g.time}</span>
-               </div>
-               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                 <span style={{fontWeight:done?(g.hs>g.as?800:500):600,fontSize:13}}>{ht&&ht.n||'TBD'}</span>
-                 <span style={{fontWeight:900,fontSize:16,margin:'0 10px',color:done||live?'var(--navy-dk)':'var(--txt3)'}}>{done||live?g.hs+' – '+g.as:'vs'}</span>
-                 <span style={{fontWeight:done?(g.as>g.hs?800:500):600,fontSize:13}}>{at&&at.n||'TBD'}</span>
-               </div>
-             </div>
-           );
-         })}
-       </div>
-     )}
-
-     {/* STANDINGS */}
-     {tab==='standings'&&(
-       <div>
-         <div className="section-head"><h2 className="section-title">Regional Standings</h2></div>
-         {SPORTS.filter(s=>mySports.includes(s.id)).map(s=>{
-           const sportTeams=myTeams.filter(t=>t.sid===s.id);
-           if(!sportTeams.length) return null;
-           return(
-             <div key={s.id} style={{marginBottom:20}}>
-               <div style={{fontWeight:800,fontSize:14,color:'var(--navy)',marginBottom:8,display:'flex',gap:8,alignItems:'center'}}>
-                 <span className="sport-code" data-tip={s.n} style={{fontSize:10}}>{s.abbr}</span>{s.n}
-               </div>
-               <div className="table-scroll">
-                 <table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}>
-                   <thead><tr style={{background:'var(--bg2)'}}>
-                     <th style={{padding:'8px 12px',textAlign:'left',fontWeight:700,color:'var(--navy)',fontSize:11}}>Team</th>
-                     <th style={{padding:'8px',textAlign:'center',fontWeight:700,color:'var(--navy)',fontSize:11}}>W</th>
-                     <th style={{padding:'8px',textAlign:'center',fontWeight:700,color:'var(--navy)',fontSize:11}}>L</th>
-                     <th style={{padding:'8px',textAlign:'center',fontWeight:700,color:'var(--navy)',fontSize:11}}>Pts</th>
-                   </tr></thead>
-                   <tbody>
-                   {sportTeams.map(t=>{
-                     const tg=myGames.filter(g=>(g.hid===t.id||g.aid===t.id)&&g.status==='completed');
-                     const w=tg.filter(g=>(g.hid===t.id&&g.hs>g.as)||(g.aid===t.id&&g.as>g.hs)).length;
-                     const l=tg.length-w;
-                     return(
-                       <tr key={t.id} style={{borderBottom:'1px solid var(--border)'}}>
-                         <td style={{padding:'8px 12px',fontWeight:600}}>{t.n}</td>
-                         <td style={{padding:'8px',textAlign:'center',fontWeight:700,color:'#16A34A'}}>{w}</td>
-                         <td style={{padding:'8px',textAlign:'center',color:'var(--txt3)'}}>{l}</td>
-                         <td style={{padding:'8px',textAlign:'center',fontWeight:800,color:'var(--navy)'}}>{w*2}</td>
-                       </tr>
-                     );
-                   })}
-                   </tbody>
-                 </table>
-               </div>
-             </div>
-           );
-         })}
-       </div>
-     )}
-
-     {/* SETUP */}
-     {tab==='setup'&&(
-       <div>
-         <div className="section-head"><h2 className="section-title">Region Setup</h2></div>
-         {myRegion&&(
-           <div className="card" style={{marginBottom:16}}>
-             <div className="card-head"><h3 className="card-title">Region Details</h3></div>
-             <div className="card-body">
-               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
-                 {[
-                   {label:'Region Name',val:myRegion.name},
-                   {label:'Country',val:myRegion.country==='CA'?'Canada':'United States'},
-                   {label:'Abbreviation',val:myRegion.abbr},
-                   {label:'Contact',val:myRegion.contact},
-                 ].map(({label,val})=>(
-                   <div key={label}>
-                     <div style={{fontSize:10,fontWeight:700,color:'var(--txt3)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:3}}>{label}</div>
-                     <div style={{fontWeight:600,fontSize:14}}>{val}</div>
-                   </div>
-                 ))}
-               </div>
-               <div style={{borderTop:'1px solid var(--border)',paddingTop:14}}>
-                 <div style={{fontSize:11,color:'var(--txt3)',marginBottom:8}}>Current login password: <strong>*****</strong></div>
-                 <button className="btn btn-ghost" onClick={()=>setShowPwModal(true)}>Change Region Password</button>
-               </div>
-             </div>
-           </div>
-         )}
-         <div className="alert alert-blue" style={{fontSize:12}}>
-           Share your region password with your coordinators only. Each region has a unique login that shows only regional data.
-         </div>
-         {showPwModal&&(
-           <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)setShowPwModal(false);}}>
-             <div className="modal" style={{maxWidth:380}}>
-               <div className="modal-header">
-                 <div style={{fontWeight:800,fontSize:16}}>Change Region Password</div>
-                 <button className="modal-close" onClick={()=>setShowPwModal(false)}>x</button>
-               </div>
-               <div style={{padding:'16px 20px 20px'}}>
-                 <div className="form-field">
-                   <label className="form-label">New Password (min 6 characters)</label>
-                   <input className="form-input" type="text" value={newPw} onChange={e=>setNewPw(e.target.value)} placeholder="e.g. bc-naig-2027"/>
-                 </div>
-                 <button className="btn btn-navy btn-w btn-lg" onClick={savePassword} style={{marginTop:8}}>Update Password</button>
-               </div>
-             </div>
-           </div>
-         )}
-       </div>
-     )}
    </div>
  );
 }
