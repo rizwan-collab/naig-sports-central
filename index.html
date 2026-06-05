@@ -278,19 +278,74 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
  .g4{grid-template-columns:repeat(2,1fr)}
 }
 
-/* ── MOBILE ── */
+/* ══ MOBILE — comprehensive overhaul ══ */
 @media(max-width:768px){
+ /* Sidebar / menu */
  #mob-menu-btn{display:flex!important}
- .sidebar{display:none;position:fixed;left:0;top:60px;z-index:250;height:calc(100vh - 60px);width:220px!important;overflow-y:auto;box-shadow:4px 0 24px rgba(0,0,0,.4)}
+ .sidebar{display:none;position:fixed;left:0;top:60px;z-index:250;height:calc(100vh - 60px);width:240px!important;overflow-y:auto;box-shadow:4px 0 24px rgba(0,0,0,.4)}
  .sidebar.mob-open{display:flex!important}
+ /* Grid collapses */
  .row2,.row3,.g2,.g3,.g4{grid-template-columns:1fr}
- .page{padding:12px 14px;padding-bottom:80px}
- .pub-hero{margin:-12px -14px 16px;padding:16px 14px}
- .hero-title{font-size:18px}
- .hero-stats{gap:6px}
- .stp{padding:4px 10px;font-size:11px}
- .calc-modes{grid-template-columns:1fr}
+ /* Page padding — extra bottom for nav */
+ .page{padding:12px 14px;padding-bottom:90px}
+ .admin-content{padding:12px 14px;padding-bottom:90px}
+ /* Hero */
+ .pub-hero{margin:-12px -14px 16px;padding:20px 14px}
+ .hero-title{font-size:20px;line-height:1.25}
+ .hero-stats{gap:8px;flex-wrap:wrap}
+ .hero-stat{min-width:64px;padding:10px 8px}
+ /* Sport tabs */
+ .stp{padding:6px 12px;font-size:12px;min-height:36px}
+ /* Role switcher */
+ .topnav{gap:2px}
+ .tnb{padding:8px 10px;font-size:11px;min-height:44px}
  .tnb span{display:none}
+ /* Calc */
+ .calc-modes{grid-template-columns:1fr}
+ .calc-mode{padding:14px;min-height:60px}
+ /* Form inputs — larger tap targets */
+ .form-input{font-size:16px!important;min-height:44px;padding:10px 12px}
+ .form-label{font-size:12px;margin-bottom:6px}
+ select.form-input{min-height:44px}
+ /* Buttons — full width and tappable */
+ .btn{min-height:44px;font-size:14px}
+ .btn-lg{min-height:52px;font-size:15px}
+ /* Game tiles */
+ .game-row{padding:14px 12px;gap:10px}
+ .game-teams{font-size:13px}
+ .game-score{font-size:20px;letter-spacing:-.5px}
+ /* Scorekeeper panel */
+ .score-display{font-size:56px!important}
+ .score-btn{min-width:56px!important;min-height:56px!important;font-size:22px!important}
+ /* Stats entry */
+ .stat-entry-grid{grid-template-columns:1fr 1fr}
+ /* Section headers */
+ .section-head{flex-wrap:wrap;gap:8px}
+ .section-head h2{font-size:18px}
+ /* Tags */
+ .tag{font-size:10px;padding:2px 7px}
+ /* Cards */
+ .card{padding:14px}
+ /* Topbar brand text */
+ .brand-name{display:none}
+ /* Filter bar — scrollable pills */
+ .filter-bar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;gap:6px;scrollbar-width:none}
+ .filter-bar::-webkit-scrollbar{display:none}
+ .filter-pill{flex-shrink:0;min-height:36px;font-size:12px}
+ /* Modals — slide up from bottom */
+ .modal-overlay{padding:0;align-items:flex-end}
+ .modal{border-radius:20px 20px 0 0;max-height:92vh;width:100%!important;max-width:100%!important}
+ .modal-header{padding:16px 16px 12px;position:sticky;top:0;background:white;z-index:10;border-radius:20px 20px 0 0}
+ .modal-body{padding:0 16px 16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+ /* Game detail tabs — scrollable */
+ .game-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;scrollbar-width:none}
+ .game-tabs::-webkit-scrollbar{display:none}
+ .game-tab{flex-shrink:0;min-height:40px;font-size:12px;padding:8px 14px}
+ /* Standings table */
+ .std-table{font-size:12px}
+ .std-table th,.std-table td{padding:8px 6px}
+ /* Medal tiles */
+ .medal-card{padding:14px}
  /* Topbar tighter on mobile */
  .topbar-inner{height:52px;padding:0 12px;gap:8px}
  .brand-name{font-size:13px}
@@ -338,15 +393,15 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
  background:var(--navy-dk);
  border-top:2px solid var(--crimson);
  z-index:250;
- padding:0;
+ padding:0 0 env(safe-area-inset-bottom,0px);
  box-shadow:0 -4px 20px rgba(0,0,0,.3);
 }
 .mbn-inner{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .mbn-inner::-webkit-scrollbar{display:none}
 .mbn-btn{
- flex:1;min-width:70px;
+ flex:1;min-width:72px;
  display:flex;flex-direction:column;align-items:center;justify-content:center;
- padding:8px 4px;gap:2px;
+ padding:10px 4px 8px;gap:3px;
  background:none;border:none;cursor:pointer;
  color:rgba(255,255,255,.55);
  font-family:'Inter',sans-serif;font-size:10px;font-weight:700;
@@ -427,9 +482,11 @@ abbr{text-decoration:underline dotted var(--muted);cursor:help}
 
 /* ── MOBILE GAME MODAL ── */
 @media(max-width:640px){
-  .modal{max-height:95vh;border-radius:12px 12px 0 0}
+  .modal{max-height:92vh;border-radius:20px 20px 0 0}
   .modal-overlay{padding:0;align-items:flex-end}
-  .score-display{font-size:48px}
+  .score-display{font-size:52px}
+  /* Pull handle indicator */
+  .modal-header::before{content:'';display:block;width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 12px;position:absolute;top:8px;left:50%;transform:translateX(-50%)}
 }
 
 /* ── LIVE BADGE PULSE ── */
@@ -550,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27d_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27f_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1230,6 +1287,28 @@ const SEED={
  {id:'sk5',name:'Dilara Kara',username:'dil.k',pin:'3579',role:'scorekeeper',sports:['s7','s12'],qr:'QR-FLAG-3579'},
  {id:'sk6',name:'Anees Walji',username:'anees.w',pin:'7531',role:'scorekeeper',sports:['s10','s11','s3'],qr:'QR-TT-7531'},
  {id:'sk7',name:'Nuzhat Devji',username:'nuz.d',pin:'4680',role:'scorekeeper',sports:['s6'],qr:'QR-DANCE-4680'},
+ ],
+ gallery:[
+  {id:'ph01',sid:'s2',sport:'Basketball',author:'Zahra Merchant',region:'BC',caption:'What a game! Our U18 squad dominates the court.',likes:24,cheers:18,img:'https://picsum.photos/seed/bsk1/400/300',ts:'2027-07-14T09:32:00'},
+  {id:'ph02',sid:'s8',sport:'Soccer',author:'Tariq Pirani',region:'Alberta',caption:'Goal of the tournament right here. 18+ Men final.',likes:47,cheers:31,img:'https://picsum.photos/seed/soc1/400/300',ts:'2027-07-14T11:15:00'},
+  {id:'ph03',sid:'s1',sport:'Badminton',author:'Nadia Virji',region:'ON-W',caption:'Semifinals done. On to the Gold Medal match!',likes:19,cheers:22,img:'https://picsum.photos/seed/bdm1/400/300',ts:'2027-07-14T13:45:00'},
+  {id:'ph04',sid:'s14',sport:'Volleyball',author:'Safiyya Hussain',region:'Prairie',caption:'The crowd energy at VBL was unreal today.',likes:33,cheers:28,img:'https://picsum.photos/seed/vbl1/400/300',ts:'2027-07-15T08:20:00'},
+  {id:'ph05',sid:'s8',sport:'Soccer',author:'Kasim Murad',region:'Texas USA',caption:'USA Southeast showing up strong. Proud of this team.',likes:55,cheers:40,img:'https://picsum.photos/seed/soc2/400/300',ts:'2027-07-15T10:00:00'},
+  {id:'ph06',sid:'s13',sport:'Track',author:'Hana Remtulla',region:'ON-E',caption:'100m final. Fastest women at NAIG 2027!',likes:61,cheers:52,img:'https://picsum.photos/seed/trk1/400/300',ts:'2027-07-15T12:30:00'},
+  {id:'ph07',sid:'s9',sport:'Pickleball',author:'Omar Rashidi',region:'Great Lakes USA',caption:'Mixed Doubles gold goes to Great Lakes! Undefeated all week.',likes:38,cheers:29,img:'https://picsum.photos/seed/pkb1/400/300',ts:'2027-07-15T15:00:00'},
+  {id:'ph08',sid:'s6',sport:'Dance',author:'Zara Bhanji',region:'BC',caption:'Solo Classical performance. Poured my heart out on that stage.',likes:72,cheers:64,img:'https://picsum.photos/seed/dnc1/400/300',ts:'2027-07-15T18:00:00'},
+  {id:'ph09',sid:'s2',sport:'Basketball',author:'Riyaz Nathwani',region:'Pacific USA',caption:'The halftime show was incredible. NAIG energy never disappoints.',likes:29,cheers:24,img:'https://picsum.photos/seed/bsk2/400/300',ts:'2027-07-16T09:00:00'},
+  {id:'ph10',sid:'s4',sport:'Cricket',author:'Arif Hasanali',region:'Atlantic',caption:'Last over thriller. Hardball final going to the wire.',likes:44,cheers:37,img:'https://picsum.photos/seed/ckh1/400/300',ts:'2027-07-16T11:30:00'},
+  {id:'ph11',sid:'s10',sport:'Table Tennis',author:'Malaika Merali',region:'Mountain USA',caption:'Table Tennis — the quiet warriors of NAIG. Respect.',likes:21,cheers:16,img:'https://picsum.photos/seed/ttn1/400/300',ts:'2027-07-16T14:00:00'},
+  {id:'ph12',sid:'s14',sport:'Volleyball',author:'Faiza Kassam',region:'Quebec',caption:'Gold Final set point. The whole gym was on their feet.',likes:89,cheers:75,img:'https://picsum.photos/seed/vbl2/400/300',ts:'2027-07-16T17:00:00'},
+  {id:'ph13',sid:'s7',sport:'Flag Football',author:'Malik Jiwa',region:'Southeast USA',caption:'Flag Football Women open. These athletes are elite.',likes:41,cheers:35,img:'https://picsum.photos/seed/ffl1/400/300',ts:'2027-07-17T09:30:00'},
+  {id:'ph14',sid:'s3',sport:'Chess',author:'Daud Bhayani',region:'BC',caption:'2 hours into this match. Chess is the ultimate mental sport.',likes:15,cheers:10,img:'https://picsum.photos/seed/che1/400/300',ts:'2027-07-17T11:00:00'},
+  {id:'ph15',sid:'s1',sport:'Badminton',author:'Suraya Rahim',region:'Northeast USA',caption:'Gold medal match was a 3-set epic. Worth every early morning.',likes:53,cheers:46,img:'https://picsum.photos/seed/bdm2/400/300',ts:'2027-07-17T16:00:00'},
+  {id:'ph16',sid:'s12',sport:'Throwball',author:'Noreen Dhanani',region:'Mid-Atlantic USA',caption:'First Throwball gold for Mid-Atlantic. History made.',likes:67,cheers:58,img:'https://picsum.photos/seed/thb1/400/300',ts:'2027-07-17T18:30:00'},
+  {id:'ph17',sid:'s11',sport:'Tennis',author:'Imtiaz Tejpar',region:'ON-W',caption:'NAIG Tennis has some serious talent this year.',likes:32,cheers:27,img:'https://picsum.photos/seed/ten1/400/300',ts:'2027-07-18T08:00:00'},
+  {id:'ph18',sid:'s5',sport:'Cricket',author:'Kiran Moledina',region:'Alberta',caption:'Cricket Tapeball Women. Finals day Ontario West vs Alberta!',likes:48,cheers:39,img:'https://picsum.photos/seed/ckt1/400/300',ts:'2027-07-18T10:00:00'},
+  {id:'ph19',sid:'s2',sport:'Basketball',author:'Yusuf Motani',region:'Quebec',caption:'Closing ceremony. NAIG 2027 — see you in 4 years.',likes:104,cheers:97,img:'https://picsum.photos/seed/bsk3/400/300',ts:'2027-07-18T19:00:00'},
+  {id:'ph20',sid:'s6',sport:'Dance',author:'Layla Pirani',region:'Ontario West',caption:'The entire Dance team after finals. Absolute legends.',likes:88,cheers:82,img:'https://picsum.photos/seed/dnc2/400/300',ts:'2027-07-18T20:00:00'},
  ],
  medals:[
  /* Individual sports — COMPLETE */
@@ -1958,23 +2037,83 @@ function Ticker({games,teams}){
 
 function Calculator(){
  const [mode,setMode]=useState('A');
- const [f,setF]=useState({sid:'s2',stype:'team',n:8,fields:2,dur:40,buf:10,hpd:8,days:3,fmt:'pools'});
+ const [f,setF]=useState({sid:'s2',stype:'team',n:8,fields:2,dur:40,buf:10,fmt:'pools'});
+ // Day schedule: each day has {checked, hours}
+ const [daySchedule,setDaySchedule]=useState([
+   {id:'mon',label:'Mon',checked:true,hours:8},
+   {id:'tue',label:'Tue',checked:true,hours:8},
+   {id:'wed',label:'Wed',checked:true,hours:8},
+   {id:'thu',label:'Thu',checked:false,hours:6},
+   {id:'fri',label:'Fri',checked:false,hours:6},
+   {id:'sat',label:'Sat',checked:false,hours:10},
+   {id:'sun',label:'Sun',checked:false,hours:10},
+ ]);
+ const activeDays=daySchedule.filter(d=>d.checked);
+ const totalHours=activeDays.reduce((s,d)=>s+d.hours,0);
+ const avgHpd=activeDays.length>0?Math.round(totalHours/activeDays.length):8;
+ function toggleDay(id){setDaySchedule(p=>p.map(d=>d.id===id?{...d,checked:!d.checked}:d))}
+ function setDayHours(id,h){setDaySchedule(p=>p.map(d=>d.id===id?{...d,hours:Math.max(1,Math.min(16,+h))}:d))}
  const [res,setRes]=useState(null);
  const sp=SPORTS.find(s=>s.id===f.sid)||SPORTS[1];
  function pick(id){const s=SPORTS.find(x=>x.id===id);setF(p=>({...p,sid:id,stype:s?.t||'team',dur:s?.dur||60,fmt:s?.t==='individual'?'heats':'pools'}));setRes(null);}
  function calc(){
- if(mode==='A')setRes({m:'A',...calcA(f.n,f.dur,f.buf,f.hpd,f.days,f.fmt,f.stype)});
- else if(mode==='B')setRes({m:'B',...calcB(f.n,f.fields,f.dur,f.buf,f.hpd,f.fmt,f.stype)});
- else setRes({m:'C',...calcC(f.fields,f.dur,f.buf,f.hpd,f.days,f.fmt)});
+ const d=activeDays.length||1;
+ const h=avgHpd;
+ if(mode==='A')setRes({m:'A',...calcA(f.n,f.dur,f.buf,h,d,f.fmt,f.stype)});
+ else if(mode==='B')setRes({m:'B',...calcB(f.n,f.fields,f.dur,f.buf,h,f.fmt,f.stype)});
+ else setRes({m:'C',...calcC(f.fields,f.dur,f.buf,h,d,f.fmt)});
  }
  const fw=f.stype==='individual'?'Lanes/Stations':'Courts/Fields';
  const tw=f.stype==='individual'?'Athletes':'Teams';
  return<div> <div className="section-head"> <div><h2 style={{fontFamily:'Outfit',fontWeight:900,fontSize:22,color:'var(--navy-dk)'}}>Schedule Calculator</h2> <p style={{color:'var(--txt2)',fontSize:14,marginTop:4}}>Figure out exactly what you need — fields, days, or capacity</p> </div> </div> <div className="calc-modes"> {[{id:'A',title:'How many fields?',sub:'Know teams & time'},{id:'B',title:'How many days?',sub:'Know teams & fields'},{id:'C',title:'How many teams fit?',sub:'Know fields & time'}].map(m=>(
  <button key={m.id} className={`calc-mode${mode===m.id?' on':''}`} onClick={()=>{setMode(m.id);setRes(null);}}> <div style={{fontWeight:800,fontSize:13}}>{m.title}</div> <div style={{fontSize:11,opacity:.7,marginTop:2}}>{m.sub}</div> </button> ))}
  </div> <div className="row2" style={{marginBottom:14}}> <div className="form-field"> <label className="form-label">Sport <span style={{textTransform:'none',fontWeight:400,color:'var(--txt3)'}}>— duration auto-fills</span></label> <select className="form-input" value={f.sid} onChange={e=>pick(e.target.value)}> {SPORTS.map(s=><option key={s.id} value={s.id}>{s.n} ({s.dur}min)</option>)}
- </select> </div> <div className="form-field"> <label className="form-label">Sport Type</label> <select className="form-input" value={f.stype} onChange={e=>setF(p=>({...p,stype:e.target.value,fmt:e.target.value==='individual'?'heats':'pools'}))}> <option value="team">Team Sport</option> <option value="individual">Individual / Track</option> </select> </div> </div> <div className="row3" style={{marginBottom:14}}> <div className="form-field"><label className="form-label">Duration (min)</label><input className="form-input" type="number" min="5" max="360" value={f.dur} onChange={e=>setF(p=>({...p,dur:+e.target.value}))}/></div> <div className="form-field"><label className="form-label">Buffer (min)</label><input className="form-input" type="number" min="0" max="60" value={f.buf} onChange={e=>setF(p=>({...p,buf:+e.target.value}))}/></div> <div className="form-field"><label className="form-label">Hours / Day</label><input className="form-input" type="number" min="1" max="16" value={f.hpd} onChange={e=>setF(p=>({...p,hpd:+e.target.value}))}/></div> </div> <div className="row3" style={{marginBottom:16}}> {(mode==='A'||mode==='B')&&<div className="form-field"><label className="form-label">{tw}</label><input className="form-input" type="number" min="2" max="500" value={f.n} onChange={e=>setF(p=>({...p,n:+e.target.value}))}/></div>}
+ </select> </div> <div className="form-field"> <label className="form-label">Sport Type</label> <select className="form-input" value={f.stype} onChange={e=>setF(p=>({...p,stype:e.target.value,fmt:e.target.value==='individual'?'heats':'pools'}))}> <option value="team">Team Sport</option> <option value="individual">Individual / Track</option> </select> </div> </div> <div className="row2" style={{marginBottom:14}}> <div className="form-field"><label className="form-label">Duration (min)</label><input className="form-input" type="number" min="5" max="360" value={f.dur} onChange={e=>setF(p=>({...p,dur:+e.target.value}))}/></div> <div className="form-field"><label className="form-label">Buffer between games (min)</label><input className="form-input" type="number" min="0" max="60" value={f.buf} onChange={e=>setF(p=>({...p,buf:+e.target.value}))}/></div> </div>
+ {/* ── DAY / HOURS PICKER ── */}
+ <div style={{marginBottom:16}}>
+   <label className="form-label" style={{marginBottom:10,display:'block'}}>Tournament Days & Hours
+     <span style={{fontWeight:400,color:'var(--txt3)',textTransform:'none',marginLeft:8}}>
+       — {activeDays.length} day{activeDays.length!==1?'s':''} selected · {totalHours}h total
+     </span>
+   </label>
+   <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:6}}>
+     {daySchedule.map(d=>(
+       <div key={d.id} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+         <button
+           onClick={()=>toggleDay(d.id)}
+           style={{
+             width:'100%',padding:'8px 4px',border:'2px solid',borderRadius:8,cursor:'pointer',
+             background:d.checked?'var(--navy)':'white',
+             borderColor:d.checked?'var(--navy)':'var(--border)',
+             color:d.checked?'white':'var(--txt2)',
+             fontWeight:700,fontSize:12,fontFamily:'Outfit,sans-serif',
+             transition:'all .15s',minHeight:40
+           }}
+         >{d.label}</button>
+         {d.checked&&(
+           <div style={{position:'relative',width:'100%'}}>
+             <input
+               type="number" min="1" max="16" value={d.hours}
+               onChange={e=>setDayHours(d.id,e.target.value)}
+               style={{width:'100%',padding:'4px 4px',border:'1px solid var(--border)',borderRadius:6,
+                 textAlign:'center',fontSize:12,fontWeight:700,color:'var(--navy-dk)',
+                 boxSizing:'border-box',background:'var(--bg2)'}}
+             />
+             <div style={{fontSize:9,textAlign:'center',color:'var(--txt3)',marginTop:2}}>hrs</div>
+           </div>
+         )}
+       </div>
+     ))}
+   </div>
+   {activeDays.length===0&&(
+     <div style={{background:'#FEF3C7',border:'1px solid #F59E0B',borderRadius:8,padding:'8px 12px',marginTop:8,fontSize:12,color:'#92400E',fontWeight:600}}>
+       Select at least one day to run the calculator
+     </div>
+   )}
+ </div>
+ <div className="row3" style={{marginBottom:0}}> <div style={{display:'none'}}>{/* spacer */}</div> <div className="row3" style={{marginBottom:16}}> {(mode==='A'||mode==='B')&&<div className="form-field"><label className="form-label">{tw}</label><input className="form-input" type="number" min="2" max="500" value={f.n} onChange={e=>setF(p=>({...p,n:+e.target.value}))}/></div>}
  {(mode==='B'||mode==='C')&&<div className="form-field"><label className="form-label">{fw}</label><input className="form-input" type="number" min="1" max="50" value={f.fields} onChange={e=>setF(p=>({...p,fields:+e.target.value}))}/></div>}
- {(mode==='A'||mode==='C')&&<div className="form-field"><label className="form-label">Days Available</label><input className="form-input" type="number" min="1" max="14" value={f.days} onChange={e=>setF(p=>({...p,days:+e.target.value}))}/></div>}
+ {(mode==='A'||mode==='C')&&<div className="form-field"><label className="form-label">Days Available</label><div className="form-input" style={{display:'flex',alignItems:'center',background:'var(--bg2)',color:'var(--navy-dk)',fontWeight:700}}>{activeDays.length} day{activeDays.length!==1?'s':''} <span style={{fontWeight:400,fontSize:11,marginLeft:6,color:'var(--txt3)'}}>from schedule above</span></div></div>}
  <div className="form-field"> <label className="form-label">Format</label> <select className="form-input" value={f.fmt} onChange={e=>setF(p=>({...p,fmt:e.target.value}))}> {f.stype==='team'?<> <option value="pools">Pool Play + Playoffs</option> <option value="roundrobin">Full Round Robin</option> <option value="single">Single Elimination</option> <option value="double">Double Elimination</option> </>:<> <option value="heats">Heats → Semis → Final</option> <option value="single">Head-to-Head Bracket</option> </>}
  </select> </div> </div> <button className="btn btn-navy btn-lg btn-w" onClick={calc}> {mode==='A'?`Calculate ${fw} needed →`:mode==='B'?'Calculate days needed →':'Calculate team capacity →'}
  </button> {res&&<div className="calc-result"> <div style={{fontWeight:700,fontSize:14,marginBottom:12,opacity:.7}}>{sp.icon} {sp.n}</div> {res.m==='A'&&<> <div className="calc-result-row"><span>Total games</span><span>{res.tot}</span></div> <div className="calc-result-row"><span>Games per day</span><span>{res.gpd}</span></div> <div className="calc-result-row"><span>Time slot per {fw.toLowerCase()}</span><span>{res.slot} min</span></div> <div className="calc-result-row"><span>Slots per {fw.toLowerCase()} / day</span><span>{res.spf}</span></div> <div className="calc-result-row"><span> {fw} needed</span><span>{res.fields}</span></div> </>}
@@ -2041,6 +2180,7 @@ function SpectatorView({db}){
  {id:'results',l:'Results'},
  {id:'sports',l:'Sports'},
  {id:'help',l:' Help'},
+ {id:'community',l:'Community'},
  ].map(t=>(
  <button key={t.id} className={`vtab${tab===t.id?' on':''}`} onClick={()=>setTab(t.id)}>{t.l}</button> ))}
  </div> {tab==='live'&&<LiveScoring db={db} onGameClick={g=>setSelectedGame(g)}/>}
@@ -2133,6 +2273,7 @@ function SpectatorView({db}){
  <div key={r} style={{background:'var(--navy-lt)',borderRadius:8,padding:'8px 12px',fontSize:13,fontWeight:600,color:'var(--navy)',display:'flex',gap:8,alignItems:'center'}}> <span style={{fontSize:11,fontWeight:700,color:'var(--crimson)'}}>{i<7?' ':'US'}</span>{r}
  </div> ))}
  </div> </div> </div> </div>}
+ {tab==='community'&&<GalleryView/>}
  </div>;
 }
 
@@ -2574,6 +2715,217 @@ function AdminPanel({db,onUpdate,scope}){
  </div> <SOPHelp role={scope==='national'?'national':'regional'}/> <div style={{marginTop:24}}><SOPHelp role='scorekeeper'/></div> </div>}
  {tab==='export'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Export & Backup</h2></div> <DataMgmt db={db} onUpdate={onUpdate}/> <div className="g2"> <div className="card"><div className="card-head"><h3 className="card-title"> JSON Backup</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Export everything as JSON. Re-import on any device to restore.</p> <button className="btn btn-navy btn-w" style={{marginBottom:10}} onClick={()=>{const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='naig2027_backup_'+new Date().toISOString().split('T')[0]+'.json';a.click();}}>Download Backup</button> <label className="btn btn-ghost btn-w" style={{cursor:'pointer'}}>Restore Backup<input type="file" accept=".json" onChange={e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{onUpdate({...SEED,...JSON.parse(ev.target.result)});flash('Data restored');}catch{flash('That file doesn\'t look right');}};r.readAsText(f);}} style={{display:'none'}}/></label> </div></div> <div className="card"><div className="card-head"><h3 className="card-title"> Print to PDF</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Use your browser's Print to PDF to save any page.</p> <button className="btn btn-navy btn-w" onClick={()=>window.print()}>Print</button> </div></div> <div className="card"><div className="card-head"><h3 className="card-title"> Reset</h3></div><div className="card-body"> <p style={{fontSize:13,color:'var(--txt2)',marginBottom:16}}>Wipes all data and reloads defaults. Download a backup first.</p> <button className="btn btn-ghost btn-w" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={()=>{if(confirm('This deletes everything. Are you sure?'))onUpdate(SEED);}}>Reset to defaults</button> </div></div> </div> </div>}
  </div> </div> </div>;
+}
+
+
+function GalleryView(){
+ const {db}=useContext(AppCtx);
+ const gallery=db.gallery&&db.gallery.length>0?db.gallery:SEED.gallery||[];
+ const [sportF,setSportF]=useState('all');
+ const [liked,setLiked]=useState({});
+ const [cheered,setCheered]=useState({});
+ const [showUpload,setShowUpload]=useState(false);
+ const [newCaption,setNewCaption]=useState('');
+ const [newSport,setNewSport]=useState('s2');
+ const [newAuthor,setNewAuthor]=useState('');
+ const [newRegion,setNewRegion]=useState('BC');
+ const [localPhotos,setLocalPhotos]=useState([]);
+ const [sortBy,setSortBy]=useState('newest');
+
+ const allPhotos=[...gallery,...localPhotos];
+ const filtered=sportF==='all'?allPhotos:allPhotos.filter(p=>p.sid===sportF);
+ const sorted=[...filtered].sort((a,b)=>{
+   if(sortBy==='newest') return new Date(b.ts)-new Date(a.ts);
+   if(sortBy==='popular') return (b.likes+b.cheers)-(a.likes+a.cheers);
+   return 0;
+ });
+
+ function toggleLike(id){setLiked(p=>({...p,[id]:!p[id]}))}
+ function toggleCheer(id){setCheered(p=>({...p,[id]:!p[id]}))}
+
+ function submitPhoto(){
+   if(!newCaption.trim()||!newAuthor.trim()) return;
+   const sp=SPORTS.find(s=>s.id===newSport);
+   const seed=`user${Date.now()}`;
+   setLocalPhotos(p=>[{
+     id:'ph_u'+Date.now(),sid:newSport,sport:sp?.n||'',
+     author:newAuthor,region:newRegion,caption:newCaption,
+     likes:0,cheers:0,img:`https://picsum.photos/seed/${seed}/400/300`,
+     ts:new Date().toISOString()
+   },...p]);
+   setNewCaption('');setNewAuthor('');setShowUpload(false);
+ }
+
+ function fmtTime(ts){
+   const d=new Date(ts);
+   return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+ }
+
+ const totalLikes=sorted.reduce((s,p)=>s+(liked[p.id]?1:0),0);
+ const topSport=sorted.length>0?sorted[0].sport:'';
+
+ return(
+ <div>
+   {/* Header */}
+   <div className="pub-hero" style={{marginBottom:20}}>
+     <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:12}}>
+       <div>
+         <h1 className="hero-title">NAIG 2027 Community</h1>
+         <p style={{color:'rgba(255,255,255,.8)',fontSize:14,marginTop:4}}>Athlete and fan photos from across all sports</p>
+       </div>
+       <button className="btn" style={{background:'var(--crimson)',color:'white',border:'none',display:'flex',alignItems:'center',gap:8,fontWeight:700,fontSize:13,padding:'10px 18px'}}
+         onClick={()=>setShowUpload(true)}>
+         <span style={{fontSize:16}}>+</span> Share a Photo
+       </button>
+     </div>
+     <div className="hero-stats" style={{marginTop:16}}>
+       <div className="hero-stat"><div className="hero-stat-n">{allPhotos.length}</div><div className="hero-stat-l">Photos</div></div>
+       <div className="hero-stat"><div className="hero-stat-n">{allPhotos.reduce((s,p)=>s+p.likes+p.cheers,0)+Object.values(liked).filter(Boolean).length+Object.values(cheered).filter(Boolean).length}</div><div className="hero-stat-l">Reactions</div></div>
+       <div className="hero-stat"><div className="hero-stat-n">{new Set(allPhotos.map(p=>p.region)).size}</div><div className="hero-stat-l">Regions</div></div>
+     </div>
+   </div>
+
+   {/* Filters */}
+   <div style={{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap',alignItems:'center'}}>
+     <div className="filter-bar" style={{flex:1}}>
+       <button className={`filter-pill${sportF==='all'?' active':''}`} onClick={()=>setSportF('all')}>All Sports</button>
+       {SPORTS.map(s=>(
+         <button key={s.id} className={`filter-pill${sportF===s.id?' active':''}`}
+           onClick={()=>setSportF(s.id)} data-tip={s.n}>
+           {s.abbr}
+         </button>
+       ))}
+     </div>
+     <select value={sortBy} onChange={e=>setSortBy(e.target.value)}
+       style={{border:'1px solid var(--border)',borderRadius:8,padding:'6px 10px',fontSize:12,fontWeight:700,color:'var(--navy-dk)',background:'white',cursor:'pointer',flexShrink:0}}>
+       <option value="newest">Newest first</option>
+       <option value="popular">Most popular</option>
+     </select>
+   </div>
+
+   {/* Photo Grid */}
+   {sorted.length===0?(
+     <div className="card" style={{textAlign:'center',padding:40}}>
+       <div style={{fontSize:40,marginBottom:12}}>📸</div>
+       <div style={{fontWeight:700,color:'var(--navy-dk)',fontSize:16}}>No photos yet for this sport</div>
+       <div style={{color:'var(--txt3)',fontSize:13,marginTop:4}}>Be the first to share a moment!</div>
+       <button className="btn btn-navy" style={{marginTop:16}} onClick={()=>setShowUpload(true)}>Share a Photo</button>
+     </div>
+   ):(
+   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:16}}>
+     {sorted.map(photo=>(
+       <div key={photo.id} className="card" style={{padding:0,overflow:'hidden',border:'1px solid var(--border)',transition:'box-shadow .2s'}}
+         onMouseEnter={e=>e.currentTarget.style.boxShadow='0 8px 32px rgba(30,58,138,.15)'}
+         onMouseLeave={e=>e.currentTarget.style.boxShadow=''}>
+         {/* Image */}
+         <div style={{position:'relative',paddingTop:'66%',overflow:'hidden',background:'var(--bg2)'}}>
+           <img src={photo.img} alt={photo.caption}
+             style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}
+             loading="lazy"
+             onError={e=>{e.target.style.display='none'}}/>
+           {/* Sport badge */}
+           <div style={{position:'absolute',top:8,left:8}}>
+             <span className="sport-code" data-tip={photo.sport} style={{fontSize:10,padding:'3px 8px'}}
+               >{SPORTS.find(s=>s.id===photo.sid)?.abbr||photo.sport.slice(0,3).toUpperCase()}</span>
+           </div>
+         </div>
+         {/* Content */}
+         <div style={{padding:'12px 14px'}}>
+           {/* Author + region */}
+           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+             <div style={{display:'flex',alignItems:'center',gap:8}}>
+               <div style={{width:28,height:28,borderRadius:'50%',background:'var(--navy)',color:'white',
+                 display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,flexShrink:0}}>
+                 {photo.author.charAt(0)}
+               </div>
+               <div>
+                 <div style={{fontWeight:700,fontSize:12,color:'var(--navy-dk)'}}>{photo.author}</div>
+                 <div style={{fontSize:10,color:'var(--txt3)'}}>{photo.region}</div>
+               </div>
+             </div>
+             <div style={{fontSize:10,color:'var(--txt3)',flexShrink:0}}>{fmtTime(photo.ts)}</div>
+           </div>
+           {/* Caption */}
+           <p style={{fontSize:13,color:'var(--txt)',lineHeight:1.5,marginBottom:12,margin:'0 0 12px'}}>{photo.caption}</p>
+           {/* Reactions */}
+           <div style={{display:'flex',gap:8,borderTop:'1px solid var(--border)',paddingTop:10}}>
+             <button onClick={()=>toggleLike(photo.id)}
+               style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,
+                 padding:'8px',border:'1px solid',borderRadius:8,cursor:'pointer',fontWeight:700,fontSize:12,
+                 background:liked[photo.id]?'#EFF6FF':'white',
+                 borderColor:liked[photo.id]?'var(--navy)':'var(--border)',
+                 color:liked[photo.id]?'var(--navy)':'var(--txt2)',transition:'all .15s'}}>
+               <span style={{fontSize:15}}>👍</span>
+               {photo.likes+(liked[photo.id]?1:0)}
+             </button>
+             <button onClick={()=>toggleCheer(photo.id)}
+               style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,
+                 padding:'8px',border:'1px solid',borderRadius:8,cursor:'pointer',fontWeight:700,fontSize:12,
+                 background:cheered[photo.id]?'#FFF7ED':'white',
+                 borderColor:cheered[photo.id]?'#F59E0B':'var(--border)',
+                 color:cheered[photo.id]?'#92400E':'var(--txt2)',transition:'all .15s'}}>
+               <span style={{fontSize:15}}>🎉</span>
+               {photo.cheers+(cheered[photo.id]?1:0)}
+             </button>
+           </div>
+         </div>
+       </div>
+     ))}
+   </div>
+   )}
+
+   {/* Upload Modal */}
+   {showUpload&&(
+     <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)setShowUpload(false)}}>
+       <div className="modal" style={{maxWidth:480}}>
+         <div className="modal-header">
+           <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:18,color:'var(--navy-dk)'}}>Share a Photo</div>
+           <button className="modal-close" onClick={()=>setShowUpload(false)}>✕</button>
+         </div>
+         <div className="modal-body" style={{padding:'0 20px 20px'}}>
+           <div style={{background:'var(--bg2)',border:'2px dashed var(--border)',borderRadius:12,
+             padding:'32px',textAlign:'center',marginBottom:16,cursor:'pointer'}}
+             onClick={()=>alert('In the live version, this opens your camera roll or file picker to upload a real photo.')}>
+             <div style={{fontSize:32,marginBottom:8}}>📸</div>
+             <div style={{fontWeight:700,color:'var(--navy-dk)',fontSize:14}}>Tap to add a photo</div>
+             <div style={{fontSize:11,color:'var(--txt3)',marginTop:4}}>JPG, PNG — max 10MB</div>
+           </div>
+           <div className="form-field" style={{marginBottom:12}}>
+             <label className="form-label">Your Name</label>
+             <input className="form-input" placeholder="e.g. Zahra Merchant" value={newAuthor} onChange={e=>setNewAuthor(e.target.value)}/>
+           </div>
+           <div className="form-field" style={{marginBottom:12}}>
+             <label className="form-label">Your Region</label>
+             <select className="form-input" value={newRegion} onChange={e=>setNewRegion(e.target.value)}>
+               {['BC','Alberta','Prairie','Ontario West','Ontario East','Quebec','Atlantic','Pacific USA','Mountain USA','Texas USA','Great Lakes USA','Mid-Atlantic USA','Southeast USA','Northeast USA'].map(r=>(
+                 <option key={r} value={r}>{r}</option>
+               ))}
+             </select>
+           </div>
+           <div className="form-field" style={{marginBottom:12}}>
+             <label className="form-label">Sport</label>
+             <select className="form-input" value={newSport} onChange={e=>setNewSport(e.target.value)}>
+               {SPORTS.map(s=><option key={s.id} value={s.id}>{s.n}</option>)}
+             </select>
+           </div>
+           <div className="form-field" style={{marginBottom:16}}>
+             <label className="form-label">Caption</label>
+             <textarea className="form-input" rows={3} placeholder="Tell us about this moment..."
+               value={newCaption} onChange={e=>setNewCaption(e.target.value)}
+               style={{resize:'vertical',minHeight:80}}/>
+           </div>
+           <button className="btn btn-navy btn-lg btn-w" onClick={submitPhoto}
+             disabled={!newCaption.trim()||!newAuthor.trim()}
+             style={{opacity:(!newCaption.trim()||!newAuthor.trim())?.5:1}}>
+             Post to Community
+           </button>
+           <p style={{fontSize:11,color:'var(--txt3)',textAlign:'center',marginTop:10}}>Photos are visible to all NAIG 2027 participants and families</p>
+         </div>
+       </div>
+     </div>
+   )}
+ </div>
+ );
 }
 
 function App(){
