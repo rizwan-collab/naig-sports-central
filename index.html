@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27t_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27w_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1288,6 +1288,22 @@ const SEED={
  {id:'sk6',name:'Anees Walji',username:'anees.w',pin:'7531',role:'scorekeeper',sports:['s10','s11','s3'],qr:'QR-TT-7531'},
  {id:'sk7',name:'Nuzhat Devji',username:'nuz.d',pin:'4680',role:'scorekeeper',sports:['s6'],qr:'QR-DANCE-4680'},
  ],
+ regionConfig:[
+  {id:'bc',name:'Canada BC',country:'CA',abbr:'BC',password:'bc2027',color:'#1E40AF',contact:'bc@naig2027.com',sports:['s1','s2','s4','s7','s8','s9','s10','s13','s14'],active:true},
+  {id:'ab',name:'Canada Alberta',country:'CA',abbr:'AB',password:'alberta2027',color:'#1D4ED8',contact:'ab@naig2027.com',sports:['s1','s2','s5','s8','s9','s10','s11','s13','s14'],active:true},
+  {id:'pr',name:'Canada Prairie',country:'CA',abbr:'PR',password:'prairie2027',color:'#2563EB',contact:'prairie@naig2027.com',sports:['s1','s2','s6','s8','s9','s12','s13','s14'],active:true},
+  {id:'onw',name:'Canada Ontario West',country:'CA',abbr:'ON-W',password:'ontario-west2027',color:'#3B82F6',contact:'onw@naig2027.com',sports:['s1','s2','s3','s4','s7','s8','s9','s10','s13','s14'],active:true},
+  {id:'one',name:'Canada Ontario East',country:'CA',abbr:'ON-E',password:'ontario-east2027',color:'#60A5FA',contact:'one@naig2027.com',sports:['s1','s2','s6','s7','s8','s9','s10','s11','s13','s14'],active:true},
+  {id:'qc',name:'Canada Quebec',country:'CA',abbr:'QC',password:'quebec2027',color:'#93C5FD',contact:'qc@naig2027.com',sports:['s1','s2','s8','s9','s10','s13','s14'],active:true},
+  {id:'atl',name:'Canada Atlantic',country:'CA',abbr:'ATL',password:'atlantic2027',color:'#BFDBFE',contact:'atlantic@naig2027.com',sports:['s1','s2','s4','s8','s9','s13','s14'],active:true},
+  {id:'pac',name:'USA Pacific',country:'US',abbr:'PAC',password:'pacific2027',color:'#991B1B',contact:'pacific@naig2027.com',sports:['s1','s2','s7','s8','s9','s10','s11','s13','s14'],active:true},
+  {id:'mtn',name:'USA Mountain',country:'US',abbr:'MTN',password:'mountain2027',color:'#B91C1C',contact:'mountain@naig2027.com',sports:['s1','s2','s8','s9','s10','s13','s14'],active:true},
+  {id:'tx',name:'USA Texas',country:'US',abbr:'TX',password:'texas2027',color:'#DC2626',contact:'texas@naig2027.com',sports:['s1','s2','s5','s7','s8','s9','s10','s13','s14'],active:true},
+  {id:'gl',name:'USA Great Lakes',country:'US',abbr:'GL',password:'greatlakes2027',color:'#EF4444',contact:'greatlakes@naig2027.com',sports:['s1','s2','s9','s10','s11','s13','s14'],active:true},
+  {id:'ma',name:'USA Mid-Atlantic',country:'US',abbr:'MA',password:'midatlantic2027',color:'#F87171',contact:'midatlantic@naig2027.com',sports:['s1','s2','s12','s8','s9','s10','s13','s14'],active:true},
+  {id:'se',name:'USA Southeast',country:'US',abbr:'SE',password:'southeast2027',color:'#FCA5A5',contact:'southeast@naig2027.com',sports:['s1','s2','s7','s8','s9','s13','s14'],active:true},
+  {id:'ne',name:'USA Northeast',country:'US',abbr:'NE',password:'northeast2027',color:'#FECACA',contact:'northeast@naig2027.com',sports:['s1','s2','s9','s10','s11','s13','s14'],active:true},
+ ],
  gallery:[
   {id:'ph01',sid:'s2',sport:'Basketball',author:'Zahra Merchant',region:'BC',caption:'What a game! Our U18 squad dominates the court.',likes:24,cheers:18,img:'https://picsum.photos/seed/bsk1/400/300',ts:'2027-07-14T09:32:00'},
   {id:'ph02',sid:'s8',sport:'Soccer',author:'Tariq Pirani',region:'Alberta',caption:'Goal of the tournament right here. 18+ Men final.',likes:47,cheers:31,img:'https://picsum.photos/seed/soc1/400/300',ts:'2027-07-14T11:15:00'},
@@ -1494,9 +1510,23 @@ function RoleLogin({role,onSuccess,onCancel}){
  const [err,setErr]=useState('');
  function tryLogin(db){
  if(role==='national'){
- if(pw===db.adminPass||pw==='naig2027'){onSuccess();return;}
- setErr('Wrong password — try again');return;
+   if(pw===db.adminPass||pw==='naig2027'){onSuccess();return;}
+   setErr('Wrong password');return;
  }
+ if(role==='regional'){
+   // Check against per-region passwords in regionConfig
+   const regions=db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig||[];
+   const matched=regions.find(r=>r.password===pw&&r.active!==false);
+   if(matched){onSuccess(matched.id,matched);return;}
+   // Fallback: master regional password
+   if(pw==='regional2027'){onSuccess('national',{name:'All Regions',sports:SPORTS.map(s=>s.id)});return;}
+   setErr('Wrong region password. Use your region code.');return;
+ }
+ // Scorekeeper
+ const sk=db.scorekeepers.find(s=>s.pin===pin||s.username===un);
+ if(sk){onSuccess(sk);return;}
+ setErr('Wrong PIN or username');
+}
  if(role==='regional'){
  if(pw==='regional2027'||pw===db.adminPass){onSuccess();return;}
  setErr('Wrong password — try again');return;
@@ -2522,6 +2552,7 @@ function Calculator(){
 }
 
 function SpectatorView({db}){
+ const [regionFilter,setRegionFilter]=useState('all'); // 'all' = national, else regionId
  const [tab,setTab]=useState('schedule');
  const [sf,setSf]=useState('all');
  const [ageF,setAgeF]=useState('');
@@ -2549,7 +2580,11 @@ function SpectatorView({db}){
     return [];
   },[db.indResults,sf,ageF,typeFilter]);
   const filtered=useMemo(()=>{
+ const allRegions=(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig)||[];
+ const myReg=regionFilter!=='all'?allRegions.find(r=>r.id===regionFilter):null;
+ const myRegTeamIds=myReg?db.teams.filter(t=>t.region&&(t.region===myReg.abbr||t.n.includes(myReg.abbr))).map(t=>t.id):null;
  let g=db.games;
+ if(myRegTeamIds)g=g.filter(x=>myRegTeamIds.includes(x.hid)||myRegTeamIds.includes(x.aid));
  if(sf!=='all')g=g.filter(x=>x.sid===sf);
  if(ageF)g=g.filter(x=>x.age===ageF||x.age===ageF.replace(' Open','').replace(' (15–17)','').replace(' (45+)',''));
  if(typeFilter==='team')g=g.filter(x=>SPORTS.find(s=>s.id===x.sid)?.t==='team');
@@ -2567,7 +2602,28 @@ function SpectatorView({db}){
  </button>)}
  </div> {curSp&&<div style={{display:'flex',gap:6,marginBottom:16}}> <button className={`sport-chip${!ageF?' on':''}`} onClick={()=>setAgeF('')}>All ages</button> {curSp.ages.map(a=><button key={a} className={`sport-chip${ageF===a?' on':''}`} onClick={()=>setAgeF(a)}>{a}</button>)}
  </div>}
- <div className="view-tabs"> {[
+ <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:12,flexWrap:'wrap'}}>
+ <div style={{fontSize:11,fontWeight:800,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.5px',flexShrink:0}}>View:</div>
+ <button className={`filter-pill${regionFilter==='all'?' active':''}`} onClick={()=>setRegionFilter('all')} style={{background:regionFilter==='all'?'var(--navy)':'white',color:regionFilter==='all'?'white':'var(--navy)',border:'1px solid var(--navy)',fontWeight:700,fontSize:11}}>
+   National (All Regions)
+ </button>
+ <div className="filter-bar" style={{flex:1,minWidth:0}}>
+   {(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig||[]).map(r=>(
+     <button key={r.id} className={`filter-pill${regionFilter===r.id?' active':''}`}
+       onClick={()=>setRegionFilter(r.id)}
+       data-tip={r.name}
+       style={{
+         background:regionFilter===r.id?'var(--crimson)':'white',
+         color:regionFilter===r.id?'white':'var(--txt2)',
+         border:'1px solid',borderColor:regionFilter===r.id?'var(--crimson)':'var(--border)',
+         fontSize:11,fontWeight:700,flexShrink:0,
+       }}>
+       {r.abbr}
+     </button>
+   ))}
+ </div>
+</div>
+<div className="view-tabs"> {[
  {id:'live',l:liveN>0?` Live (${liveN})`:'Live'},
  {id:'schedule',l:'Schedule'},
  {id:'standings',l:'Standings'},
@@ -2968,6 +3024,72 @@ function DataMgmt({db,onUpdate}){
  </select> <button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={byRegion}>Delete Region</button> </div> </div> </div> <div style={{paddingTop:12,borderTop:'1px solid var(--border)'}}> <button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)',borderColor:'var(--crimson)'}} onClick={clearGames}> Clear All Games</button> <span style={{fontSize:12,color:'var(--txt3)',marginLeft:10}}>Keeps teams — wipes the schedule</span> </div> </div> </div>;
 }
 
+
+function RegionCard({reg, db, onUpdate}){
+ const [editing,setEditing]=useState(false);
+ const [sports,setSports]=useState(reg.sports||[]);
+ const [pw,setPw]=useState(reg.password||'');
+ function save(){
+   const allR=(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig)||[];
+   const updated=allR.map(r=>r.id===reg.id?{...r,sports,password:pw}:r);
+   onUpdate({...db,regionConfig:updated});
+   setEditing(false);
+ }
+ const regTeams=db.teams.filter(t=>t.region&&(t.region===reg.abbr||t.n.includes(reg.abbr)));
+ return(
+   <div className="card" style={{borderLeft:'3px solid '+(reg.country==='CA'?'var(--navy)':'var(--crimson)')}}>
+     <div className="card-head">
+       <div style={{display:'flex',gap:8,alignItems:'center'}}>
+         <span style={{fontSize:10,fontWeight:800,padding:'2px 6px',borderRadius:4,background:reg.country==='CA'?'var(--navy)':'var(--crimson)',color:'white'}}>{reg.country}</span>
+         <span style={{fontWeight:800,fontSize:14}}>{reg.name}</span>
+       </div>
+       <div style={{display:'flex',gap:6}}>
+         {editing
+           ?<><button className="btn btn-ghost btn-sm" onClick={()=>setEditing(false)}>Cancel</button>
+              <button className="btn btn-navy btn-sm" onClick={save}>Save</button></>
+           :<button className="btn btn-ghost btn-sm" onClick={()=>setEditing(true)}>Edit</button>
+         }
+       </div>
+     </div>
+     <div style={{marginTop:10}}>
+       <div style={{display:'flex',gap:12,flexWrap:'wrap',fontSize:12,color:'var(--txt3)',marginBottom:8}}>
+         <span>{regTeams.length} teams</span>
+         <span>{(reg.sports||[]).length} sports</span>
+         <span>Password: <strong>{reg.password||reg.abbr.toLowerCase()+'2027'}</strong></span>
+       </div>
+       {editing?(
+         <div>
+           <div className="form-field" style={{marginBottom:10}}>
+             <label className="form-label">Region Password</label>
+             <input className="form-input" value={pw} onChange={e=>setPw(e.target.value)} placeholder="e.g. bc-naig-2027"/>
+           </div>
+           <label className="form-label" style={{marginBottom:8,display:'block'}}>Sports Offered — click to toggle</label>
+           <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+             {SPORTS.map(s=>{
+               const sel=sports.includes(s.id);
+               return(
+                 <button key={s.id} onClick={()=>setSports(p=>sel?p.filter(x=>x!==s.id):[...p,s.id])}
+                   className="sport-code" data-tip={s.n}
+                   style={{cursor:'pointer',fontSize:10,background:sel?'var(--navy)':'var(--bg2)',color:sel?'white':'var(--txt3)',border:'2px solid',borderColor:sel?'var(--navy)':'var(--border)'}}>
+                   {s.abbr}
+                 </button>
+               );
+             })}
+           </div>
+         </div>
+       ):(
+         <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+           {(reg.sports||[]).map(sid=>{
+             const sp=SPORTS.find(s=>s.id===sid);
+             return sp?<span key={sid} className="sport-code" data-tip={sp.n} style={{fontSize:9,cursor:'default'}}>{sp.abbr}</span>:null;
+           })}
+         </div>
+       )}
+     </div>
+   </div>
+ );
+}
+
 function AdminPanel({db,onUpdate,scope}){
  const [tab,setTab]=useState('dashboard');
  const [selAdminGame,setSelAdminGame]=useState(null);
@@ -3035,6 +3157,7 @@ function AdminPanel({db,onUpdate,scope}){
 
  const nationalTabs=[
  {id:'dashboard',icon:'',l:'Dashboard'},
+ {id:'regions',icon:'',l:'Regions'},
  {id:'calc',icon:'',l:'Calculator'},
  {id:'venues',icon:'',l:'Venues'},
  {id:'teams',icon:'',l:'Teams'},
@@ -3062,7 +3185,84 @@ function AdminPanel({db,onUpdate,scope}){
  <div className="sidebar-section">Resources</div> <button className={`sb${tab==='rulebook'?' on':''}`} onClick={()=>setTab('rulebook')}><span className="sb-icon"></span>Rulebook</button> <button className={`sb${tab==='scoresheets'?' on':''}`} onClick={()=>setTab('scoresheets')}><span className="sb-icon"></span>Scoresheets</button> <button className={`sb${tab==='export'?' on':''}`} onClick={()=>setTab('export')}><span className="sb-icon"></span>{scope==='national'?'Export & Data':'Data Mgmt'}</button> <div className="sidebar-section">Help</div> <button className={`sb${tab==='help_sop'?' on':''}`} onClick={()=>setTab('help_sop')}><span className="sb-icon"></span>User Guides</button> <div style={{marginTop:'auto',paddingTop:20,borderTop:'1px solid rgba(255,255,255,.08)'}}> <div style={{fontSize:11,color:'rgba(255,255,255,.35)',padding:'0 10px'}}>NAIG 2027 · {scope==='national'?'National Admin':'Regional Coordinator'}</div> </div> </nav> {/* MAIN */}
  <div className="content-area"> <div className="admin-content"> {msg&&<div className="alert alert-green" style={{marginBottom:16}}>{msg}</div>}
 
- {tab==='dashboard'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Dashboard</h2></div> <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:20,width:"100%"}}> {[
+ {tab==='regions'&&<div>
+ <div className="section-head">
+   <div>
+     <h2 className="section-title">Region Management</h2>
+     <p style={{color:'var(--txt2)',fontSize:13,marginTop:4}}>Configure each region, set sports they offer, and manage passwords</p>
+   </div>
+ </div>
+ <div className="g2">
+   {(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig||[]).map((reg,ri)=>(
+     <RegionCard key={reg.id} reg={reg} db={db} onUpdate={onUpdate}/>
+     function saveReg(){
+       const updated=(db.regionConfig||SEED.regionConfig).map(r=>r.id===reg.id?{...r,sports:regSports,password:regPw}:r);
+       onUpdate({...db,regionConfig:updated});
+       setEditingReg(false);
+     }
+     const regTeams=db.teams.filter(t=>t.region&&(t.region===reg.abbr||t.n.includes(reg.abbr)));
+     return(
+       <div key={reg.id} className="card" style={{borderLeft:'3px solid '+(reg.country==='CA'?'var(--navy)':'var(--crimson)')}}>
+         <div className="card-head">
+           <div style={{display:'flex',gap:8,alignItems:'center'}}>
+             <span style={{fontSize:10,fontWeight:800,padding:'2px 6px',borderRadius:4,background:reg.country==='CA'?'var(--navy)':'var(--crimson)',color:'white'}}>{reg.country}</span>
+             <span style={{fontWeight:800,fontSize:14}}>{reg.name}</span>
+           </div>
+           <div style={{display:'flex',gap:6}}>
+             {editingReg
+               ?<><button className="btn btn-ghost btn-sm" onClick={()=>setEditingReg(false)}>Cancel</button>
+                  <button className="btn btn-navy btn-sm" onClick={saveReg}>Save</button></>
+               :<button className="btn btn-ghost btn-sm" onClick={()=>setEditingReg(true)}>Edit</button>
+             }
+           </div>
+         </div>
+         <div style={{marginTop:10}}>
+           <div style={{display:'flex',gap:12,flexWrap:'wrap',fontSize:12,color:'var(--txt3)',marginBottom:10}}>
+             <span>{regTeams.length} teams</span>
+             <span>{reg.sports&&reg.sports.length} sports</span>
+             <span>Login: <strong>{reg.abbr.toLowerCase()}2027</strong></span>
+           </div>
+           {editingReg&&(
+             <div>
+               <div className="form-field" style={{marginBottom:10}}>
+                 <label className="form-label">Region Password</label>
+                 <input className="form-input" value={regPw} onChange={e=>setRegPw(e.target.value)} placeholder="e.g. bc-naig-2027"/>
+               </div>
+               <label className="form-label" style={{marginBottom:8,display:'block'}}>Sports Offered</label>
+               <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+                 {SPORTS.map(s=>{
+                   const sel=regSports.includes(s.id);
+                   return(
+                     <button key={s.id} onClick={()=>setRegSports(p=>sel?p.filter(x=>x!==s.id):[...p,s.id])}
+                       className="sport-code" data-tip={s.n}
+                       style={{
+                         cursor:'pointer',fontSize:10,
+                         background:sel?'var(--navy)':'var(--bg2)',
+                         color:sel?'white':'var(--txt3)',
+                         border:'2px solid',borderColor:sel?'var(--navy)':'var(--border)',
+                         opacity:1,
+                       }}>
+                       {s.abbr}
+                     </button>
+                   );
+                 })}
+               </div>
+             </div>
+           )}
+           {!editingReg&&(
+             <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+               {(reg.sports||[]).map(sid=>{
+                 const sp=SPORTS.find(s=>s.id===sid);
+                 return sp?<span key={sid} className="sport-code" data-tip={sp.n} style={{fontSize:9}}>{sp.abbr}</span>:null;
+               })}
+             </div>
+           )}
+         </div>
+       </div>
+   ))}
+ </div>
+</div>}
+{tab==='dashboard'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Dashboard</h2></div> <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:16,marginBottom:20,width:"100%"}}> {[
   {n:db.teams.length,l:'Teams',t:'teams',sub:'Registered teams'},
   {n:db.athletes.length,l:'Athletes',t:'athletes',sub:'Individual entries'},
   {n:db.venues.length,l:'Venues',t:'venues',sub:'Competition venues'},
@@ -3525,7 +3725,7 @@ function LandingPage({goTo, db, live}){
  return(
    <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#0F172A 0%,#1E3A8A 50%,#0F172A 100%)'}}>
      {/* Hero */}
-     <div style={{textAlign:'center',padding:'60px 24px 40px',color:'white'}}>
+     <div style={{textAlign:'center',padding:'clamp(24px,5vw,48px) 20px 24px',color:'white'}}>
        <div style={{fontSize:11,fontWeight:800,letterSpacing:3,opacity:.6,textTransform:'uppercase',marginBottom:16}}>North American Ismaili Games 2027</div>
        <h1 style={{fontFamily:'Outfit',fontWeight:900,fontSize:'clamp(32px,6vw,56px)',margin:'0 0 12px',lineHeight:1.1}}>
          NAIG Sports Central
@@ -3541,7 +3741,7 @@ function LandingPage({goTo, db, live}){
        )}
      </div>
      {/* Role Cards */}
-     <div style={{maxWidth:900,margin:'0 auto',padding:'0 20px 60px',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:16}}>
+     <div style={{maxWidth:900,margin:'0 auto',padding:'0 16px 32px',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:16}}>
        {cards.map(card=>(
          <div key={card.id}
            onClick={()=>goTo(card.id)}
@@ -3588,11 +3788,379 @@ function LandingPage({goTo, db, live}){
  );
 }
 
+
+function RegionalAdminView({db, onUpdate, authed, onHome}){
+ const rconf=authed.regionData;
+ const isAll=authed.regionId==='national';
+ const regionId=authed.regionId;
+ // Get this region's config from db
+ const allRegions=(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig)||[];
+ const myRegion=isAll?null:allRegions.find(r=>r.id===regionId)||rconf;
+ const [tab,setTab]=React.useState('overview');
+ const [editSports,setEditSports]=React.useState(false);
+ const [mySports,setMySports]=React.useState((myRegion&&myRegion.sports)||SPORTS.map(s=>s.id));
+ const [showPwModal,setShowPwModal]=React.useState(false);
+ const [newPw,setNewPw]=React.useState('');
+
+ // Filter data to this region
+ function regionMatch(team){
+   if(isAll) return true;
+   const rn=myRegion&&myRegion.name;
+   return team.n&&team.n.startsWith(rn?rn.replace('Canada ','').replace('USA ',''):'');
+ }
+ const myTeams=db.teams.filter(t=>{
+   if(isAll) return true;
+   const abb=myRegion&&myRegion.abbr;
+   return t.region&&(t.region===abb||t.region===myRegion.name||t.n.includes(myRegion.abbr));
+ });
+ const myGames=db.games.filter(g=>{
+   if(isAll) return true;
+   return myTeams.some(t=>t.id===g.hid||t.id===g.aid);
+ });
+ const liveGames=myGames.filter(g=>g.status==='in_progress');
+ const doneGames=myGames.filter(g=>g.status==='completed');
+
+ function saveSports(){
+   const updated=allRegions.map(r=>r.id===regionId?{...r,sports:mySports}:r);
+   onUpdate({...db,regionConfig:updated});
+   setEditSports(false);
+ }
+ function savePassword(){
+   if(newPw.length<6){alert('Password must be at least 6 characters');return;}
+   const updated=allRegions.map(r=>r.id===regionId?{...r,password:newPw}:r);
+   onUpdate({...db,regionConfig:updated});
+   setShowPwModal(false);
+   setNewPw('');
+   alert('Password updated. Share the new password with your region coordinator.');
+ }
+
+ const TABS=[
+   {id:'overview',label:'Overview'},
+   {id:'sports',label:'Our Sports'},
+   {id:'teams',label:'Teams'},
+   {id:'schedule',label:'Schedule'},
+   {id:'standings',label:'Standings'},
+   {id:'setup',label:'Setup'},
+ ];
+
+ return(
+   <div className="page" style={{paddingBottom:40}}>
+     {/* Header */}
+     <div style={{background:'linear-gradient(135deg,var(--navy-dk),var(--navy))',borderRadius:16,padding:'20px 24px',marginBottom:20,color:'white'}}>
+       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:10}}>
+         <div>
+           <div style={{fontSize:11,fontWeight:700,opacity:.6,letterSpacing:1,textTransform:'uppercase',marginBottom:6}}>Regional Coordinator Dashboard</div>
+           <h1 style={{fontFamily:'Outfit',fontWeight:900,fontSize:'clamp(22px,4vw,32px)',margin:'0 0 4px'}}>{myRegion?myRegion.name:'All Regions'}</h1>
+           <div style={{opacity:.7,fontSize:13}}>{myTeams.length} teams registered across {mySports.length} sports</div>
+         </div>
+         <button onClick={onHome} style={{background:'rgba(255,255,255,.12)',border:'1px solid rgba(255,255,255,.2)',color:'white',borderRadius:8,padding:'8px 14px',cursor:'pointer',fontSize:12,fontWeight:700}}>
+           Home
+         </button>
+       </div>
+       <div style={{display:'flex',gap:10,marginTop:16,flexWrap:'wrap'}}>
+         {[
+           {label:'Live',val:liveGames.length,color:liveGames.length>0?'#4ADE80':'rgba(255,255,255,.4)'},
+           {label:'Done',val:doneGames.length,color:'rgba(255,255,255,.7)'},
+           {label:'Remaining',val:myGames.filter(g=>g.status==='scheduled').length,color:'rgba(255,255,255,.7)'},
+           {label:'Teams',val:myTeams.length,color:'rgba(255,255,255,.7)'},
+         ].map(({label,val,color})=>(
+           <div key={label} style={{background:'rgba(255,255,255,.1)',borderRadius:8,padding:'8px 14px',minWidth:60,textAlign:'center'}}>
+             <div style={{fontSize:20,fontWeight:900,color,fontFamily:'Outfit'}}>{val}</div>
+             <div style={{fontSize:10,opacity:.6,fontWeight:700}}>{label}</div>
+           </div>
+         ))}
+       </div>
+     </div>
+
+     {/* Tabs */}
+     <div className="view-tabs" style={{marginBottom:20}}>
+       {TABS.map(t=>(
+         <button key={t.id} className={`vtab${tab===t.id?' on':''}`} onClick={()=>setTab(t.id)}>{t.label}</button>
+       ))}
+     </div>
+
+     {/* OVERVIEW */}
+     {tab==='overview'&&(
+       <div>
+         {liveGames.length>0&&(
+           <div style={{background:'linear-gradient(135deg,#F0FDF4,#DCFCE7)',border:'2px solid #16A34A',borderRadius:12,padding:'14px 18px',marginBottom:16}}>
+             <div style={{fontWeight:800,color:'#15803D',marginBottom:10,display:'flex',alignItems:'center',gap:8}}>
+               <span style={{width:10,height:10,borderRadius:'50%',background:'#22C55E',display:'inline-block',animation:'breathe 1.5s infinite'}}></span>
+               {liveGames.length} game{liveGames.length>1?'s':''} live now
+             </div>
+             {liveGames.map(g=>{
+               const ht=db.teams.find(t=>t.id===g.hid);
+               const at=db.teams.find(t=>t.id===g.aid);
+               const sp=SPORTS.find(s=>s.id===g.sid);
+               return(
+                 <div key={g.id} style={{display:'flex',justifyContent:'space-between',fontSize:13,marginBottom:6,padding:'6px 10px',background:'white',borderRadius:8}}>
+                   <span style={{fontWeight:700}}>{ht&&ht.n} <span style={{color:'var(--txt3)'}}>vs</span> {at&&at.n}</span>
+                   <span style={{fontWeight:900,color:'var(--navy)'}}>{g.hs} – {g.as} <span style={{fontSize:11,color:'var(--txt3)'}}>{sp&&sp.abbr}</span></span>
+                 </div>
+               );
+             })}
+           </div>
+         )}
+         <div className="g2">
+           {SPORTS.filter(s=>mySports.includes(s.id)).map(s=>{
+             const sportTeams=myTeams.filter(t=>t.sid===s.id);
+             const sportGames=myGames.filter(g=>g.sid===s.id);
+             const done=sportGames.filter(g=>g.status==='completed').length;
+             return(
+               <div key={s.id} className="card" style={{borderLeft:'3px solid var(--navy)'}}>
+                 <div className="card-head">
+                   <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                     <span className="sport-code" data-tip={s.n}>{s.abbr}</span>
+                     <span style={{fontWeight:700,fontSize:14}}>{s.n}</span>
+                   </div>
+                   <span style={{fontSize:11,color:'var(--txt3)'}}>{sportTeams.length} teams</span>
+                 </div>
+                 <div style={{display:'flex',gap:8,flexWrap:'wrap',marginTop:8}}>
+                   <span style={{fontSize:12,color:'var(--txt2)'}}>Games: {done}/{sportGames.length}</span>
+                   <span style={{height:4,flex:1,background:'var(--bg2)',borderRadius:2,alignSelf:'center',overflow:'hidden'}}>
+                     <div style={{height:'100%',background:'var(--navy)',width:(sportGames.length?done/sportGames.length*100:0)+'%',transition:'width .3s'}}/>
+                   </span>
+                 </div>
+               </div>
+             );
+           })}
+         </div>
+       </div>
+     )}
+
+     {/* SPORTS SELECTION */}
+     {tab==='sports'&&(
+       <div>
+         <div className="section-head">
+           <div>
+             <h2 className="section-title">Sports We Are Offering</h2>
+             <p style={{color:'var(--txt2)',fontSize:13,marginTop:4}}>Select which sports your region is participating in. This affects team registration and scheduling.</p>
+           </div>
+           {editSports
+             ?<div style={{display:'flex',gap:8}}>
+               <button className="btn btn-ghost" onClick={()=>setEditSports(false)}>Cancel</button>
+               <button className="btn btn-navy" onClick={saveSports}>Save Sports</button>
+             </div>
+             :<button className="btn btn-navy" onClick={()=>setEditSports(true)}>Edit Sports</button>
+           }
+         </div>
+         <div className="g2">
+           {SPORTS.map(s=>{
+             const selected=mySports.includes(s.id);
+             const teamCount=myTeams.filter(t=>t.sid===s.id).length;
+             return(
+               <div key={s.id} className="card" onClick={()=>{
+                 if(!editSports) return;
+                 setMySports(p=>selected?p.filter(x=>x!==s.id):[...p,s.id]);
+               }} style={{
+                 cursor:editSports?'pointer':'default',
+                 borderColor:selected?'var(--navy)':'var(--border)',
+                 border:'2px solid',
+                 opacity:editSports&&!selected?.6:1,
+                 transition:'all .15s',
+                 background:selected?'white':'var(--bg2)',
+               }}>
+                 <div className="card-head">
+                   <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                     <span className="sport-code" data-tip={s.n} style={{background:selected?'var(--navy)':'var(--txt3)'}}>{s.abbr}</span>
+                     <div>
+                       <div style={{fontWeight:700,fontSize:14,color:selected?'var(--navy-dk)':'var(--txt3)'}}>{s.n}</div>
+                       <div style={{fontSize:11,color:'var(--txt3)'}}>{s.t} · {s.ages.join(', ')}</div>
+                     </div>
+                   </div>
+                   {editSports&&(
+                     <div style={{width:24,height:24,borderRadius:6,border:'2px solid',borderColor:selected?'var(--navy)':'var(--border)',background:selected?'var(--navy)':'white',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,color:'white',fontWeight:900}}>
+                       {selected?'x':''}
+                     </div>
+                   )}
+                 </div>
+                 <div style={{fontSize:12,color:'var(--txt3)',marginTop:6}}>{teamCount} team{teamCount!==1?'s':''} registered</div>
+                 {!editSports&&selected&&(
+                   <div style={{marginTop:8,background:'var(--bg2)',borderRadius:6,padding:'6px 10px',fontSize:11,color:'var(--txt2)'}}>
+                     Genders: {s.genders.join(' / ')} · Ages: {s.ages.join(', ')}
+                   </div>
+                 )}
+               </div>
+             );
+           })}
+         </div>
+         {!editSports&&(
+           <div className="alert alert-blue" style={{marginTop:16,fontSize:13}}>
+             {mySports.length} of {SPORTS.length} sports selected for {myRegion&&myRegion.name}
+           </div>
+         )}
+       </div>
+     )}
+
+     {/* TEAMS */}
+     {tab==='teams'&&(
+       <div>
+         <div className="section-head">
+           <h2 className="section-title">{myRegion&&myRegion.name} Teams</h2>
+           <span className="tag tag-navy">{myTeams.length} registered</span>
+         </div>
+         {myTeams.length===0
+           ?<div className="empty"><p className="empty-title">No teams registered yet</p><p className="empty-sub">Teams appear here once registered in the National system</p></div>
+           :<div className="g2">
+             {myTeams.map(t=>{
+               const sp=SPORTS.find(s=>s.id===t.sid);
+               const tGames=myGames.filter(g=>g.hid===t.id||g.aid===t.id);
+               const wins=tGames.filter(g=>g.status==='completed'&&((g.hid===t.id&&g.hs>g.as)||(g.aid===t.id&&g.as>g.hs))).length;
+               return(
+                 <div key={t.id} className="card">
+                   <div className="card-head">
+                     <div style={{fontWeight:700}}>{t.n}</div>
+                     <span className="sport-code" data-tip={sp&&sp.n} style={{fontSize:10}}>{sp&&sp.abbr}</span>
+                   </div>
+                   <div style={{display:'flex',gap:10,marginTop:6,flexWrap:'wrap',fontSize:12}}>
+                     <span style={{color:'var(--txt2)'}}>{t.age} · {t.gender}</span>
+                     <span style={{color:'var(--txt3)'}}>Pool {t.pool}</span>
+                     <span style={{fontWeight:700,color:wins>0?'#16A34A':'var(--txt3)'}}>{wins}W / {tGames.filter(g=>g.status==='completed').length-wins}L</span>
+                   </div>
+                 </div>
+               );
+             })}
+           </div>
+         }
+       </div>
+     )}
+
+     {/* SCHEDULE */}
+     {tab==='schedule'&&(
+       <div>
+         <div className="section-head">
+           <h2 className="section-title">Our Schedule</h2>
+           <span className="tag tag-navy">{myGames.length} games</span>
+         </div>
+         {myGames.slice(0,30).map(g=>{
+           const sp=SPORTS.find(s=>s.id===g.sid);
+           const ht=db.teams.find(t=>t.id===g.hid);
+           const at=db.teams.find(t=>t.id===g.aid);
+           const done=g.status==='completed';
+           const live=g.status==='in_progress';
+           return(
+             <div key={g.id} style={{border:'1px solid var(--border)',borderRadius:10,padding:'12px 14px',marginBottom:8,background:live?'#F0FDF4':'white',borderColor:live?'#16A34A':'var(--border)'}}>
+               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+                 <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                   <span className="sport-code" data-tip={sp&&sp.n} style={{fontSize:10}}>{sp&&sp.abbr}</span>
+                   <span style={{fontSize:11,color:'var(--txt3)',fontWeight:600}}>{g.round}</span>
+                   {live&&<span className="tag tag-live" style={{fontSize:9}}>LIVE</span>}
+                 </div>
+                 <span style={{fontSize:11,color:'var(--txt3)'}}>{g.date} {g.time}</span>
+               </div>
+               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                 <span style={{fontWeight:done?(g.hs>g.as?800:500):600,fontSize:13}}>{ht&&ht.n||'TBD'}</span>
+                 <span style={{fontWeight:900,fontSize:16,margin:'0 10px',color:done||live?'var(--navy-dk)':'var(--txt3)'}}>{done||live?g.hs+' – '+g.as:'vs'}</span>
+                 <span style={{fontWeight:done?(g.as>g.hs?800:500):600,fontSize:13}}>{at&&at.n||'TBD'}</span>
+               </div>
+             </div>
+           );
+         })}
+       </div>
+     )}
+
+     {/* STANDINGS */}
+     {tab==='standings'&&(
+       <div>
+         <div className="section-head"><h2 className="section-title">Regional Standings</h2></div>
+         {SPORTS.filter(s=>mySports.includes(s.id)).map(s=>{
+           const sportTeams=myTeams.filter(t=>t.sid===s.id);
+           if(!sportTeams.length) return null;
+           return(
+             <div key={s.id} style={{marginBottom:20}}>
+               <div style={{fontWeight:800,fontSize:14,color:'var(--navy)',marginBottom:8,display:'flex',gap:8,alignItems:'center'}}>
+                 <span className="sport-code" data-tip={s.n} style={{fontSize:10}}>{s.abbr}</span>{s.n}
+               </div>
+               <div className="table-scroll">
+                 <table style={{width:'100%',borderCollapse:'collapse',fontSize:13}}>
+                   <thead><tr style={{background:'var(--bg2)'}}>
+                     <th style={{padding:'8px 12px',textAlign:'left',fontWeight:700,color:'var(--navy)',fontSize:11}}>Team</th>
+                     <th style={{padding:'8px',textAlign:'center',fontWeight:700,color:'var(--navy)',fontSize:11}}>W</th>
+                     <th style={{padding:'8px',textAlign:'center',fontWeight:700,color:'var(--navy)',fontSize:11}}>L</th>
+                     <th style={{padding:'8px',textAlign:'center',fontWeight:700,color:'var(--navy)',fontSize:11}}>Pts</th>
+                   </tr></thead>
+                   <tbody>
+                   {sportTeams.map(t=>{
+                     const tg=myGames.filter(g=>(g.hid===t.id||g.aid===t.id)&&g.status==='completed');
+                     const w=tg.filter(g=>(g.hid===t.id&&g.hs>g.as)||(g.aid===t.id&&g.as>g.hs)).length;
+                     const l=tg.length-w;
+                     return(
+                       <tr key={t.id} style={{borderBottom:'1px solid var(--border)'}}>
+                         <td style={{padding:'8px 12px',fontWeight:600}}>{t.n}</td>
+                         <td style={{padding:'8px',textAlign:'center',fontWeight:700,color:'#16A34A'}}>{w}</td>
+                         <td style={{padding:'8px',textAlign:'center',color:'var(--txt3)'}}>{l}</td>
+                         <td style={{padding:'8px',textAlign:'center',fontWeight:800,color:'var(--navy)'}}>{w*2}</td>
+                       </tr>
+                     );
+                   })}
+                   </tbody>
+                 </table>
+               </div>
+             </div>
+           );
+         })}
+       </div>
+     )}
+
+     {/* SETUP */}
+     {tab==='setup'&&(
+       <div>
+         <div className="section-head"><h2 className="section-title">Region Setup</h2></div>
+         {myRegion&&(
+           <div className="card" style={{marginBottom:16}}>
+             <div className="card-head"><h3 className="card-title">Region Details</h3></div>
+             <div className="card-body">
+               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
+                 {[
+                   {label:'Region Name',val:myRegion.name},
+                   {label:'Country',val:myRegion.country==='CA'?'Canada':'United States'},
+                   {label:'Abbreviation',val:myRegion.abbr},
+                   {label:'Contact',val:myRegion.contact},
+                 ].map(({label,val})=>(
+                   <div key={label}>
+                     <div style={{fontSize:10,fontWeight:700,color:'var(--txt3)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:3}}>{label}</div>
+                     <div style={{fontWeight:600,fontSize:14}}>{val}</div>
+                   </div>
+                 ))}
+               </div>
+               <div style={{borderTop:'1px solid var(--border)',paddingTop:14}}>
+                 <div style={{fontSize:11,color:'var(--txt3)',marginBottom:8}}>Current login password: <strong>*****</strong></div>
+                 <button className="btn btn-ghost" onClick={()=>setShowPwModal(true)}>Change Region Password</button>
+               </div>
+             </div>
+           </div>
+         )}
+         <div className="alert alert-blue" style={{fontSize:12}}>
+           Share your region password with your coordinators only. Each region has a unique login that shows only regional data.
+         </div>
+         {showPwModal&&(
+           <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)setShowPwModal(false);}}>
+             <div className="modal" style={{maxWidth:380}}>
+               <div className="modal-header">
+                 <div style={{fontWeight:800,fontSize:16}}>Change Region Password</div>
+                 <button className="modal-close" onClick={()=>setShowPwModal(false)}>x</button>
+               </div>
+               <div style={{padding:'16px 20px 20px'}}>
+                 <div className="form-field">
+                   <label className="form-label">New Password (min 6 characters)</label>
+                   <input className="form-input" type="text" value={newPw} onChange={e=>setNewPw(e.target.value)} placeholder="e.g. bc-naig-2027"/>
+                 </div>
+                 <button className="btn btn-navy btn-w btn-lg" onClick={savePassword} style={{marginTop:8}}>Update Password</button>
+               </div>
+             </div>
+           </div>
+         )}
+       </div>
+     )}
+   </div>
+ );
+}
+
 function App(){
  const [db,setDb]=useState(load);
  const [view,setView]=useState('home');
  const [skUser,setSkUser]=useState(null);
- const [authed,setAuthed]=useState({regional:false,national:false});
+ const [authed,setAuthed]=useState({regional:false,national:false,regionId:null,regionData:null});
  function upd(d){setDb(d);save(d);}
  const live=db.games.filter(g=>g.status==='in_progress').length;
 
@@ -3621,8 +4189,8 @@ function App(){
    {view==='spectator'&&<div className="content-area"><SpectatorView db={db}/></div>}
  {view==='sk-login'&&<div className="content-area"><RoleLogin role="scorekeeper" onSuccess={u=>{setSkUser(u);setView('scorekeeper');}} onCancel={()=>setView('spectator')}/></div>}
  {view==='scorekeeper'&&skUser&&<div className="content-area"><ScorekeeperView db={db} onUpdate={upd} user={skUser} onLogout={()=>{setSkUser(null);setView('spectator');}}/></div>}
- {view==='reg-login'&&<div className="content-area"><RoleLogin role="regional" onSuccess={()=>{setAuthed(a=>({...a,regional:true}));setView('regional');}} onCancel={()=>setView('spectator')}/></div>}
- {view==='regional'&&authed.regional&&<AdminPanel db={db} onUpdate={upd} scope="regional"/>}
+ {view==='reg-login'&&<div className="content-area"><RoleLogin role="regional" onSuccess={(rid,rdata)=>{setAuthed(a=>({...a,regional:true,regionId:rid,regionData:rdata}));setView('regional');}} onCancel={()=>setView('spectator')}/></div>}
+ {view==='regional'&&authed.regional&&<RegionalAdminView db={db} onUpdate={upd} authed={authed} onHome={()=>setView('home')}/>}
  {view==='nat-login'&&<div className="content-area"><RoleLogin role="national" onSuccess={()=>{setAuthed(a=>({...a,national:true}));setView('national');}} onCancel={()=>setView('spectator')}/></div>}
  {view==='national'&&authed.national&&<AdminPanel db={db} onUpdate={upd} scope="national"/>}
  </div> {/* MOBILE BOTTOM NAV */}
