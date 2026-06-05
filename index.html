@@ -160,8 +160,9 @@ h1,h2,h3,h4,h5{font-family:'Outfit',sans-serif;line-height:1.2}
 .sport-chip:hover{border-color:var(--navy);color:var(--navy)}
 .sport-chip.on{background:var(--navy);color:white;border-color:var(--navy)}
 
-.view-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px}
-.vtab{padding:10px 18px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--txt3);transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px}
+.view-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:24px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.view-tabs::-webkit-scrollbar{display:none}
+.vtab{padding:10px 14px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;color:var(--txt3);transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;flex-shrink:0}
 .vtab:hover{color:var(--txt2)}
 .vtab.on{color:var(--navy);border-bottom-color:var(--navy)}
 
@@ -399,7 +400,7 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 .mbn-inner{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .mbn-inner::-webkit-scrollbar{display:none}
 .mbn-btn{
- flex:1;min-width:72px;
+ flex:1;min-width:60px;
  display:flex;flex-direction:column;align-items:center;justify-content:center;
  padding:10px 4px 8px;gap:3px;
  background:none;border:none;cursor:pointer;
@@ -482,8 +483,17 @@ abbr{text-decoration:underline dotted var(--muted);cursor:help}
 
 /* ── MOBILE GAME MODAL ── */
 @media(max-width:480px){
-  /* Home page: stack cards on very small screens */
-  .landing-cards{grid-template-columns:1fr!important}
+  .sport-chip{font-size:11px!important;padding:5px 8px!important}
+  .sport-chip .sport-name{display:none}
+}
+/* Region filter responsive */
+.region-filter-mobile{display:none}
+.region-filter-desktop{display:flex}
+.region-select{width:100%;padding:10px 12px;border:2px solid var(--navy);border-radius:10px;font-size:15px;font-weight:700;color:var(--navy-dk);background:white;cursor:pointer;-webkit-appearance:none;appearance:none;font-family:'Inter',sans-serif}
+.region-select:focus{outline:none;border-color:var(--crimson)}
+@media(max-width:768px){
+  .region-filter-mobile{display:block}
+  .region-filter-desktop{display:none!important}
 }
 @media(max-width:640px){
   .modal{max-height:92vh;border-radius:20px 20px 0 0}
@@ -611,7 +621,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27ad_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27af_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -2621,25 +2631,36 @@ function SpectatorView({db}){
  </button>)}
  </div> {curSp&&<div style={{display:'flex',gap:6,marginBottom:16}}> <button className={`sport-chip${!ageF?' on':''}`} onClick={()=>setAgeF('')}>All ages</button> {curSp.ages.map(a=><button key={a} className={`sport-chip${ageF===a?' on':''}`} onClick={()=>setAgeF(a)}>{a}</button>)}
  </div>}
- <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:12,flexWrap:'wrap'}}>
- <div style={{fontSize:11,fontWeight:800,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.5px',flexShrink:0}}>View:</div>
- <button className={`filter-pill${regionFilter==='all'?' active':''}`} onClick={()=>setRegionFilter('all')} style={{background:regionFilter==='all'?'var(--navy)':'white',color:regionFilter==='all'?'white':'var(--navy)',border:'1px solid var(--navy)',fontWeight:700,fontSize:11}}>
-   National (All Regions)
- </button>
- <div className="filter-bar" style={{flex:1,minWidth:0}}>
-   {(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig||[]).map(r=>(
-     <button key={r.id} className={`filter-pill${regionFilter===r.id?' active':''}`}
-       onClick={()=>setRegionFilter(r.id)}
-       data-tip={r.name}
-       style={{
-         background:regionFilter===r.id?'var(--crimson)':'white',
-         color:regionFilter===r.id?'white':'var(--txt2)',
-         border:'1px solid',borderColor:regionFilter===r.id?'var(--crimson)':'var(--border)',
-         fontSize:11,fontWeight:700,flexShrink:0,
-       }}>
-       {r.abbr}
-     </button>
-   ))}
+ {/* Region filter — dropdown on mobile, pills on desktop */}
+<div style={{marginBottom:12}}>
+ {/* Mobile dropdown */}
+ <div className="region-filter-mobile">
+   <select
+     className="region-select"
+     value={regionFilter}
+     onChange={e=>setRegionFilter(e.target.value)}>
+     <option value="all">National View — All Regions</option>
+     {(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig||[]).map(r=>(
+       <option key={r.id} value={r.id}>{r.name}</option>
+     ))}
+   </select>
+ </div>
+ {/* Desktop pills */}
+ <div className="region-filter-desktop" style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
+   <span style={{fontSize:11,fontWeight:800,color:'var(--navy)',textTransform:'uppercase',letterSpacing:'.5px',flexShrink:0}}>View:</span>
+   <button className={`filter-pill${regionFilter==='all'?' active':''}`} onClick={()=>setRegionFilter('all')}
+     style={{background:regionFilter==='all'?'var(--navy)':'white',color:regionFilter==='all'?'white':'var(--navy)',border:'1px solid var(--navy)',fontWeight:700,fontSize:11}}>
+     All Regions
+   </button>
+   <div className="filter-bar" style={{flex:1,minWidth:0}}>
+     {(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig||[]).map(r=>(
+       <button key={r.id} className={`filter-pill${regionFilter===r.id?' active':''}`}
+         onClick={()=>setRegionFilter(r.id)} data-tip={r.name}
+         style={{background:regionFilter===r.id?'var(--crimson)':'white',color:regionFilter===r.id?'white':'var(--txt2)',border:'1px solid',borderColor:regionFilter===r.id?'var(--crimson)':'var(--border)',fontSize:11,fontWeight:700,flexShrink:0}}>
+         {r.abbr}
+       </button>
+     ))}
+   </div>
  </div>
 </div>
 <div className="view-tabs"> {[
