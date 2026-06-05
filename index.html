@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27i_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27j_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -2041,7 +2041,7 @@ function Ticker({games,teams}){
 
 function Calculator(){
  const [mode,setMode]=useState('A');
- const [f,setF]=useState({sid:'s2',stype:'team',n:8,fields:2,dur:40,buf:10,fmt:'pools'});
+ const [f,setF]=useState({sid:'s2',stype:'team',n:8,nMin:4,nMax:16,fields:2,dur:40,buf:10,fmt:'pools'});
  const [daySchedule,setDaySchedule]=useState([
    {id:'mon',label:'Mon',checked:true,hours:8},
    {id:'tue',label:'Tue',checked:true,hours:8},
@@ -2148,12 +2148,42 @@ function Calculator(){
      )}
    </div>
    <div className="row3" style={{marginBottom:16}}>
-     {(mode==='A'||mode==='B')&&(
-       <div className="form-field">
-         <label className="form-label">{tw}</label>
-         <input className="form-input" type="number" min="2" max="500" value={f.n} onChange={e=>setF(p=>({...p,n:+e.target.value}))}/>
+     <div className="form-field">
+       <label className="form-label">{tw}
+         <span style={{fontWeight:400,color:'var(--txt3)',textTransform:'none',marginLeft:8,fontSize:11}}>min / max range</span>
+       </label>
+       <div style={{display:'flex',gap:8,alignItems:'center'}}>
+         <div style={{flex:1}}>
+           <div style={{fontSize:10,fontWeight:700,color:'var(--txt3)',marginBottom:3,textTransform:'uppercase',letterSpacing:'.4px'}}>Min</div>
+           <input className="form-input" type="number" min="2" max={f.nMax||500} value={f.nMin||2}
+             onChange={e=>setF(p=>({...p,nMin:Math.max(2,+e.target.value),n:Math.max(2,+e.target.value)}))}
+             style={{textAlign:'center'}}/>
+         </div>
+         <div style={{fontWeight:900,color:'var(--txt3)',fontSize:18,paddingTop:16}}>–</div>
+         <div style={{flex:1}}>
+           <div style={{fontSize:10,fontWeight:700,color:'var(--txt3)',marginBottom:3,textTransform:'uppercase',letterSpacing:'.4px'}}>Max</div>
+           <input className="form-input" type="number" min={f.nMin||2} max="500" value={f.nMax||32}
+             onChange={e=>setF(p=>({...p,nMax:Math.max(p.nMin||2,+e.target.value),n:Math.max(p.nMin||2,+e.target.value)}))}
+             style={{textAlign:'center'}}/>
+         </div>
+         <div style={{flex:1}}>
+           <div style={{fontSize:10,fontWeight:700,color:'var(--navy)',marginBottom:3,textTransform:'uppercase',letterSpacing:'.4px'}}>Target</div>
+           <input className="form-input" type="number" min={f.nMin||2} max={f.nMax||500} value={f.n}
+             onChange={e=>setF(p=>({...p,n:Math.min(p.nMax||500,Math.max(p.nMin||2,+e.target.value))}))}
+             style={{textAlign:'center',fontWeight:800,color:'var(--navy-dk)',borderColor:'var(--navy)'}}/>
+         </div>
        </div>
-     )}
+       {f.nMin&&f.nMax&&f.nMax>f.nMin&&(
+         <div style={{marginTop:6,fontSize:11,color:'var(--txt3)',display:'flex',gap:6,flexWrap:'wrap'}}>
+           <span style={{background:'var(--bg2)',borderRadius:6,padding:'2px 8px',fontWeight:600}}>
+             Range: {f.nMax-f.nMin} possible team counts
+           </span>
+           <span style={{background:'var(--bg2)',borderRadius:6,padding:'2px 8px',fontWeight:600}}>
+             Calculating for target: {f.n} {tw.toLowerCase()}
+           </span>
+         </div>
+       )}
+     </div>
      {(mode==='B'||mode==='C')&&(
        <div className="form-field">
          <label className="form-label">{fw}</label>
