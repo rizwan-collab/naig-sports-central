@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27g_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27h_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -2238,10 +2238,7 @@ function SpectatorView({db}){
    onMouseLeave={e=>e.currentTarget.style.boxShadow='var(--shadow)'}>
    <div className="game-vs">
     <div>
-     <div className={`game-team${hw?' winner':''}`} style={{display:'flex',alignItems:'center',gap:6}}>
-       {hw&&<span style={{color:'var(--gold)',fontWeight:900}}>+</span>}
-       {(()=>{const ht=db.teams.find(t=>t.id===g.hid);return ht?<span className={ht.pool==='A'?'reg-ca':'reg-us'} data-tip={ht.pool==='A'?'Canada region':'USA region'} style={{flexShrink:0}}>{ht.pool==='A'?'CA':'US'}</span>:null;})()}
-       <span>{tn(g.hid)}</span>
+     <div className={`game-team${hw?' winner':''}`}>{hw?'+ ':''}{tn(g.hid)}
      </div>
      <div style={{fontSize:12,color:'var(--txt2)',marginTop:3}}><span className="sport-code" style={{fontSize:8,padding:'1px 4px'}}>{s?.abbr}</span> {s?.n}</div></div>
     <div className="game-score-box"><div className="game-score">{g.status!=='scheduled'?`${g.hs}–${g.as}`:'vs'}</div><div style={{marginTop:4}}>{sbadge(g.status)}</div></div>
@@ -2272,10 +2269,10 @@ function SpectatorView({db}){
      <tbody>
      {REGIONS.map((region,i)=>{
        const rm=db.medals.filter(m=>m.region===region);
-       const g=rm.filter(m=>m.medal==='gold').length;
-       const s=rm.filter(m=>m.medal==='silver').length;
-       const b=rm.filter(m=>m.medal==='bronze').length;
-       const tot=g+s+b;
+       const mg=rm.filter(m=>m.medal==='gold').length;
+       const ms=rm.filter(m=>m.medal==='silver').length;
+       const mb=rm.filter(m=>m.medal==='bronze').length;
+       const tot=mg+ms+mb;
        if(!tot) return null;
        return<tr key={region} style={{borderBottom:'1px solid var(--border)',cursor:'pointer'}} onClick={()=>setSf(SPORTS[0].id)}>
          <td style={{padding:'10px 16px'}}>
@@ -2284,9 +2281,9 @@ function SpectatorView({db}){
              <span style={{fontWeight:600,color:'var(--navy-dk)'}}>{region}</span>
            </div>
          </td>
-         <td style={{textAlign:'center',padding:'10px',fontWeight:g?800:400,color:g?'#B45309':'var(--txt3)'}}>{g||'—'}</td>
-         <td style={{textAlign:'center',padding:'10px',fontWeight:s?800:400,color:s?'#6B7280':'var(--txt3)'}}>{s||'—'}</td>
-         <td style={{textAlign:'center',padding:'10px',fontWeight:b?800:400,color:b?'#92400E':'var(--txt3)'}}>{b||'—'}</td>
+         <td style={{textAlign:'center',padding:'10px',fontWeight:mg?800:400,color:mg?'#B45309':'var(--txt3)'}}>{mg||'—'}</td>
+         <td style={{textAlign:'center',padding:'10px',fontWeight:ms?800:400,color:ms?'#6B7280':'var(--txt3)'}}>{ms||'—'}</td>
+         <td style={{textAlign:'center',padding:'10px',fontWeight:mb?800:400,color:mb?'#92400E':'var(--txt3)'}}>{mb||'—'}</td>
          <td style={{textAlign:'center',padding:'10px',fontWeight:700,color:'var(--navy)'}}>{tot}</td>
        </tr>;
      })}
@@ -2325,7 +2322,7 @@ function SpectatorView({db}){
  <div key={r} style={{background:'var(--navy-lt)',borderRadius:8,padding:'8px 12px',fontSize:13,fontWeight:600,color:'var(--navy)',display:'flex',gap:8,alignItems:'center'}}> <span style={{fontSize:11,fontWeight:700,color:'var(--crimson)'}}>{i<7?' ':'US'}</span>{r}
  </div> ))}
  </div> </div> </div> </div>}
- {tab==='community'&&<GalleryView/>}
+ {tab==='community'&&<GalleryView db={db}/>}
  </div>;
 }
 
@@ -2770,8 +2767,7 @@ function AdminPanel({db,onUpdate,scope}){
 }
 
 
-function GalleryView(){
- const {db}=useContext(AppCtx);
+function GalleryView({db}){
  const gallery=db.gallery&&db.gallery.length>0?db.gallery:SEED.gallery||[];
  const [sportF,setSportF]=useState('all');
  const [liked,setLiked]=useState({});
