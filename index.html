@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27j_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27l_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1568,17 +1568,104 @@ function Standings({teams,games,sid,age,gender}){
 function Bracket({teams,games,sid,age,gender,onGameClick}){
  const rnds=['Quarterfinal','Semifinal','Bronze Final','Gold Final'];
  const byR=rnds.map(r=>games.filter(g=>g.sid===sid&&g.age===age&&g.gender===gender&&g.round===r));
- if(!byR.some(r=>r.length))return<div className="card" style={{textAlign:'center',padding:'32px 20px',border:'2px dashed var(--border)'}}>
- <div style={{fontSize:36,marginBottom:12,color:'var(--border)'}}>🏆</div>
- <div style={{fontWeight:800,color:'var(--navy-dk)',fontSize:16,marginBottom:8}}>Bracket Fills as Pool Play Completes</div>
- <div style={{color:'var(--txt3)',fontSize:13,maxWidth:320,margin:'0 auto',lineHeight:1.6}}>Quarterfinal, Semifinal, and Final matchups appear here once teams advance from Pool Play. Check the Schedule tab for active games.</div>
-</div>;
  const tn=id=>teams.find(t=>t.id===id)?.n||'TBD';
- return<div className="bracket-scroll"> {byR.map((rg,ri)=>rg.length?(
- <div key={ri} className="bracket-col"> <div className="bracket-round-label">{rnds[ri]}</div> {rg.map(g=>(
- <div key={g.id} className="bracket-match" style={{cursor:g.status!=="scheduled"?"pointer":"default"}} onClick={()=>g.status!=="scheduled"&&onGameClick&&onGameClick(g)}> <div className={`bracket-team${g.status==='completed'&&+g.hs>+g.as?' w':''}`}> <span>{tn(g.hid)}</span><span style={{fontWeight:800}}>{g.status!=='scheduled'?g.hs:'—'}</span> </div> <div className="bracket-sep"/> <div className={`bracket-team${g.status==='completed'&&+g.as>+g.hs?' w':''}`}> <span>{tn(g.aid)||'TBD'}</span><span style={{fontWeight:800}}>{g.status!=='scheduled'?g.as:'—'}</span> </div> </div> ))}
- </div> ):null)}
- </div>;
+ const hasData=byR.some(r=>r.length>0);
+ if(!hasData)return(
+   <div className="card" style={{textAlign:'center',padding:'32px 20px',border:'2px dashed var(--border)'}}>
+     <div style={{fontSize:36,marginBottom:12,color:'var(--border)'}}>🏆</div>
+     <div style={{fontWeight:800,color:'var(--navy-dk)',fontSize:16,marginBottom:8}}>Bracket Fills as Pool Play Completes</div>
+     <div style={{color:'var(--txt3)',fontSize:13,maxWidth:320,margin:'0 auto',lineHeight:1.6}}>Quarterfinal, Semifinal, and Final matchups appear here once teams advance from Pool Play.</div>
+   </div>
+ );
+ const ROUND_LABELS=['Quarterfinal','Semifinal','Final'];
+ const RND_COLORS=['#EFF6FF','#F0FDF4','#FFFBEB'];
+ const RND_BORDER=['var(--navy)','#16A34A','var(--gold2)'];
+ function GameCard({g,rnd}){
+   if(!g)return<div style={{height:72,border:'2px dashed var(--border)',borderRadius:10,margin:'4px 0',background:'white',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--txt3)',fontSize:11,fontWeight:600}}>TBD</div>;
+   const hw=g.hs>g.as;const aw=g.as>g.hs;
+   const done=g.status==='completed';const live=g.status==='in_progress';
+   return(
+     <div onClick={()=>onGameClick&&onGameClick(g)}
+       style={{border:'2px solid',borderColor:live?'#16A34A':done?'var(--border)':'var(--navy)',
+         borderRadius:10,overflow:'hidden',cursor:'pointer',margin:'4px 0',
+         boxShadow:live?'0 0 0 3px rgba(22,163,74,.2)':'none',transition:'all .15s'}}
+       onMouseEnter={e=>e.currentTarget.style.transform='translateY(-1px)'}
+       onMouseLeave={e=>e.currentTarget.style.transform=''}>
+       {live&&<div style={{background:'#16A34A',color:'white',fontSize:9,fontWeight:800,padding:'2px 8px',textAlign:'center',letterSpacing:1}}>LIVE</div>}
+       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 10px',background:hw&&done?'#EFF6FF':'white',borderBottom:'1px solid var(--border)'}}>
+         <span style={{fontSize:11,fontWeight:hw&&done?800:500,color:hw&&done?'var(--navy)':'var(--txt)',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{tn(g.hid)}</span>
+         <span style={{fontSize:14,fontWeight:900,color:hw&&done?'var(--navy)':'var(--txt)',marginLeft:8,minWidth:20,textAlign:'right'}}>{done||live?g.hs:'–'}</span>
+       </div>
+       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 10px',background:aw&&done?'#EFF6FF':'white'}}>
+         <span style={{fontSize:11,fontWeight:aw&&done?800:500,color:aw&&done?'var(--navy)':'var(--txt)',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{tn(g.aid)}</span>
+         <span style={{fontSize:14,fontWeight:900,color:aw&&done?'var(--navy)':'var(--txt)',marginLeft:8,minWidth:20,textAlign:'right'}}>{done||live?g.as:'–'}</span>
+       </div>
+     </div>
+   );
+ }
+ // Pool play summary
+ const poolGames=games.filter(g=>g.sid===sid&&g.age===age&&g.gender===gender&&g.round&&g.round.includes('Pool'));
+ return(
+   <div>
+     {/* Bracket visual */}
+     <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch',paddingBottom:8}}>
+       <div style={{display:'flex',gap:0,minWidth:600,alignItems:'flex-start'}}>
+         {[['Quarterfinal',4],['Semifinal',2],['Final',1]].map(([rnd,slots],ri)=>{
+           const rGames=byR[ri==='Quarterfinal'?0:ri==='Semifinal'?1:3]||byR[rnds.indexOf(rnd)]||[];
+           const actualRnd=ri===2?byR[3]:byR[ri];
+           const rGames2=actualRnd||[];
+           return(
+             <div key={rnd} style={{flex:1,minWidth:140,position:'relative'}}>
+               <div style={{background:RND_COLORS[ri],border:'1px solid',borderColor:RND_BORDER[ri],
+                 borderRadius:'8px 8px 0 0',padding:'6px 10px',textAlign:'center',
+                 fontWeight:800,fontSize:10,color:RND_BORDER[ri],textTransform:'uppercase',letterSpacing:'.5px',
+                 marginBottom:8,marginRight:ri<2?8:0}}>
+                 {rnd==='Final'?'Final':rnd}
+               </div>
+               <div style={{paddingRight:ri<2?8:0,display:'flex',flexDirection:'column',
+                 justifyContent:'space-around',minHeight:ri===0?280:ri===1?200:120}}>
+                 {rGames2.length>0?rGames2.map((g,gi)=><GameCard key={gi} g={g} rnd={rnd}/>):
+                   Array.from({length:slots}).map((_,si)=><GameCard key={si} g={null} rnd={rnd}/>)
+                 }
+               </div>
+             </div>
+           );
+         })}
+       </div>
+     </div>
+     {/* Pool play summary below bracket */}
+     {poolGames.length>0&&(
+       <div style={{marginTop:20}}>
+         <div style={{fontWeight:800,fontSize:13,color:'var(--navy)',marginBottom:10,textTransform:'uppercase',letterSpacing:'.4px'}}>Pool Play Results</div>
+         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))',gap:8}}>
+           {poolGames.map(g=>{
+             const done=g.status==='completed';const live=g.status==='in_progress';
+             const hw=g.hs>g.as;
+             return(
+               <div key={g.id} onClick={()=>onGameClick&&onGameClick(g)}
+                 style={{border:'1px solid var(--border)',borderRadius:8,padding:'10px 12px',
+                   cursor:'pointer',background:live?'#F0FDF4':'white',
+                   borderColor:live?'#16A34A':'var(--border)'}}
+                 onMouseEnter={e=>e.currentTarget.style.background='var(--bg2)'}
+                 onMouseLeave={e=>e.currentTarget.style.background=live?'#F0FDF4':'white'}>
+                 <div style={{display:'flex',justifyContent:'space-between',fontSize:11,marginBottom:6}}>
+                   <span style={{color:'var(--txt3)',fontWeight:600}}>{g.round}</span>
+                   {live&&<span style={{color:'#16A34A',fontWeight:800,fontSize:10}}>LIVE</span>}
+                   {done&&<span style={{color:'var(--txt3)',fontSize:10}}>Final</span>}
+                 </div>
+                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                   <span style={{fontSize:12,fontWeight:hw&&done?800:500,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{tn(g.hid)}</span>
+                   <span style={{fontWeight:900,fontSize:15,margin:'0 8px',color:'var(--navy-dk)',minWidth:36,textAlign:'center'}}>{done||live?g.hs+' – '+g.as:'vs'}</span>
+                   <span style={{fontSize:12,fontWeight:!hw&&done?800:500,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textAlign:'right'}}>{tn(g.aid)}</span>
+                 </div>
+               </div>
+             );
+           })}
+         </div>
+       </div>
+     )}
+   </div>
+ );
 }
 
 function Rulebook({onExport}){
@@ -2065,7 +2152,15 @@ function Calculator(){
    const h=avgHpd;
    if(mode==='A')setRes({m:'A',...calcA(f.n,f.dur,f.buf,h,d,f.fmt,f.stype)});
    else if(mode==='B')setRes({m:'B',...calcB(f.n,f.fields,f.dur,f.buf,h,f.fmt,f.stype)});
-   else setRes({m:'C',...calcC(f.fields,f.dur,f.buf,h,d,f.fmt)});
+   else{
+     const r=calcC(f.fields,f.dur,f.buf,h,d,f.fmt);
+     setRes({m:'C',...r});
+     if(r.maxTeams){
+       const maxT=r.maxTeams;
+       const minT=Math.max(2,Math.floor(maxT*0.5));
+       setF(p=>({...p,nMax:maxT,nMin:minT,n:maxT}));
+     }
+   }
  }
  const fw=f.stype==='individual'?'Lanes/Stations':'Courts/Fields';
  const tw=f.stype==='individual'?'Athletes':'Teams';
@@ -2236,7 +2331,13 @@ function Calculator(){
        {res.m==='C'&&(<>
          <div className="calc-result-row"><span>Total slots available</span><span>{res.tSlots}</span></div>
          <div className="calc-result-row"><span>Slots / {fw.toLowerCase()} / day</span><span>{res.spf}</span></div>
-         <div className="calc-result-row"><span>Max {tw.toLowerCase()} you can fit</span><span>{res.maxTeams}</span></div>
+         <div className="calc-result-row" style={{background:'linear-gradient(135deg,var(--navy-lt),#EFF6FF)',borderRadius:8,padding:'12px 16px',marginTop:4}}>
+           <span style={{fontWeight:800,color:'var(--navy-dk)'}}>Max {tw.toLowerCase()} capacity</span>
+           <span style={{fontWeight:900,fontSize:24,color:'var(--navy)'}}>{res.maxTeams}</span>
+         </div>
+         <div style={{marginTop:10,padding:'10px 12px',background:'#F0FDF4',border:'1px solid #BBF7D0',borderRadius:8,fontSize:12,color:'#15803D',fontWeight:600}}>
+           Range auto-updated: {f.nMin} min – {f.nMax} max teams based on your venue capacity
+         </div>
        </>)}
        {res.fields>8&&<div className="calc-tip">That is a lot of {fw.toLowerCase()}. Consider running over more days or splitting by age group.</div>}
        {res.days>7&&<div className="calc-tip">More than a week. Try adding another {fw.toLowerCase()} or changing the format.</div>}
