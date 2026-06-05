@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27l_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27m_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -2126,9 +2126,95 @@ function Ticker({games,teams}){
  return<div className="ticker"> <div className="ticker-track"><span style={{paddingRight:60}}> LIVE: {items}&nbsp;&nbsp;&nbsp; LIVE: {items}</span></div> </div>;
 }
 
+/* ══ SCHEDULE ENGINE ══ */
+function schedEngine(n, nMin, nMax, fields, dur, buf, days, daySchedule, minGames, playoffFmt){
+  if(!n||n<2||!fields||!days) return null;
+  const slot=dur+buf;
+  const activeDays=daySchedule.filter(d=>d.checked);
+  // Total slot-minutes available
+  const totalSlotMins=activeDays.reduce((s,d)=>s+(d.hours*60),0);
+  const totalSlots=Math.floor(totalSlotMins/slot)*fields;
+
+  // Determine optimal pool size to guarantee minGames per team
+  // Pool of size P gives each team (P-1) games. minGames=3 → P≥4
+  const minPool=minGames+1; // pool size to guarantee minGames
+  // Try pool sizes from minPool to minPool+2 and pick the one closest to n
+  let bestPool=minPool;
+  for(let p=minPool;p<=minPool+3;p++){
+    if(n%p===0){ bestPool=p; break; }
+  }
+  const numPools=Math.ceil(n/bestPool);
+  const actualPoolSize=Math.ceil(n/numPools);
+  const gamesPerTeamPool=actualPoolSize-1; // within-pool round robin
+
+  // Total pool play games
+  const poolGames=numPools*((actualPoolSize*(actualPoolSize-1))/2);
+  const gamesPerTeamActual=gamesPerTeamPool;
+
+  // Playoff structure
+  let playoffGames=0;
+  let advancing=0;
+  let playoffDesc='';
+  if(playoffFmt==='all'){
+    advancing=n;
+    // Need bracket: nearest power of 2 ≥ n
+    const bracket=Math.pow(2,Math.ceil(Math.log2(n)));
+    const byes=bracket-n;
+    playoffGames=bracket-1;
+    playoffDesc=`All ${n} teams advance (${byes} byes in Round of ${bracket})`;
+  } else if(playoffFmt==='half'){
+    advancing=Math.floor(n/2);
+    const bracket=Math.pow(2,Math.ceil(Math.log2(advancing)));
+    playoffGames=bracket-1;
+    playoffDesc=`Top ${advancing} advance (${Math.floor(advancing/numPools)} per pool)`;
+  } else { // top2
+    advancing=numPools*2;
+    const bracket=Math.pow(2,Math.ceil(Math.log2(advancing)));
+    playoffGames=bracket-1;
+    playoffDesc=`Top 2 per pool = ${advancing} teams advance`;
+  }
+
+  const totalGames=poolGames+playoffGames;
+  const slotsNeeded=totalGames;
+  const feasible=slotsNeeded<=totalSlots;
+  const hoursNeeded=(totalGames*slot)/60/fields;
+  const gamesPerDay=Math.ceil(totalGames/Math.max(1,activeDays.length));
+  const fieldsNeeded=Math.max(1,Math.ceil(gamesPerDay/Math.floor((activeDays.length>0?activeDays[0].hours*60:480)/slot)));
+
+  // Min/Max scenario
+  const minScenario=schedEngine_simple(nMin,fields,slot,totalSlots,minGames,playoffFmt,numPools);
+  const maxScenario=schedEngine_simple(nMax,fields,slot,totalSlots,minGames,playoffFmt,Math.ceil(nMax/(minPool)));
+
+  return {
+    n, numPools, actualPoolSize, gamesPerTeamActual, poolGames, playoffGames,
+    totalGames, totalSlots, slotsNeeded, feasible, hoursNeeded, gamesPerDay,
+    playoffDesc, advancing, fieldsNeeded, minScenario, maxScenario,
+    activeDays: activeDays.length
+  };
+}
+function schedEngine_simple(n, fields, slot, totalSlots, minGames, playoffFmt, numPools){
+  if(!n||n<2) return null;
+  const minPool=minGames+1;
+  const np=Math.max(1,Math.ceil(n/Math.max(minPool,Math.ceil(n/Math.max(1,numPools)))));
+  const ps=Math.ceil(n/np);
+  const pg=np*((ps*(ps-1))/2);
+  let plg=0;
+  if(playoffFmt==='all'){plg=Math.pow(2,Math.ceil(Math.log2(n)))-1;}
+  else if(playoffFmt==='half'){plg=Math.pow(2,Math.ceil(Math.log2(Math.floor(n/2))))-1;}
+  else{plg=Math.pow(2,Math.ceil(Math.log2(np*2)))-1;}
+  const tg=pg+plg;
+  return{n,totalGames:tg,feasible:tg<=totalSlots,numPools:np,poolSize:ps,gamesPerTeam:ps-1};
+}
+
 function Calculator(){
- const [mode,setMode]=useState('A');
- const [f,setF]=useState({sid:'s2',stype:'team',n:8,nMin:4,nMax:16,fields:2,dur:40,buf:10,fmt:'pools'});
+ const [mode,setMode]=useState('build');
+ const [f,setF]=useState({
+   sid:'s2',stype:'team',
+   n:12, nMin:8, nMax:16,
+   fields:3, dur:40, buf:10, fmt:'pools',
+   minGames:3,
+   playoffFmt:'all'
+ });
  const [daySchedule,setDaySchedule]=useState([
    {id:'mon',label:'Mon',checked:true,hours:8},
    {id:'tue',label:'Tue',checked:true,hours:8},
@@ -2141,70 +2227,149 @@ function Calculator(){
  const [res,setRes]=useState(null);
  const activeDays=daySchedule.filter(d=>d.checked);
  const totalHours=activeDays.reduce((s,d)=>s+d.hours,0);
- const avgHpd=activeDays.length>0?Math.round(totalHours/activeDays.length):8;
  function toggleDay(id){setDaySchedule(p=>p.map(d=>d.id===id?{...d,checked:!d.checked}:d));}
  function setDayHours(id,h){setDaySchedule(p=>p.map(d=>d.id===id?{...d,hours:Math.max(1,Math.min(16,Number(h)))}:d));}
  const sp=SPORTS.find(s=>s.id===f.sid)||SPORTS[1];
  function pick(id){const s=SPORTS.find(x=>x.id===id);setF(p=>({...p,sid:id,stype:s?.t||'team',dur:s?.dur||60,fmt:s?.t==='individual'?'heats':'pools'}));setRes(null);}
  function calc(){
-   if(!activeDays.length)return;
-   const d=activeDays.length;
-   const h=avgHpd;
-   if(mode==='A')setRes({m:'A',...calcA(f.n,f.dur,f.buf,h,d,f.fmt,f.stype)});
-   else if(mode==='B')setRes({m:'B',...calcB(f.n,f.fields,f.dur,f.buf,h,f.fmt,f.stype)});
-   else{
-     const r=calcC(f.fields,f.dur,f.buf,h,d,f.fmt);
-     setRes({m:'C',...r});
-     if(r.maxTeams){
-       const maxT=r.maxTeams;
-       const minT=Math.max(2,Math.floor(maxT*0.5));
-       setF(p=>({...p,nMax:maxT,nMin:minT,n:maxT}));
-     }
-   }
+   if(!activeDays.length) return;
+   const r=schedEngine(f.n,f.nMin,f.nMax,f.fields,f.dur,f.buf,activeDays.length,daySchedule,f.minGames,f.playoffFmt);
+   setRes(r);
  }
+ // Live preview — update whenever inputs change
+ const liveRes=React.useMemo(()=>{
+   if(!activeDays.length) return null;
+   return schedEngine(f.n,f.nMin,f.nMax,f.fields,f.dur,f.buf,activeDays.length,daySchedule,f.minGames,f.playoffFmt);
+ },[f,daySchedule]);
+
  const fw=f.stype==='individual'?'Lanes/Stations':'Courts/Fields';
  const tw=f.stype==='individual'?'Athletes':'Teams';
  return(
  <div>
    <div className="section-head">
      <div>
-       <h2 style={{fontFamily:'Outfit',fontWeight:900,fontSize:22,color:'var(--navy-dk)'}}>Schedule Calculator</h2>
-       <p style={{color:'var(--txt2)',fontSize:14,marginTop:4}}>Figure out exactly what you need — fields, days, or capacity</p>
+       <h2 style={{fontFamily:'Outfit',fontWeight:900,fontSize:22,color:'var(--navy-dk)'}}>Dynamic Schedule Builder</h2>
+       <p style={{color:'var(--txt2)',fontSize:14,marginTop:4}}>Enter your constraints — get a complete schedule structure with pool assignments, game guarantees, and playoff format</p>
      </div>
    </div>
-   <div className="calc-modes">
-     {[{id:'A',title:'How many fields?',sub:'Know teams & time'},{id:'B',title:'How many days?',sub:'Know teams & fields'},{id:'C',title:'How many teams fit?',sub:'Know fields & time'}].map(m=>(
-       <button key={m.id} className={`calc-mode${mode===m.id?' on':''}`} onClick={()=>{setMode(m.id);setRes(null);}}>
-         <div style={{fontWeight:800,fontSize:13}}>{m.title}</div>
-         <div style={{fontSize:11,opacity:.7,marginTop:2}}>{m.sub}</div>
-       </button>
-     ))}
-   </div>
+
+   {/* Sport + Type */}
    <div className="row2" style={{marginBottom:14}}>
      <div className="form-field">
        <label className="form-label">Sport <span style={{textTransform:'none',fontWeight:400,color:'var(--txt3)'}}>— duration auto-fills</span></label>
        <select className="form-input" value={f.sid} onChange={e=>pick(e.target.value)}>
-         {SPORTS.map(s=><option key={s.id} value={s.id}>{s.n} ({s.dur}min)</option>)}
+         {SPORTS.map(s=><option key={s.id} value={s.id}>{s.n} ({s.dur} min)</option>)}
        </select>
      </div>
      <div className="form-field">
        <label className="form-label">Sport Type</label>
-       <select className="form-input" value={f.stype} onChange={e=>setF(p=>({...p,stype:e.target.value,fmt:e.target.value==='individual'?'heats':'pools'}))}>
+       <select className="form-input" value={f.stype} onChange={e=>setF(p=>({...p,stype:e.target.value}))}>
          <option value="team">Team Sport</option>
          <option value="individual">Individual / Track</option>
        </select>
      </div>
    </div>
+
+   {/* Game duration + buffer */}
    <div className="row2" style={{marginBottom:14}}>
      <div className="form-field">
-       <label className="form-label">Duration (min)</label>
+       <label className="form-label">Game Duration (min)</label>
        <input className="form-input" type="number" min="5" max="360" value={f.dur} onChange={e=>setF(p=>({...p,dur:+e.target.value}))}/>
      </div>
      <div className="form-field">
-       <label className="form-label">Buffer between games (min)</label>
+       <label className="form-label">Buffer Between Games (min)</label>
        <input className="form-input" type="number" min="0" max="60" value={f.buf} onChange={e=>setF(p=>({...p,buf:+e.target.value}))}/>
      </div>
    </div>
+
+   {/* Teams — ALWAYS VISIBLE: Min / Target / Max */}
+   <div style={{marginBottom:14}}>
+     <label className="form-label" style={{marginBottom:8,display:'block'}}>
+       Number of {tw}
+       <span style={{fontWeight:400,color:'var(--txt3)',textTransform:'none',marginLeft:8,fontSize:11}}>Set min, target, and max to plan for uncertainty</span>
+     </label>
+     <div style={{display:'grid',gridTemplateColumns:'1fr 32px 1fr 32px 1fr',gap:4,alignItems:'end'}}>
+       <div>
+         <div style={{fontSize:10,fontWeight:800,color:'var(--txt3)',marginBottom:4,textTransform:'uppercase',letterSpacing:'.5px'}}>Min</div>
+         <input className="form-input" type="number" min="2" max={f.n} value={f.nMin}
+           onChange={e=>setF(p=>({...p,nMin:Math.max(2,Math.min(p.n,+e.target.value))}))}
+           style={{textAlign:'center',fontWeight:700}}/>
+       </div>
+       <div style={{textAlign:'center',fontWeight:900,color:'var(--txt3)',fontSize:18,paddingBottom:8}}>–</div>
+       <div>
+         <div style={{fontSize:10,fontWeight:800,color:'var(--navy)',marginBottom:4,textTransform:'uppercase',letterSpacing:'.5px'}}>Target</div>
+         <input className="form-input" type="number" min={f.nMin} max={f.nMax} value={f.n}
+           onChange={e=>setF(p=>({...p,n:Math.max(p.nMin,Math.min(p.nMax,+e.target.value))}))}
+           style={{textAlign:'center',fontWeight:900,color:'var(--navy-dk)',borderColor:'var(--navy)',borderWidth:2}}/>
+       </div>
+       <div style={{textAlign:'center',fontWeight:900,color:'var(--txt3)',fontSize:18,paddingBottom:8}}>–</div>
+       <div>
+         <div style={{fontSize:10,fontWeight:800,color:'var(--crimson)',marginBottom:4,textTransform:'uppercase',letterSpacing:'.5px'}}>Max</div>
+         <input className="form-input" type="number" min={f.n} max="500" value={f.nMax}
+           onChange={e=>setF(p=>({...p,nMax:Math.max(p.n,+e.target.value)}))}
+           style={{textAlign:'center',fontWeight:700}}/>
+       </div>
+     </div>
+     {liveRes&&(
+       <div style={{display:'flex',gap:6,marginTop:8,flexWrap:'wrap'}}>
+         <span style={{background:'var(--bg2)',borderRadius:6,padding:'3px 10px',fontSize:11,fontWeight:700,color:'var(--navy)'}}>
+           Target: {liveRes.numPools} pool{liveRes.numPools>1?'s':''} of {liveRes.actualPoolSize}
+         </span>
+         <span style={{background:'var(--bg2)',borderRadius:6,padding:'3px 10px',fontSize:11,fontWeight:700,color:'var(--txt2)'}}>
+           {liveRes.gamesPerTeamActual} pool games / team
+         </span>
+         {liveRes.minScenario&&<span style={{background:'#FEF3C7',borderRadius:6,padding:'3px 10px',fontSize:11,fontWeight:700,color:'#92400E'}}>
+           Min ({f.nMin}): {liveRes.minScenario.totalGames} total games
+         </span>}
+         {liveRes.maxScenario&&<span style={{background:'#FEE2E2',borderRadius:6,padding:'3px 10px',fontSize:11,fontWeight:700,color:'#B91C1C'}}>
+           Max ({f.nMax}): {liveRes.maxScenario.totalGames} total games
+         </span>}
+       </div>
+     )}
+   </div>
+
+   {/* Fields + Min games guarantee */}
+   <div className="row2" style={{marginBottom:14}}>
+     <div className="form-field">
+       <label className="form-label">{fw} Available</label>
+       <input className="form-input" type="number" min="1" max="50" value={f.fields} onChange={e=>setF(p=>({...p,fields:+e.target.value}))}/>
+     </div>
+     <div className="form-field">
+       <label className="form-label">Min Games Per Team <span style={{fontWeight:400,textTransform:'none',color:'var(--txt3)'}}>pool play guarantee</span></label>
+       <select className="form-input" value={f.minGames} onChange={e=>setF(p=>({...p,minGames:+e.target.value}))}>
+         <option value={2}>2 games minimum</option>
+         <option value={3}>3 games minimum (recommended)</option>
+         <option value={4}>4 games minimum</option>
+         <option value={5}>5 games minimum</option>
+       </select>
+     </div>
+   </div>
+
+   {/* Playoff format */}
+   <div className="form-field" style={{marginBottom:14}}>
+     <label className="form-label">Playoff Format</label>
+     <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+       {[
+         {id:'all',label:'Everyone Advances',sub:'All teams make playoffs',color:'var(--navy)'},
+         {id:'half',label:'Top Half',sub:'~50% of teams advance',color:'#0891B2'},
+         {id:'top2',label:'Top 2 Per Pool',sub:'Standard tournament format',color:'var(--txt2)'},
+       ].map(opt=>(
+         <button key={opt.id} onClick={()=>setF(p=>({...p,playoffFmt:opt.id}))}
+           style={{
+             padding:'10px 8px',borderRadius:10,border:'2px solid',cursor:'pointer',textAlign:'center',
+             transition:'all .15s',
+             background:f.playoffFmt===opt.id?opt.color:'white',
+             borderColor:f.playoffFmt===opt.id?opt.color:'var(--border)',
+             color:f.playoffFmt===opt.id?'white':'var(--txt)',
+           }}>
+           <div style={{fontWeight:800,fontSize:12}}>{opt.label}</div>
+           <div style={{fontSize:10,opacity:.8,marginTop:2}}>{opt.sub}</div>
+         </button>
+       ))}
+     </div>
+   </div>
+
+   {/* Day / Hours picker */}
    <div style={{marginBottom:16}}>
      <label className="form-label" style={{marginBottom:10,display:'block'}}>
        Tournament Days &amp; Hours Per Day
@@ -2238,109 +2403,117 @@ function Calculator(){
      </div>
      {activeDays.length===0&&(
        <div style={{background:'#FEF3C7',border:'1px solid #F59E0B',borderRadius:8,padding:'8px 12px',marginTop:8,fontSize:12,color:'#92400E',fontWeight:600}}>
-         Select at least one day above to run the calculator.
+         Select at least one day to build a schedule.
        </div>
      )}
    </div>
-   <div className="row3" style={{marginBottom:16}}>
-     <div className="form-field">
-       <label className="form-label">{tw}
-         <span style={{fontWeight:400,color:'var(--txt3)',textTransform:'none',marginLeft:8,fontSize:11}}>min / max range</span>
-       </label>
-       <div style={{display:'flex',gap:8,alignItems:'center'}}>
-         <div style={{flex:1}}>
-           <div style={{fontSize:10,fontWeight:700,color:'var(--txt3)',marginBottom:3,textTransform:'uppercase',letterSpacing:'.4px'}}>Min</div>
-           <input className="form-input" type="number" min="2" max={f.nMax||500} value={f.nMin||2}
-             onChange={e=>setF(p=>({...p,nMin:Math.max(2,+e.target.value),n:Math.max(2,+e.target.value)}))}
-             style={{textAlign:'center'}}/>
+
+   <button className="btn btn-navy btn-lg btn-w" onClick={calc} disabled={!activeDays.length} style={{opacity:activeDays.length?1:.5}}>
+     Build My Schedule
+   </button>
+
+   {/* RESULTS */}
+   {liveRes&&(
+     <div style={{marginTop:20}}>
+       {/* Feasibility banner */}
+       <div style={{
+         background:liveRes.feasible?'linear-gradient(135deg,#F0FDF4,#DCFCE7)':'linear-gradient(135deg,#FEF2F2,#FEE2E2)',
+         border:'2px solid',borderColor:liveRes.feasible?'#16A34A':'#EF4444',
+         borderRadius:12,padding:'14px 18px',marginBottom:16,
+         display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8
+       }}>
+         <div>
+           <div style={{fontWeight:900,fontSize:15,color:liveRes.feasible?'#15803D':'#B91C1C'}}>
+             {liveRes.feasible?'Schedule Is Feasible':'Not Enough Time'}
+           </div>
+           <div style={{fontSize:12,color:liveRes.feasible?'#16A34A':'#EF4444',marginTop:2}}>
+             {liveRes.totalGames} games needed · {liveRes.totalSlots} slots available · {liveRes.hoursNeeded.toFixed(1)}h total play time
+           </div>
          </div>
-         <div style={{fontWeight:900,color:'var(--txt3)',fontSize:18,paddingTop:16}}>–</div>
-         <div style={{flex:1}}>
-           <div style={{fontSize:10,fontWeight:700,color:'var(--txt3)',marginBottom:3,textTransform:'uppercase',letterSpacing:'.4px'}}>Max</div>
-           <input className="form-input" type="number" min={f.nMin||2} max="500" value={f.nMax||32}
-             onChange={e=>setF(p=>({...p,nMax:Math.max(p.nMin||2,+e.target.value),n:Math.max(p.nMin||2,+e.target.value)}))}
-             style={{textAlign:'center'}}/>
-         </div>
-         <div style={{flex:1}}>
-           <div style={{fontSize:10,fontWeight:700,color:'var(--navy)',marginBottom:3,textTransform:'uppercase',letterSpacing:'.4px'}}>Target</div>
-           <input className="form-input" type="number" min={f.nMin||2} max={f.nMax||500} value={f.n}
-             onChange={e=>setF(p=>({...p,n:Math.min(p.nMax||500,Math.max(p.nMin||2,+e.target.value))}))}
-             style={{textAlign:'center',fontWeight:800,color:'var(--navy-dk)',borderColor:'var(--navy)'}}/>
+         <div style={{fontWeight:900,fontSize:28,color:liveRes.feasible?'#15803D':'#B91C1C'}}>
+           {liveRes.feasible?'GO':'ADD TIME'}
          </div>
        </div>
-       {f.nMin&&f.nMax&&f.nMax>f.nMin&&(
-         <div style={{marginTop:6,fontSize:11,color:'var(--txt3)',display:'flex',gap:6,flexWrap:'wrap'}}>
-           <span style={{background:'var(--bg2)',borderRadius:6,padding:'2px 8px',fontWeight:600}}>
-             Range: {f.nMax-f.nMin} possible team counts
-           </span>
-           <span style={{background:'var(--bg2)',borderRadius:6,padding:'2px 8px',fontWeight:600}}>
-             Calculating for target: {f.n} {tw.toLowerCase()}
-           </span>
+
+       {/* Schedule breakdown */}
+       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:10,marginBottom:16}}>
+         {[
+           {label:'Pools',val:liveRes.numPools,sub:`${liveRes.actualPoolSize} teams each`,color:'var(--navy)'},
+           {label:'Games per Team',val:liveRes.gamesPerTeamActual+'+',sub:`${liveRes.gamesPerTeamActual} pool + playoffs`,color:'#0891B2'},
+           {label:'Pool Play Games',val:liveRes.poolGames,sub:'Round robin within pools',color:'var(--txt2)'},
+           {label:'Playoff Games',val:liveRes.playoffGames,sub:liveRes.playoffDesc,color:'#D97706'},
+           {label:'Total Games',val:liveRes.totalGames,sub:`~${liveRes.gamesPerDay} per day`,color:'var(--navy-dk)'},
+           {label:'Teams Advancing',val:liveRes.advancing,sub:'to playoffs',color:'#16A34A'},
+         ].map(({label,val,sub,color})=>(
+           <div key={label} className="card" style={{padding:'12px 14px',borderLeft:`3px solid ${color}`}}>
+             <div style={{fontSize:10,fontWeight:700,color:'var(--txt3)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:4}}>{label}</div>
+             <div style={{fontSize:22,fontWeight:900,color,fontFamily:'Outfit,sans-serif'}}>{val}</div>
+             <div style={{fontSize:11,color:'var(--txt3)',marginTop:2}}>{sub}</div>
+           </div>
+         ))}
+       </div>
+
+       {/* Min/Max scenario comparison */}
+       {(liveRes.minScenario||liveRes.maxScenario)&&(
+         <div style={{background:'var(--bg2)',borderRadius:12,padding:'14px 16px',marginBottom:16}}>
+           <div style={{fontWeight:800,fontSize:13,color:'var(--navy)',marginBottom:10}}>Scenario Comparison</div>
+           <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+             <thead><tr>
+               <th style={{textAlign:'left',padding:'6px 8px',color:'var(--txt3)',fontWeight:700,fontSize:11}}>Scenario</th>
+               <th style={{textAlign:'center',padding:'6px 8px',color:'var(--txt3)',fontWeight:700,fontSize:11}}>Teams</th>
+               <th style={{textAlign:'center',padding:'6px 8px',color:'var(--txt3)',fontWeight:700,fontSize:11}}>Pools</th>
+               <th style={{textAlign:'center',padding:'6px 8px',color:'var(--txt3)',fontWeight:700,fontSize:11}}>Total Games</th>
+               <th style={{textAlign:'center',padding:'6px 8px',color:'var(--txt3)',fontWeight:700,fontSize:11}}>Feasible</th>
+             </tr></thead>
+             <tbody>
+               {[
+                 {label:'Minimum',data:liveRes.minScenario,bg:'#FEF3C7'},
+                 {label:'Target',data:{n:liveRes.n,numPools:liveRes.numPools,totalGames:liveRes.totalGames,feasible:liveRes.feasible,poolSize:liveRes.actualPoolSize},bg:'#EFF6FF'},
+                 {label:'Maximum',data:liveRes.maxScenario,bg:'#FEE2E2'},
+               ].filter(r=>r.data).map(({label,data,bg})=>(
+                 <tr key={label} style={{background:bg}}>
+                   <td style={{padding:'8px',fontWeight:700}}>{label}</td>
+                   <td style={{padding:'8px',textAlign:'center',fontWeight:700}}>{data.n}</td>
+                   <td style={{padding:'8px',textAlign:'center'}}>{data.numPools} × {data.poolSize||data.actualPoolSize}</td>
+                   <td style={{padding:'8px',textAlign:'center',fontWeight:700}}>{data.totalGames}</td>
+                   <td style={{padding:'8px',textAlign:'center',fontWeight:900,color:data.feasible?'#16A34A':'#EF4444'}}>{data.feasible?'Yes':'No'}</td>
+                 </tr>
+               ))}
+             </tbody>
+           </table>
          </div>
        )}
-     </div>
-     {(mode==='B'||mode==='C')&&(
-       <div className="form-field">
-         <label className="form-label">{fw}</label>
-         <input className="form-input" type="number" min="1" max="50" value={f.fields} onChange={e=>setF(p=>({...p,fields:+e.target.value}))}/>
-       </div>
-     )}
-     {(mode==='A'||mode==='C')&&(
-       <div className="form-field">
-         <label className="form-label">Days Available</label>
-         <div className="form-input" style={{background:'var(--bg2)',color:'var(--navy-dk)',fontWeight:700,display:'flex',alignItems:'center'}}>
-           {activeDays.length} day{activeDays.length!==1?'s':''}
-           <span style={{fontWeight:400,fontSize:11,marginLeft:6,color:'var(--txt3)'}}>from schedule above</span>
+
+       {/* Pool structure visual */}
+       <div style={{background:'var(--bg2)',borderRadius:12,padding:'14px 16px'}}>
+         <div style={{fontWeight:800,fontSize:13,color:'var(--navy)',marginBottom:10}}>Proposed Pool Structure ({f.n} teams)</div>
+         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))',gap:8}}>
+           {Array.from({length:liveRes.numPools}).map((_,pi)=>{
+             const teamsInPool=pi<liveRes.numPools-1?liveRes.actualPoolSize:f.n-pi*liveRes.actualPoolSize;
+             const tCount=Math.max(1,teamsInPool);
+             return(
+               <div key={pi} style={{background:'white',borderRadius:8,padding:'10px 12px',border:'1px solid var(--border)'}}>
+                 <div style={{fontWeight:800,fontSize:11,color:'var(--navy)',marginBottom:6,display:'flex',justifyContent:'space-between'}}>
+                   <span>Pool {String.fromCharCode(65+pi)}</span>
+                   <span style={{color:'var(--txt3)',fontWeight:600}}>{tCount} teams</span>
+                 </div>
+                 {Array.from({length:tCount}).map((_,ti)=>(
+                   <div key={ti} style={{fontSize:10,color:'var(--txt2)',padding:'2px 0',borderBottom:'1px solid var(--bg2)',display:'flex',gap:6}}>
+                     <span style={{color:'var(--txt3)',fontWeight:600,width:16}}>{ti+1}.</span>
+                     <span>Team {pi*liveRes.actualPoolSize+ti+1}</span>
+                   </div>
+                 ))}
+                 <div style={{marginTop:6,fontSize:10,color:'var(--txt3)',fontWeight:600}}>
+                   {tCount-1} pool games/team
+                 </div>
+               </div>
+             );
+           })}
+         </div>
+         <div style={{marginTop:12,padding:'8px 12px',background:'linear-gradient(135deg,#EFF6FF,#DBEAFE)',borderRadius:8,fontSize:12,color:'var(--navy)',fontWeight:600}}>
+           Playoff: {liveRes.playoffDesc}
          </div>
        </div>
-     )}
-     <div className="form-field">
-       <label className="form-label">Format</label>
-       <select className="form-input" value={f.fmt} onChange={e=>setF(p=>({...p,fmt:e.target.value}))}>
-         {f.stype==='team'?(<>
-           <option value="pools">Pool Play + Playoffs</option>
-           <option value="roundrobin">Full Round Robin</option>
-           <option value="single">Single Elimination</option>
-           <option value="double">Double Elimination</option>
-         </>):(<>
-           <option value="heats">Heats then Semis then Final</option>
-           <option value="single">Head-to-Head Bracket</option>
-         </>)}
-       </select>
-     </div>
-   </div>
-   <button className="btn btn-navy btn-lg btn-w" onClick={calc} disabled={!activeDays.length} style={{opacity:activeDays.length?1:.5}}>
-     {mode==='A'?'Calculate '+fw+' needed':mode==='B'?'Calculate days needed':'Calculate team capacity'}
-   </button>
-   {res&&(
-     <div className="calc-result">
-       <div style={{fontWeight:700,fontSize:14,marginBottom:12,opacity:.7}}>{sp.n}</div>
-       {res.m==='A'&&(<>
-         <div className="calc-result-row"><span>Total games</span><span>{res.tot}</span></div>
-         <div className="calc-result-row"><span>Games per day</span><span>{res.gpd}</span></div>
-         <div className="calc-result-row"><span>Slot per {fw.toLowerCase()}</span><span>{res.slot} min</span></div>
-         <div className="calc-result-row"><span>Slots / {fw.toLowerCase()} / day</span><span>{res.spf}</span></div>
-         <div className="calc-result-row"><span>{fw} needed</span><span>{res.fields}</span></div>
-       </>)}
-       {res.m==='B'&&(<>
-         <div className="calc-result-row"><span>Total games</span><span>{res.tot}</span></div>
-         <div className="calc-result-row"><span>Available slots / day</span><span>{res.tSlots}</span></div>
-         <div className="calc-result-row"><span>Games per day</span><span>{res.gpd}</span></div>
-         <div className="calc-result-row"><span>Days needed</span><span>{res.days}</span></div>
-       </>)}
-       {res.m==='C'&&(<>
-         <div className="calc-result-row"><span>Total slots available</span><span>{res.tSlots}</span></div>
-         <div className="calc-result-row"><span>Slots / {fw.toLowerCase()} / day</span><span>{res.spf}</span></div>
-         <div className="calc-result-row" style={{background:'linear-gradient(135deg,var(--navy-lt),#EFF6FF)',borderRadius:8,padding:'12px 16px',marginTop:4}}>
-           <span style={{fontWeight:800,color:'var(--navy-dk)'}}>Max {tw.toLowerCase()} capacity</span>
-           <span style={{fontWeight:900,fontSize:24,color:'var(--navy)'}}>{res.maxTeams}</span>
-         </div>
-         <div style={{marginTop:10,padding:'10px 12px',background:'#F0FDF4',border:'1px solid #BBF7D0',borderRadius:8,fontSize:12,color:'#15803D',fontWeight:600}}>
-           Range auto-updated: {f.nMin} min – {f.nMax} max teams based on your venue capacity
-         </div>
-       </>)}
-       {res.fields>8&&<div className="calc-tip">That is a lot of {fw.toLowerCase()}. Consider running over more days or splitting by age group.</div>}
-       {res.days>7&&<div className="calc-tip">More than a week. Try adding another {fw.toLowerCase()} or changing the format.</div>}
      </div>
    )}
  </div>
