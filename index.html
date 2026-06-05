@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27h_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27i_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -2042,7 +2042,6 @@ function Ticker({games,teams}){
 function Calculator(){
  const [mode,setMode]=useState('A');
  const [f,setF]=useState({sid:'s2',stype:'team',n:8,fields:2,dur:40,buf:10,fmt:'pools'});
- // Day schedule: each day has {checked, hours}
  const [daySchedule,setDaySchedule]=useState([
    {id:'mon',label:'Mon',checked:true,hours:8},
    {id:'tue',label:'Tue',checked:true,hours:8},
@@ -2052,81 +2051,169 @@ function Calculator(){
    {id:'sat',label:'Sat',checked:false,hours:10},
    {id:'sun',label:'Sun',checked:false,hours:10},
  ]);
+ const [res,setRes]=useState(null);
  const activeDays=daySchedule.filter(d=>d.checked);
  const totalHours=activeDays.reduce((s,d)=>s+d.hours,0);
  const avgHpd=activeDays.length>0?Math.round(totalHours/activeDays.length):8;
- function toggleDay(id){setDaySchedule(p=>p.map(d=>d.id===id?{...d,checked:!d.checked}:d))}
- function setDayHours(id,h){setDaySchedule(p=>p.map(d=>d.id===id?{...d,hours:Math.max(1,Math.min(16,+h))}:d))}
- const [res,setRes]=useState(null);
+ function toggleDay(id){setDaySchedule(p=>p.map(d=>d.id===id?{...d,checked:!d.checked}:d));}
+ function setDayHours(id,h){setDaySchedule(p=>p.map(d=>d.id===id?{...d,hours:Math.max(1,Math.min(16,Number(h)))}:d));}
  const sp=SPORTS.find(s=>s.id===f.sid)||SPORTS[1];
  function pick(id){const s=SPORTS.find(x=>x.id===id);setF(p=>({...p,sid:id,stype:s?.t||'team',dur:s?.dur||60,fmt:s?.t==='individual'?'heats':'pools'}));setRes(null);}
  function calc(){
- const d=activeDays.length||1;
- const h=avgHpd;
- if(mode==='A')setRes({m:'A',...calcA(f.n,f.dur,f.buf,h,d,f.fmt,f.stype)});
- else if(mode==='B')setRes({m:'B',...calcB(f.n,f.fields,f.dur,f.buf,h,f.fmt,f.stype)});
- else setRes({m:'C',...calcC(f.fields,f.dur,f.buf,h,d,f.fmt)});
+   if(!activeDays.length)return;
+   const d=activeDays.length;
+   const h=avgHpd;
+   if(mode==='A')setRes({m:'A',...calcA(f.n,f.dur,f.buf,h,d,f.fmt,f.stype)});
+   else if(mode==='B')setRes({m:'B',...calcB(f.n,f.fields,f.dur,f.buf,h,f.fmt,f.stype)});
+   else setRes({m:'C',...calcC(f.fields,f.dur,f.buf,h,d,f.fmt)});
  }
  const fw=f.stype==='individual'?'Lanes/Stations':'Courts/Fields';
  const tw=f.stype==='individual'?'Athletes':'Teams';
- return<div> <div className="section-head"> <div><h2 style={{fontFamily:'Outfit',fontWeight:900,fontSize:22,color:'var(--navy-dk)'}}>Schedule Calculator</h2> <p style={{color:'var(--txt2)',fontSize:14,marginTop:4}}>Figure out exactly what you need — fields, days, or capacity</p> </div> </div> <div className="calc-modes"> {[{id:'A',title:'How many fields?',sub:'Know teams & time'},{id:'B',title:'How many days?',sub:'Know teams & fields'},{id:'C',title:'How many teams fit?',sub:'Know fields & time'}].map(m=>(
- <button key={m.id} className={`calc-mode${mode===m.id?' on':''}`} onClick={()=>{setMode(m.id);setRes(null);}}> <div style={{fontWeight:800,fontSize:13}}>{m.title}</div> <div style={{fontSize:11,opacity:.7,marginTop:2}}>{m.sub}</div> </button> ))}
- </div> <div className="row2" style={{marginBottom:14}}> <div className="form-field"> <label className="form-label">Sport <span style={{textTransform:'none',fontWeight:400,color:'var(--txt3)'}}>— duration auto-fills</span></label> <select className="form-input" value={f.sid} onChange={e=>pick(e.target.value)}> {SPORTS.map(s=><option key={s.id} value={s.id}>{s.n} ({s.dur}min)</option>)}
- </select> </div> <div className="form-field"> <label className="form-label">Sport Type</label> <select className="form-input" value={f.stype} onChange={e=>setF(p=>({...p,stype:e.target.value,fmt:e.target.value==='individual'?'heats':'pools'}))}> <option value="team">Team Sport</option> <option value="individual">Individual / Track</option> </select> </div> </div> <div className="row2" style={{marginBottom:14}}> <div className="form-field"><label className="form-label">Duration (min)</label><input className="form-input" type="number" min="5" max="360" value={f.dur} onChange={e=>setF(p=>({...p,dur:+e.target.value}))}/></div> <div className="form-field"><label className="form-label">Buffer between games (min)</label><input className="form-input" type="number" min="0" max="60" value={f.buf} onChange={e=>setF(p=>({...p,buf:+e.target.value}))}/></div> </div>
- {/* ── DAY / HOURS PICKER ── */}
- <div style={{marginBottom:16}}>
-   <label className="form-label" style={{marginBottom:10,display:'block'}}>Tournament Days & Hours
-     <span style={{fontWeight:400,color:'var(--txt3)',textTransform:'none',marginLeft:8}}>
-       — {activeDays.length} day{activeDays.length!==1?'s':''} selected · {totalHours}h total
-     </span>
-   </label>
-   <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:6}}>
-     {daySchedule.map(d=>(
-       <div key={d.id} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-         <button
-           onClick={()=>toggleDay(d.id)}
-           style={{
+ return(
+ <div>
+   <div className="section-head">
+     <div>
+       <h2 style={{fontFamily:'Outfit',fontWeight:900,fontSize:22,color:'var(--navy-dk)'}}>Schedule Calculator</h2>
+       <p style={{color:'var(--txt2)',fontSize:14,marginTop:4}}>Figure out exactly what you need — fields, days, or capacity</p>
+     </div>
+   </div>
+   <div className="calc-modes">
+     {[{id:'A',title:'How many fields?',sub:'Know teams & time'},{id:'B',title:'How many days?',sub:'Know teams & fields'},{id:'C',title:'How many teams fit?',sub:'Know fields & time'}].map(m=>(
+       <button key={m.id} className={`calc-mode${mode===m.id?' on':''}`} onClick={()=>{setMode(m.id);setRes(null);}}>
+         <div style={{fontWeight:800,fontSize:13}}>{m.title}</div>
+         <div style={{fontSize:11,opacity:.7,marginTop:2}}>{m.sub}</div>
+       </button>
+     ))}
+   </div>
+   <div className="row2" style={{marginBottom:14}}>
+     <div className="form-field">
+       <label className="form-label">Sport <span style={{textTransform:'none',fontWeight:400,color:'var(--txt3)'}}>— duration auto-fills</span></label>
+       <select className="form-input" value={f.sid} onChange={e=>pick(e.target.value)}>
+         {SPORTS.map(s=><option key={s.id} value={s.id}>{s.n} ({s.dur}min)</option>)}
+       </select>
+     </div>
+     <div className="form-field">
+       <label className="form-label">Sport Type</label>
+       <select className="form-input" value={f.stype} onChange={e=>setF(p=>({...p,stype:e.target.value,fmt:e.target.value==='individual'?'heats':'pools'}))}>
+         <option value="team">Team Sport</option>
+         <option value="individual">Individual / Track</option>
+       </select>
+     </div>
+   </div>
+   <div className="row2" style={{marginBottom:14}}>
+     <div className="form-field">
+       <label className="form-label">Duration (min)</label>
+       <input className="form-input" type="number" min="5" max="360" value={f.dur} onChange={e=>setF(p=>({...p,dur:+e.target.value}))}/>
+     </div>
+     <div className="form-field">
+       <label className="form-label">Buffer between games (min)</label>
+       <input className="form-input" type="number" min="0" max="60" value={f.buf} onChange={e=>setF(p=>({...p,buf:+e.target.value}))}/>
+     </div>
+   </div>
+   <div style={{marginBottom:16}}>
+     <label className="form-label" style={{marginBottom:10,display:'block'}}>
+       Tournament Days &amp; Hours Per Day
+       <span style={{fontWeight:400,color:'var(--txt3)',textTransform:'none',marginLeft:8}}>
+         — {activeDays.length} day{activeDays.length!==1?'s':''} · {totalHours}h total
+       </span>
+     </label>
+     <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:6}}>
+       {daySchedule.map(d=>(
+         <div key={d.id} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+           <button onClick={()=>toggleDay(d.id)} style={{
              width:'100%',padding:'8px 4px',border:'2px solid',borderRadius:8,cursor:'pointer',
              background:d.checked?'var(--navy)':'white',
              borderColor:d.checked?'var(--navy)':'var(--border)',
              color:d.checked?'white':'var(--txt2)',
-             fontWeight:700,fontSize:12,fontFamily:'Outfit,sans-serif',
-             transition:'all .15s',minHeight:40
-           }}
-         >{d.label}</button>
-         {d.checked&&(
-           <div style={{position:'relative',width:'100%'}}>
-             <input
-               type="number" min="1" max="16" value={d.hours}
-               onChange={e=>setDayHours(d.id,e.target.value)}
-               style={{width:'100%',padding:'4px 4px',border:'1px solid var(--border)',borderRadius:6,
-                 textAlign:'center',fontSize:12,fontWeight:700,color:'var(--navy-dk)',
-                 boxSizing:'border-box',background:'var(--bg2)'}}
-             />
-             <div style={{fontSize:9,textAlign:'center',color:'var(--txt3)',marginTop:2}}>hrs</div>
-           </div>
-         )}
+             fontWeight:700,fontSize:12,transition:'all .15s',minHeight:40,
+             fontFamily:'Outfit,sans-serif'
+           }}>{d.label}</button>
+           {d.checked&&(
+             <div>
+               <input type="number" min="1" max="16" value={d.hours}
+                 onChange={e=>setDayHours(d.id,e.target.value)}
+                 style={{width:'100%',padding:'4px',border:'1px solid var(--border)',borderRadius:6,
+                   textAlign:'center',fontSize:12,fontWeight:700,color:'var(--navy-dk)',
+                   boxSizing:'border-box',background:'var(--bg2)'}}/>
+               <div style={{fontSize:9,textAlign:'center',color:'var(--txt3)',marginTop:2}}>hrs</div>
+             </div>
+           )}
+         </div>
+       ))}
+     </div>
+     {activeDays.length===0&&(
+       <div style={{background:'#FEF3C7',border:'1px solid #F59E0B',borderRadius:8,padding:'8px 12px',marginTop:8,fontSize:12,color:'#92400E',fontWeight:600}}>
+         Select at least one day above to run the calculator.
        </div>
-     ))}
+     )}
    </div>
-   {activeDays.length===0&&(
-     <div style={{background:'#FEF3C7',border:'1px solid #F59E0B',borderRadius:8,padding:'8px 12px',marginTop:8,fontSize:12,color:'#92400E',fontWeight:600}}>
-       Select at least one day to run the calculator
+   <div className="row3" style={{marginBottom:16}}>
+     {(mode==='A'||mode==='B')&&(
+       <div className="form-field">
+         <label className="form-label">{tw}</label>
+         <input className="form-input" type="number" min="2" max="500" value={f.n} onChange={e=>setF(p=>({...p,n:+e.target.value}))}/>
+       </div>
+     )}
+     {(mode==='B'||mode==='C')&&(
+       <div className="form-field">
+         <label className="form-label">{fw}</label>
+         <input className="form-input" type="number" min="1" max="50" value={f.fields} onChange={e=>setF(p=>({...p,fields:+e.target.value}))}/>
+       </div>
+     )}
+     {(mode==='A'||mode==='C')&&(
+       <div className="form-field">
+         <label className="form-label">Days Available</label>
+         <div className="form-input" style={{background:'var(--bg2)',color:'var(--navy-dk)',fontWeight:700,display:'flex',alignItems:'center'}}>
+           {activeDays.length} day{activeDays.length!==1?'s':''}
+           <span style={{fontWeight:400,fontSize:11,marginLeft:6,color:'var(--txt3)'}}>from schedule above</span>
+         </div>
+       </div>
+     )}
+     <div className="form-field">
+       <label className="form-label">Format</label>
+       <select className="form-input" value={f.fmt} onChange={e=>setF(p=>({...p,fmt:e.target.value}))}>
+         {f.stype==='team'?(<>
+           <option value="pools">Pool Play + Playoffs</option>
+           <option value="roundrobin">Full Round Robin</option>
+           <option value="single">Single Elimination</option>
+           <option value="double">Double Elimination</option>
+         </>):(<>
+           <option value="heats">Heats then Semis then Final</option>
+           <option value="single">Head-to-Head Bracket</option>
+         </>)}
+       </select>
+     </div>
+   </div>
+   <button className="btn btn-navy btn-lg btn-w" onClick={calc} disabled={!activeDays.length} style={{opacity:activeDays.length?1:.5}}>
+     {mode==='A'?'Calculate '+fw+' needed':mode==='B'?'Calculate days needed':'Calculate team capacity'}
+   </button>
+   {res&&(
+     <div className="calc-result">
+       <div style={{fontWeight:700,fontSize:14,marginBottom:12,opacity:.7}}>{sp.n}</div>
+       {res.m==='A'&&(<>
+         <div className="calc-result-row"><span>Total games</span><span>{res.tot}</span></div>
+         <div className="calc-result-row"><span>Games per day</span><span>{res.gpd}</span></div>
+         <div className="calc-result-row"><span>Slot per {fw.toLowerCase()}</span><span>{res.slot} min</span></div>
+         <div className="calc-result-row"><span>Slots / {fw.toLowerCase()} / day</span><span>{res.spf}</span></div>
+         <div className="calc-result-row"><span>{fw} needed</span><span>{res.fields}</span></div>
+       </>)}
+       {res.m==='B'&&(<>
+         <div className="calc-result-row"><span>Total games</span><span>{res.tot}</span></div>
+         <div className="calc-result-row"><span>Available slots / day</span><span>{res.tSlots}</span></div>
+         <div className="calc-result-row"><span>Games per day</span><span>{res.gpd}</span></div>
+         <div className="calc-result-row"><span>Days needed</span><span>{res.days}</span></div>
+       </>)}
+       {res.m==='C'&&(<>
+         <div className="calc-result-row"><span>Total slots available</span><span>{res.tSlots}</span></div>
+         <div className="calc-result-row"><span>Slots / {fw.toLowerCase()} / day</span><span>{res.spf}</span></div>
+         <div className="calc-result-row"><span>Max {tw.toLowerCase()} you can fit</span><span>{res.maxTeams}</span></div>
+       </>)}
+       {res.fields>8&&<div className="calc-tip">That is a lot of {fw.toLowerCase()}. Consider running over more days or splitting by age group.</div>}
+       {res.days>7&&<div className="calc-tip">More than a week. Try adding another {fw.toLowerCase()} or changing the format.</div>}
      </div>
    )}
  </div>
- <div className="row3" style={{marginBottom:0}}> <div style={{display:'none'}}>{/* spacer */}</div> <div className="row3" style={{marginBottom:16}}> {(mode==='A'||mode==='B')&&<div className="form-field"><label className="form-label">{tw}</label><input className="form-input" type="number" min="2" max="500" value={f.n} onChange={e=>setF(p=>({...p,n:+e.target.value}))}/></div>}
- {(mode==='B'||mode==='C')&&<div className="form-field"><label className="form-label">{fw}</label><input className="form-input" type="number" min="1" max="50" value={f.fields} onChange={e=>setF(p=>({...p,fields:+e.target.value}))}/></div>}
- {(mode==='A'||mode==='C')&&<div className="form-field"><label className="form-label">Days Available</label><div className="form-input" style={{display:'flex',alignItems:'center',background:'var(--bg2)',color:'var(--navy-dk)',fontWeight:700}}>{activeDays.length} day{activeDays.length!==1?'s':''} <span style={{fontWeight:400,fontSize:11,marginLeft:6,color:'var(--txt3)'}}>from schedule above</span></div></div>}
- <div className="form-field"> <label className="form-label">Format</label> <select className="form-input" value={f.fmt} onChange={e=>setF(p=>({...p,fmt:e.target.value}))}> {f.stype==='team'?<> <option value="pools">Pool Play + Playoffs</option> <option value="roundrobin">Full Round Robin</option> <option value="single">Single Elimination</option> <option value="double">Double Elimination</option> </>:<> <option value="heats">Heats → Semis → Final</option> <option value="single">Head-to-Head Bracket</option> </>}
- </select> </div> </div> <button className="btn btn-navy btn-lg btn-w" onClick={calc}> {mode==='A'?`Calculate ${fw} needed →`:mode==='B'?'Calculate days needed →':'Calculate team capacity →'}
- </button> {res&&<div className="calc-result"> <div style={{fontWeight:700,fontSize:14,marginBottom:12,opacity:.7}}>{sp.icon} {sp.n}</div> {res.m==='A'&&<> <div className="calc-result-row"><span>Total games</span><span>{res.tot}</span></div> <div className="calc-result-row"><span>Games per day</span><span>{res.gpd}</span></div> <div className="calc-result-row"><span>Time slot per {fw.toLowerCase()}</span><span>{res.slot} min</span></div> <div className="calc-result-row"><span>Slots per {fw.toLowerCase()} / day</span><span>{res.spf}</span></div> <div className="calc-result-row"><span> {fw} needed</span><span>{res.fields}</span></div> </>}
- {res.m==='B'&&<> <div className="calc-result-row"><span>Total games</span><span>{res.tot}</span></div> <div className="calc-result-row"><span>Available slots / day</span><span>{res.tSlots}</span></div> <div className="calc-result-row"><span>Games per day</span><span>{res.gpd}</span></div> <div className="calc-result-row"><span> Days needed</span><span>{res.days}</span></div> </>}
- {res.m==='C'&&<> <div className="calc-result-row"><span>Total slots available</span><span>{res.tSlots}</span></div> <div className="calc-result-row"><span>Slots per {fw.toLowerCase()} / day</span><span>{res.spf}</span></div> <div className="calc-result-row"><span> Max {tw.toLowerCase()} you can fit</span><span>{res.maxTeams}</span></div> </>}
- {res.fields>8&&<div className="calc-tip"> That's a lot of {fw.toLowerCase()}. Consider running over more days or splitting into more age/gender groups.</div>}
- {res.days>7&&<div className="calc-tip"> More than a week. Try adding another {fw.toLowerCase()} or changing the format.</div>}
- </div>}
- </div>;
+ );
 }
 
 function SpectatorView({db}){
