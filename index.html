@@ -607,7 +607,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27m_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27r_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1669,6 +1669,7 @@ function Bracket({teams,games,sid,age,gender,onGameClick}){
 }
 
 function Rulebook({onExport}){
+ const NAIG_URL='https://naismailigames.com/sports';
  const [sel,setSel]=useState('all');
  const [search,setSearch]=useState('');
  const filtered=SPORTS.filter(s=>(sel==='all'||s.id===sel)&&(!search||s.n.toLowerCase().includes(search.toLowerCase())||s.rules.toLowerCase().includes(search.toLowerCase())));
@@ -2984,7 +2985,8 @@ function AdminPanel({db,onUpdate,scope}){
  function saveAth(){if(!af.n.trim())return;onUpdate({...db,athletes:[...db.athletes,{id:uid(),...af}]});setShowAth(false);setAf(aI);flash('Athlete added');}
 
  /* venue form */ const vI={name:'',location:'',courts:2};
- const [showVn,setShowVn]=useState(false);const [vf,setVf]=useState(vI);
+ const [showVn,setShowVn]=useState(false);
+ const [selVenue,setSelVenue]=useState(null);const [vf,setVf]=useState(vI);
  function saveVn(){if(!vf.name.trim())return;onUpdate({...db,venues:[...db.venues,{id:uid(),...vf}]});setShowVn(false);setVf(vI);flash('Venue saved');}
 
  /* game form */ const gI={sid:'s2',age:'18+',gender:'Open',hid:'',aid:'',vid:'',date:'',time:'09:00',round:'Pool Play'};
@@ -3087,7 +3089,87 @@ function AdminPanel({db,onUpdate,scope}){
 
  {tab==='venues'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Venues</h2><button className="btn btn-navy" onClick={()=>setShowVn(true)}>Add Venue</button></div> {!db.venues.length&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">No venues yet</p><p className="empty-sub">Add venues before you schedule games</p></div>}
  <div className="g2">{db.venues.map(v=>(
- <div key={v.id} className="card"> <div className="card-head"><h3 className="card-title"> {v.name}</h3><button className="btn btn-ghost btn-sm" style={{color:'var(--crimson)'}} onClick={()=>{if(confirm('Delete?'))onUpdate({...db,venues:db.venues.filter(x=>x.id!==v.id)});}}>Remove</button></div> <div className="card-body"><p style={{fontSize:13,color:'var(--txt2)',marginBottom:6}}> {v.location||'Location not set'}</p><p style={{fontSize:13}}>Courts / Fields / Lanes: <strong>{v.courts}</strong></p><p style={{fontSize:12,color:'var(--txt3)',marginTop:4}}>Games scheduled here: {db.games.filter(g=>g.vid===v.id).length}</p></div> </div> ))}</div> {showVn&&<Modal title="Add Venue" onClose={()=>setShowVn(false)}> <div className="form-field"><label className="form-label">Name</label><input className="form-input" value={vf.name} onChange={e=>setVf({...vf,name:e.target.value})} placeholder="e.g. Main Arena" autoFocus/></div> <div className="form-field"><label className="form-label">Location</label><input className="form-input" value={vf.location} onChange={e=>setVf({...vf,location:e.target.value})} placeholder="Address or description"/></div> <div className="form-field"><label className="form-label">Courts / Fields / Lanes</label><input className="form-input" type="number" min="1" value={vf.courts} onChange={e=>setVf({...vf,courts:+e.target.value})}/></div> <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:16}}> <button className="btn btn-ghost" onClick={()=>setShowVn(false)}>Cancel</button> <button className="btn btn-navy" onClick={saveVn}>Save venue</button> </div> </Modal>}
+ <div key={v.id} className="card" style={{cursor:'pointer',transition:'box-shadow .15s'}}
+   onClick={()=>setSelVenue(v)}
+   onMouseEnter={e=>e.currentTarget.style.boxShadow='0 8px 32px rgba(30,58,138,.15)'}
+   onMouseLeave={e=>e.currentTarget.style.boxShadow=''}>
+   <div className="card-head">
+     <h3 className="card-title">{v.name}</h3>
+     <button className="btn btn-ghost btn-sm" onClick={e=>{e.stopPropagation();setSelVenue(v);}}>Details</button>
+   </div>
+   <div className="card-body">
+     <p style={{fontSize:13,color:'var(--txt2)',marginBottom:6}}>{v.location||'Location not set'}</p>
+     <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+       <span style={{fontSize:12,fontWeight:700,color:'var(--navy)'}}>{v.courts} courts/fields</span>
+       <span style={{fontSize:12,color:'var(--txt3)'}}>{db.games.filter(g=>g.vid===v.id).length} games scheduled</span>
+       <span style={{fontSize:12,color:db.games.filter(g=>g.vid===v.id&&g.status==='in_progress').length>0?'#16A34A':'var(--txt3)'}}>
+         {db.games.filter(g=>g.vid===v.id&&g.status==='in_progress').length>0?'LIVE NOW':''}
+       </span>
+     </div>
+   </div>
+ </div> ))}</div> {selVenue&&(
+ <div className="modal-overlay" onClick={e=>{if(e.target===e.currentTarget)setSelVenue(null);}}>
+   <div className="modal" style={{maxWidth:520}}>
+     <div style={{background:'var(--navy-dk)',color:'white',padding:'16px 20px',borderRadius:'12px 12px 0 0',display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+       <div>
+         <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:20}}>{selVenue.name}</div>
+         <div style={{fontSize:13,opacity:.8,marginTop:2}}>{selVenue.location||'Location not set'}</div>
+       </div>
+       <button onClick={()=>setSelVenue(null)} style={{background:'rgba(255,255,255,.15)',border:'none',color:'white',borderRadius:8,width:32,height:32,cursor:'pointer',fontSize:16,fontWeight:700}}>x</button>
+     </div>
+     <div style={{padding:'20px'}}>
+       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:20}}>
+         {[
+           {label:'Courts/Fields',val:selVenue.courts,color:'var(--navy)'},
+           {label:'Games Done',val:db.games.filter(g=>g.vid===selVenue.id&&g.status==='completed').length,color:'#16A34A'},
+           {label:'Remaining',val:db.games.filter(g=>g.vid===selVenue.id&&g.status!=='completed').length,color:'var(--crimson)'},
+         ].map(({label,val,color})=>(
+           <div key={label} style={{background:'var(--bg2)',borderRadius:10,padding:'12px',textAlign:'center'}}>
+             <div style={{fontSize:22,fontWeight:900,color,fontFamily:'Outfit'}}>{val}</div>
+             <div style={{fontSize:10,color:'var(--txt3)',fontWeight:700,marginTop:2}}>{label}</div>
+           </div>
+         ))}
+       </div>
+       <div style={{marginBottom:14}}>
+         <div style={{fontWeight:800,fontSize:13,color:'var(--navy)',marginBottom:8}}>Sports Hosted Here</div>
+         <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+           {[...new Set(db.games.filter(g=>g.vid===selVenue.id).map(g=>g.sid))].map(sid=>{
+             const sp=SPORTS.find(s=>s.id===sid);
+             return sp?<span key={sid} className="sport-code" data-tip={sp.n} style={{fontSize:10}}>{sp.abbr}</span>:null;
+           })}
+           {db.games.filter(g=>g.vid===selVenue.id).length===0&&<span style={{color:'var(--txt3)',fontSize:12}}>No games assigned yet</span>}
+         </div>
+       </div>
+       <div style={{marginBottom:16}}>
+         <div style={{fontWeight:800,fontSize:13,color:'var(--navy)',marginBottom:8}}>Upcoming Games at This Venue</div>
+         {db.games.filter(g=>g.vid===selVenue.id&&g.status!=='completed').slice(0,5).map(g=>{
+           const sp=SPORTS.find(s=>s.id===g.sid);
+           const ht=db.teams.find(t=>t.id===g.hid);
+           const at=db.teams.find(t=>t.id===g.aid);
+           return(
+             <div key={g.id} style={{padding:'8px 12px',borderRadius:8,border:'1px solid var(--border)',marginBottom:6,fontSize:12}}>
+               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3}}>
+                 <span style={{fontWeight:700,fontSize:13}}>{ht?.n||'TBD'} vs {at?.n||'TBD'}</span>
+                 <span style={{fontSize:10,fontWeight:700,color:g.status==='in_progress'?'#16A34A':'var(--txt3)'}}>{g.status==='in_progress'?'LIVE':'Upcoming'}</span>
+               </div>
+               <div style={{color:'var(--txt3)'}}>{g.date} · {g.time} · {sp?.n} · {g.round}</div>
+             </div>
+           );
+         })}
+         {db.games.filter(g=>g.vid===selVenue.id&&g.status!=='completed').length===0&&<span style={{color:'var(--txt3)',fontSize:12}}>No upcoming games</span>}
+       </div>
+       <div style={{display:'flex',gap:8}}>
+         <button className="btn btn-ghost btn-w" onClick={()=>setSelVenue(null)}>Back</button>
+         <button style={{flex:1,background:'var(--crimson)',color:'white',border:'none',borderRadius:8,padding:'10px',fontWeight:700,cursor:'pointer'}}
+           onClick={()=>{if(confirm('Delete this venue?')){onUpdate({...db,venues:db.venues.filter(x=>x.id!==selVenue.id)});setSelVenue(null);}}}>
+           Remove Venue
+         </button>
+       </div>
+     </div>
+   </div>
+ </div>
+)}
+{showVn&&<Modal title="Add Venue" onClose={()=>setShowVn(false)}> <div className="form-field"><label className="form-label">Name</label><input className="form-input" value={vf.name} onChange={e=>setVf({...vf,name:e.target.value})} placeholder="e.g. Main Arena" autoFocus/></div> <div className="form-field"><label className="form-label">Location</label><input className="form-input" value={vf.location} onChange={e=>setVf({...vf,location:e.target.value})} placeholder="Address or description"/></div> <div className="form-field"><label className="form-label">Courts / Fields / Lanes</label><input className="form-input" type="number" min="1" value={vf.courts} onChange={e=>setVf({...vf,courts:+e.target.value})}/></div> <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:16}}> <button className="btn btn-ghost" onClick={()=>setShowVn(false)}>Cancel</button> <button className="btn btn-navy" onClick={saveVn}>Save venue</button> </div> </Modal>}
  </div>}
 
  {tab==='teams'&&<div> <div style={{display:'flex',gap:8,marginBottom:14,flexWrap:'wrap'}}> {SPORTS.filter(s=>s.t==='team').map(s=><button key={s.id} className={`sport-chip${aSp===s.id?' on':''}`} onClick={()=>{setASp(s.id);setAAge(s.ages[0]);setAGen(s.genders[0]);}}>{s.n}</button>)}
@@ -3112,7 +3194,17 @@ function AdminPanel({db,onUpdate,scope}){
  </select> </div> </div> <div className="form-field"><label className="form-label">Event / Discipline</label><input className="form-input" value={af.event} onChange={e=>setAf({...af,event:e.target.value})} placeholder="e.g. Singles, 400m, Mixed Doubles"/></div> <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:16}}> <button className="btn btn-ghost" onClick={()=>setShowAth(false)}>Cancel</button> <button className="btn btn-navy" onClick={saveAth}>Add athlete</button> </div> </Modal>}
  </div>}
 
- {tab==='schedule'&&<div> <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Schedule</h2> <div style={{display:'flex',gap:8}}><button className="btn btn-ghost" onClick={autoSched}>Auto-Generate Pool Play</button><button className="btn btn-navy" onClick={()=>setShowGm(true)}>+ Add game</button></div> </div> {!db.games.length&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">Nothing scheduled yet</p><p className="empty-sub">Add teams and venues, then hit Auto-generate</p></div>}
+ {tab==='schedule'&&<div>
+ <div style={{background:'linear-gradient(135deg,var(--navy-lt),#DBEAFE)',border:'1px solid var(--navy)',borderRadius:12,padding:'14px 18px',marginBottom:16,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:10}}>
+   <div>
+     <div style={{fontWeight:800,color:'var(--navy-dk)',fontSize:14}}>Dynamic Schedule Builder</div>
+     <div style={{fontSize:12,color:'var(--txt2)',marginTop:2}}>Use the calculator to plan pools, game counts, and playoff structure</div>
+   </div>
+   <button className="btn btn-navy" onClick={()=>alert('In the live version this generates game slots and pool assignments from your team list and venue availability. Go to the Schedule Calculator tab to plan your schedule structure.')}>
+     Open Schedule Calculator
+   </button>
+ </div>
+ <div className="section-head"><h2 className="section-title" style={{fontSize:22}}>Schedule</h2> <div style={{display:'flex',gap:8}}><button className="btn btn-ghost" onClick={autoSched}>Auto-Generate Pool Play</button><button className="btn btn-navy" onClick={()=>setShowGm(true)}>+ Add game</button></div> </div> {!db.games.length&&<div className="empty"><div className="empty-icon" style={{fontSize:32,color:"var(--border)",fontWeight:900}}>—</div><p className="empty-title">Nothing scheduled yet</p><p className="empty-sub">Add teams and venues, then hit Auto-generate</p></div>}
  {db.games.map(g=>{const s=SPORTS.find(x=>x.id===g.sid);return(
  <div key={g.id} className="game-row" style={{cursor:"pointer"}} onClick={()=>setSelAdminGame(g)}> <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:8}}> <div><div style={{fontWeight:700,fontSize:14}}>{tn(g.hid)} vs {tn(g.aid)||'TBD'}</div> <div style={{fontSize:12,color:'var(--txt2)',marginTop:2}}>{s?.abbr} {s?.n} · {g.age} {g.gender} · {g.round}</div> </div> <div style={{display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}> {g.status==='completed'&&<span className="tag tag-gray">Final {g.hs}–{g.as}</span>}
  {g.status==='in_progress'&&<span className="tag tag-live"> Live {g.hs}–{g.as}</span>}
@@ -3367,9 +3459,138 @@ function GalleryView({db}){
  );
 }
 
+
+function LandingPage({goTo, db, live}){
+ const totalTeams=db.teams.length;
+ const totalGames=db.games.length;
+ const completedGames=db.games.filter(g=>g.status==='completed').length;
+ const cards=[
+   {
+     id:'spectator',
+     title:'Spectator View',
+     sub:'Live scores, standings, brackets, schedule, gallery',
+     color:'var(--navy)',
+     bg:'linear-gradient(135deg,var(--navy-dk),var(--navy))',
+     icon:'📊',
+     stats:[
+       {label:'Live Now',val:live>0?live+' games':'—',hot:live>0},
+       {label:'Completed',val:completedGames},
+       {label:'Teams',val:totalTeams},
+     ],
+     cta:'View Scores',
+   },
+   {
+     id:'scorekeeper',
+     title:'Score Entry',
+     sub:'Enter scores, track stats, manage live game data',
+     color:'#0891B2',
+     bg:'linear-gradient(135deg,#0E7490,#0891B2)',
+     icon:'✏️',
+     stats:[
+       {label:'Active Games',val:live>0?live:'0',hot:live>0},
+       {label:'Your Queue',val:'Check in'},
+       {label:'Auth',val:'PIN / QR'},
+     ],
+     cta:'Sign In',
+   },
+   {
+     id:'regional',
+     title:'Regional Coordinator',
+     sub:'Manage your region's teams, rosters, and setup',
+     color:'#7C3AED',
+     bg:'linear-gradient(135deg,#6D28D9,#7C3AED)',
+     icon:'🏅',
+     stats:[
+       {label:'14 Regions',val:'CA + USA'},
+       {label:'Teams',val:totalTeams},
+       {label:'Auth',val:'Password'},
+     ],
+     cta:'Coordinator Login',
+   },
+   {
+     id:'national',
+     title:'National Admin',
+     sub:'Full tournament control — schedule, venues, results',
+     color:'var(--crimson)',
+     bg:'linear-gradient(135deg,#991B1B,var(--crimson))',
+     icon:'🏆',
+     stats:[
+       {label:'Sports',val:SPORTS.length},
+       {label:'Total Games',val:totalGames},
+       {label:'Auth',val:'Admin Password'},
+     ],
+     cta:'Admin Login',
+   },
+ ];
+ return(
+   <div style={{minHeight:'100vh',background:'linear-gradient(160deg,#0F172A 0%,#1E3A8A 50%,#0F172A 100%)'}}>
+     {/* Hero */}
+     <div style={{textAlign:'center',padding:'60px 24px 40px',color:'white'}}>
+       <div style={{fontSize:11,fontWeight:800,letterSpacing:3,opacity:.6,textTransform:'uppercase',marginBottom:16}}>North American Ismaili Games 2027</div>
+       <h1 style={{fontFamily:'Outfit',fontWeight:900,fontSize:'clamp(32px,6vw,56px)',margin:'0 0 12px',lineHeight:1.1}}>
+         NAIG Sports Central
+       </h1>
+       <p style={{fontSize:'clamp(14px,2vw,18px)',opacity:.7,margin:'0 auto 32px',maxWidth:500}}>
+         #CompeteConnectUnite — Live scores, team management, and tournament operations for all 14 regions
+       </p>
+       {live>0&&(
+         <div style={{display:'inline-flex',alignItems:'center',gap:10,background:'rgba(22,163,74,.2)',border:'1px solid rgba(22,163,74,.4)',borderRadius:99,padding:'8px 20px',color:'#4ADE80',fontWeight:800,fontSize:14,marginBottom:24}}>
+           <span style={{width:10,height:10,borderRadius:'50%',background:'#22C55E',display:'inline-block',animation:'breathe 1.5s infinite'}}></span>
+           {live} game{live>1?'s':''} live right now
+         </div>
+       )}
+     </div>
+     {/* Role Cards */}
+     <div style={{maxWidth:900,margin:'0 auto',padding:'0 20px 60px',display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:16}}>
+       {cards.map(card=>(
+         <div key={card.id}
+           onClick={()=>goTo(card.id)}
+           style={{
+             background:card.bg,
+             borderRadius:20,
+             padding:'28px 22px',
+             cursor:'pointer',
+             color:'white',
+             transition:'transform .2s, box-shadow .2s',
+             boxShadow:'0 4px 24px rgba(0,0,0,.3)',
+             border:'1px solid rgba(255,255,255,.1)',
+             position:'relative',
+             overflow:'hidden',
+           }}
+           onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 16px 48px rgba(0,0,0,.5)';}}
+           onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='0 4px 24px rgba(0,0,0,.3)';}}>
+           {/* Icon */}
+           <div style={{fontSize:32,marginBottom:16}}>{card.icon}</div>
+           {/* Title */}
+           <div style={{fontFamily:'Outfit',fontWeight:900,fontSize:20,marginBottom:6}}>{card.title}</div>
+           <div style={{fontSize:12,opacity:.75,marginBottom:20,lineHeight:1.5}}>{card.sub}</div>
+           {/* Stats */}
+           <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:20}}>
+             {card.stats.map(({label,val,hot})=>(
+               <div key={label} style={{display:'flex',justifyContent:'space-between',fontSize:11,background:'rgba(255,255,255,.1)',borderRadius:6,padding:'4px 10px'}}>
+                 <span style={{opacity:.7}}>{label}</span>
+                 <span style={{fontWeight:800,color:hot?'#4ADE80':'white'}}>{val}</span>
+               </div>
+             ))}
+           </div>
+           {/* CTA */}
+           <div style={{background:'rgba(255,255,255,.15)',borderRadius:10,padding:'10px',textAlign:'center',fontWeight:800,fontSize:13,letterSpacing:.5,border:'1px solid rgba(255,255,255,.2)'}}>
+             {card.cta} →
+           </div>
+         </div>
+       ))}
+     </div>
+     {/* Footer */}
+     <div style={{textAlign:'center',paddingBottom:40,color:'rgba(255,255,255,.3)',fontSize:11}}>
+       NAIG Sports Central · Powered by AKYSB · Houston 2027
+     </div>
+   </div>
+ );
+}
+
 function App(){
  const [db,setDb]=useState(load);
- const [view,setView]=useState('spectator');
+ const [view,setView]=useState('home');
  const [skUser,setSkUser]=useState(null);
  const [authed,setAuthed]=useState({regional:false,national:false});
  function upd(d){setDb(d);save(d);}
@@ -3383,19 +3604,21 @@ function App(){
  }
 
  const NAV=[
- {id:'spectator',icon:'',label:'Spectator'},
+ {id:'home',icon:'',label:'Home'},
+   {id:'spectator',icon:'',label:'Spectator'},
  {id:'scorekeeper',icon:'',label:'Score Entry'},
  {id:'regional',icon:'',label:'Regional'},
  {id:'national',icon:'',label:'National'},
  ];
 
- const activeBase=view.replace('-login','').replace('sk','scorekeeper').replace('reg','regional').replace('nat','national');
+ const activeBase=view.replace('-login','').replace('nat-login','national').replace('reg-login','regional').replace('sk-login','scorekeeper').replace('nat','national').replace('reg','regional');
 
  return(
  <div className="app-shell"> {/* TOP BAR */}
  <header className="topbar no-print"> <div className="topbar-inner"> <div className="brand"> <div className="brand-mark" data-tip="NAIG Sports Central" style={{cursor:"help"}}>NSC</div> <div className="brand-text"> <div className="brand-name">NAIG Sports Central</div> <div className="brand-sub">North American Ismaili Games · 2027</div> </div> </div> <nav className="topnav"> <button className={`tnb${activeBase==='spectator'?' on':''}`} onClick={()=>goTo('spectator')}> <span>Spectator</span> {live>0&&<span className="live-badge" style={{background:"#16A34A",color:"white"}}>{live} Live</span>}
  </button> <button className={`tnb${activeBase==='scorekeeper'?' on':''}`} onClick={()=>goTo('scorekeeper')}> <span>Scorekeeper</span> </button> <button className={`tnb${activeBase==='regional'?' on':''}`} onClick={()=>goTo('regional')}> <span>Regional</span> </button> <button className={`tnb${activeBase==='national'?' on':''}`} onClick={()=>goTo('national')}> <span>National</span> </button> </nav> </div> </header> {/* VIEWS */}
- <div className="app-body"> {view==='spectator'&&<div className="content-area"><SpectatorView db={db}/></div>}
+ <div className="app-body"> {view==='home'&&<LandingPage goTo={goTo} db={db} live={live}/>}
+   {view==='spectator'&&<div className="content-area"><SpectatorView db={db}/></div>}
  {view==='sk-login'&&<div className="content-area"><RoleLogin role="scorekeeper" onSuccess={u=>{setSkUser(u);setView('scorekeeper');}} onCancel={()=>setView('spectator')}/></div>}
  {view==='scorekeeper'&&skUser&&<div className="content-area"><ScorekeeperView db={db} onUpdate={upd} user={skUser} onLogout={()=>{setSkUser(null);setView('spectator');}}/></div>}
  {view==='reg-login'&&<div className="content-area"><RoleLogin role="regional" onSuccess={()=>{setAuthed(a=>({...a,regional:true}));setView('regional');}} onCancel={()=>setView('spectator')}/></div>}
