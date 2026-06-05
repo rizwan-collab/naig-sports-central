@@ -611,7 +611,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27x_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27y_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1531,16 +1531,6 @@ function RoleLogin({role,onSuccess,onCancel}){
  if(sk){onSuccess(sk);return;}
  setErr('Wrong PIN or username');
 }
- if(role==='regional'){
- if(pw==='regional2027'||pw===db.adminPass){onSuccess();return;}
- setErr('Wrong password — try again');return;
- }
- let u=mode==='pin'?db.scorekeepers.find(s=>s.pin===pin)
- :mode==='user'?db.scorekeepers.find(s=>s.username===un&&s.pin===pw)
- :db.scorekeepers.find(s=>s.qr===qr.trim());
- if(u)onSuccess(u);
- else setErr('Credentials not recognised — check with your coordinator');
- }
  return(
  <div style={{maxWidth:420,margin:'60px auto'}}> <div className="card"> <div style={{background:'var(--navy-dk)',padding:'20px 24px',borderRadius:'12px 12px 0 0',borderBottom:'3px solid var(--crimson)'}}> <div style={{fontSize:28,marginBottom:8}}>{meta.icon}</div> <h2 style={{fontFamily:'Outfit',fontWeight:900,color:'white',fontSize:20,marginBottom:4}}>{meta.label}</h2> <p style={{fontSize:13,color:'rgba(255,255,255,.6)'}}>{meta.sub}</p> </div> <div className="card-body"> {err&&<div className="alert alert-amber" style={{marginBottom:16}}> {err}</div>}
  {(role==='national'||role==='regional')&&(
