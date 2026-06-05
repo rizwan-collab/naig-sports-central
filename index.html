@@ -611,7 +611,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27y_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27aa_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -3189,70 +3189,6 @@ function AdminPanel({db,onUpdate,scope}){
  <div className="g2">
    {(db.regionConfig&&db.regionConfig.length?db.regionConfig:SEED.regionConfig||[]).map((reg,ri)=>(
      <RegionCard key={reg.id} reg={reg} db={db} onUpdate={onUpdate}/>
-     function saveReg(){
-       const updated=(db.regionConfig||SEED.regionConfig).map(r=>r.id===reg.id?{...r,sports:regSports,password:regPw}:r);
-       onUpdate({...db,regionConfig:updated});
-       setEditingReg(false);
-     }
-     const regTeams=db.teams.filter(t=>t.region&&(t.region===reg.abbr||t.n.includes(reg.abbr)));
-     return(
-       <div key={reg.id} className="card" style={{borderLeft:'3px solid '+(reg.country==='CA'?'var(--navy)':'var(--crimson)')}}>
-         <div className="card-head">
-           <div style={{display:'flex',gap:8,alignItems:'center'}}>
-             <span style={{fontSize:10,fontWeight:800,padding:'2px 6px',borderRadius:4,background:reg.country==='CA'?'var(--navy)':'var(--crimson)',color:'white'}}>{reg.country}</span>
-             <span style={{fontWeight:800,fontSize:14}}>{reg.name}</span>
-           </div>
-           <div style={{display:'flex',gap:6}}>
-             {editingReg
-               ?<><button className="btn btn-ghost btn-sm" onClick={()=>setEditingReg(false)}>Cancel</button>
-                  <button className="btn btn-navy btn-sm" onClick={saveReg}>Save</button></>
-               :<button className="btn btn-ghost btn-sm" onClick={()=>setEditingReg(true)}>Edit</button>
-             }
-           </div>
-         </div>
-         <div style={{marginTop:10}}>
-           <div style={{display:'flex',gap:12,flexWrap:'wrap',fontSize:12,color:'var(--txt3)',marginBottom:10}}>
-             <span>{regTeams.length} teams</span>
-             <span>{reg.sports&&reg.sports.length} sports</span>
-             <span>Login: <strong>{reg.abbr.toLowerCase()}2027</strong></span>
-           </div>
-           {editingReg&&(
-             <div>
-               <div className="form-field" style={{marginBottom:10}}>
-                 <label className="form-label">Region Password</label>
-                 <input className="form-input" value={regPw} onChange={e=>setRegPw(e.target.value)} placeholder="e.g. bc-naig-2027"/>
-               </div>
-               <label className="form-label" style={{marginBottom:8,display:'block'}}>Sports Offered</label>
-               <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
-                 {SPORTS.map(s=>{
-                   const sel=regSports.includes(s.id);
-                   return(
-                     <button key={s.id} onClick={()=>setRegSports(p=>sel?p.filter(x=>x!==s.id):[...p,s.id])}
-                       className="sport-code" data-tip={s.n}
-                       style={{
-                         cursor:'pointer',fontSize:10,
-                         background:sel?'var(--navy)':'var(--bg2)',
-                         color:sel?'white':'var(--txt3)',
-                         border:'2px solid',borderColor:sel?'var(--navy)':'var(--border)',
-                         opacity:1,
-                       }}>
-                       {s.abbr}
-                     </button>
-                   );
-                 })}
-               </div>
-             </div>
-           )}
-           {!editingReg&&(
-             <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
-               {(reg.sports||[]).map(sid=>{
-                 const sp=SPORTS.find(s=>s.id===sid);
-                 return sp?<span key={sid} className="sport-code" data-tip={sp.n} style={{fontSize:9}}>{sp.abbr}</span>:null;
-               })}
-             </div>
-           )}
-         </div>
-       </div>
    ))}
  </div>
 </div>}
