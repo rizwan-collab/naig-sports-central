@@ -622,7 +622,7 @@ const AGES=['U18 (15–17)','18+ Open','Legends (45+)'];
 
 const ROUNDS=['Pool Play','Quarterfinal','Semifinal','Bronze Final','Gold Final'];
 
-const SK='naig27ah_v1'; // bumped to clear old localStorage without indResults
+const SK='naig27al_v1'; // bumped to clear old localStorage without indResults
 
 const SEED={
  name:'NAIG 2027 — Sports Central',
@@ -1560,28 +1560,20 @@ function RoleLogin({role,onSuccess,onCancel}){
  if(reg){
    setPw(reg.password);
    setErr('');
-   // Auto-login — show password then navigate
-   setTimeout(()=>onSuccess(reg.id,reg),800);
+   // Auto-login — navigate immediately
+   onSuccess(reg.id,reg);
  }
 }}>
            <option value="">-- Choose your region --</option>
            {allRegions.map(r=><option key={r.id} value={r.id}>{r.name}</option>)}
          </select>
        </div>
-       {selReg&&(
-         <div style={{background:'linear-gradient(135deg,#F0FDF4,#DCFCE7)',border:'2px solid #16A34A',borderRadius:12,padding:'14px 16px',marginBottom:12,textAlign:'center'}}>
-           <div style={{fontWeight:800,fontSize:15,color:'#15803D',marginBottom:6}}>{selReg.name}</div>
-           <div style={{fontSize:13,color:'#16A34A',fontWeight:600}}>Opening regional dashboard...</div>
-           <div style={{width:'100%',height:4,background:'#DCFCE7',borderRadius:2,marginTop:10,overflow:'hidden'}}>
-             <div style={{height:'100%',background:'#16A34A',borderRadius:2,animation:'progress-bar 0.8s linear forwards'}}/>
-           </div>
-         </div>
-       )}
+       {selReg&&<span style={{fontSize:11,color:'#16A34A',fontWeight:700}}>Opening dashboard...</span>}
      </div>
    )}
-   <div className="form-field"> <label className="form-label">{role==='regional'?'Confirm Password':'Password'}</label> <input className="form-input" type="password" value={pw} onChange={e=>setPw(e.target.value)}
- placeholder={role==='regional'&&selReg?'Confirm: '+selReg.password:'Enter password'} autoFocus
- onKeyDown={e=>e.key==='Enter'&&tryLogin(load())}/> </div> <button className="btn btn-navy btn-w btn-lg" onClick={()=>tryLogin(load())}>Sign In</button> <p style={{textAlign:'center',fontSize:12,color:'var(--txt3)',marginTop:12}}>{meta.hint}</p> </div> )}
+   <div className="form-field"> <label className="form-label">Password</label> <input className="form-input" type="password" value={pw} onChange={e=>setPw(e.target.value)}
+ placeholder="Enter password" autoFocus
+ onKeyDown={e=>e.key==='Enter'&&tryLogin(load())}/> </div> {!selReg&&<button className="btn btn-navy btn-w btn-lg" onClick={()=>tryLogin(load())}>Sign In</button>} <p style={{textAlign:'center',fontSize:12,color:'var(--txt3)',marginTop:12}}>{meta.hint}</p> </div> )}
  {role==='scorekeeper'&&(
  <div> <div style={{display:'flex',gap:4,background:'var(--navy-lt)',borderRadius:8,padding:4,marginBottom:20}}> {[{id:'pin',l:'PIN'},{id:'user',l:'Login'},{id:'qr',l:'QR Code'}].map(m=>(
  <button key={m.id} className={`btn btn-sm ${mode===m.id?'btn-navy':'btn-ghost'}`}
